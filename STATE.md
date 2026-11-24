@@ -4,4 +4,4 @@ Active: none
 Last merges: —
 Blocked (architect): none
 Next up: S1.1, S1.2, S1.3
-Notes: M0 bootstrap PR open (branch m0-bootstrap). Its `redaction` job fails closed until the REDACTION_DENYLIST secret exists, and `protected-paths` fails until the architect applies `architect-approved`. Both are expected; see the PR's Gate 1 packet.
+Notes: Gate 1 recommendations approved by the architect (see DECISIONS-LOG). Remaining Gate 1 steps are manual: secrets, `architect-approved` label, merge, branch protection.
