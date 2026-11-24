@@ -221,3 +221,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# compound-intake-demo
+.redaction-denylist
+.env
+*.sqlite
+.venv/
+__pycache__/

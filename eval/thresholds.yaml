@@ -1,0 +1,6 @@
+# Protected. Tuned on the dev split only; frozen at Gate 2.
+weights: { ingredients: 0.40, strength: 0.25, dosage_form: 0.15, base: 0.10, route: 0.10 }
+strength_tolerance: { full_credit_pct: 10, zero_credit_pct: 50 }
+T_match: 0.60
+T_margin: 0.10
+soft_gates: { top1_dev_drop_pts: 5, false_alarm_rise_pts: 10 }
