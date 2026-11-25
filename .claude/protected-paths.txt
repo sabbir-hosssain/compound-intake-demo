@@ -1,0 +1,13 @@
+docs/SPEC.md
+docs/HARNESS_DESIGN.md
+docs/adr/*
+CLAUDE.md
+eval/thresholds.yaml
+.claude/settings.json
+.claude/hooks/*
+.claude/agents/*
+.claude/protected-paths.txt
+.github/workflows/*
+scripts/redaction_check.py
+scripts/protected_paths_check.py
+# data/golden/* is added automatically when data/golden/LOCKED exists

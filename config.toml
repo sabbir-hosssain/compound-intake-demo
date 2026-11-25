@@ -1,0 +1,10 @@
+[model]
+provider = "anthropic"
+model_id = "claude-sonnet-5-5"   # pinned; verify it's available on the key
+temperature = 0
+max_tokens = 2000
+[paths]
+formulas = "data/formulas"
+golden = "data/golden"
+cassettes = "eval/cassettes"
+audit_db = "intake_audit.sqlite"

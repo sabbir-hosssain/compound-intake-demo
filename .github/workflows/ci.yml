@@ -1,0 +1,50 @@
+name: ci
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches: [main]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync && uv run ruff check .
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync && uv run pytest -q
+  eval-replay:
+    runs-on: ubuntu-latest
+    env: { INTAKE_MODE: replay }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      # Placeholder until S1.9 adds eval/run_eval.py (see DECISIONS-LOG 2026-11-24).
+      # Once the file exists, the real eval runs with hard gates enforced; no workflow edit is needed.
+      - run: |
+          uv sync
+          if [ -f eval/run_eval.py ]; then
+            uv run python -m eval.run_eval --mode replay --enforce-gates
+          else
+            echo "eval-replay: placeholder (eval/run_eval.py not yet implemented; arrives in S1.9)"
+          fi
+  redaction:
+    runs-on: ubuntu-latest
+    env: { REDACTION_DENYLIST: "${{ secrets.REDACTION_DENYLIST }}" }
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/redaction_check.py
+  protected-paths:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      APPROVED: "${{ contains(github.event.pull_request.labels.*.name, 'architect-approved') }}"
+      BASE_REF: "origin/${{ github.base_ref }}"
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - run: python3 scripts/protected_paths_check.py

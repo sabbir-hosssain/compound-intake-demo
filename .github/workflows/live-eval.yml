@@ -1,0 +1,12 @@
+name: live-eval
+on: workflow_dispatch
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    env: { ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}", INTAKE_MODE: live }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync && uv run python -m eval.run_eval --mode live --runs 3
+      - uses: actions/upload-artifact@v4
+        with: { name: live-results, path: results/ }
