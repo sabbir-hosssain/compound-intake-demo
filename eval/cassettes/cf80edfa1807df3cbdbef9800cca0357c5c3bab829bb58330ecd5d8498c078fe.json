@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx via SH Compounding Network portal\nPrescriber: Dr. C. Demo\nPatient ref: PT-10003\nFamotidine oral susp 8 mg/mL, cherry flavour.\nSig: 2.5 mL by mouth twice daily.\nDisp: 120 mL\n\n</prescription>",
+  "key": "cf80edfa1807df3cbdbef9800cca0357c5c3bab829bb58330ecd5d8498c078fe",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01VT9WZjHBNhT4D3c1ZB5Eo5",
+        "input": {
+          "base": null,
+          "directions": "2.5 mL by mouth twice daily.",
+          "dosage_form": "suspension",
+          "extraction_notes": "Flavouring: cherry. No base/vehicle specified.",
+          "ingredients": [
+            {
+              "name": "famotidine",
+              "strength": 8,
+              "unit": "mg/mL"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-10003",
+          "prescriber_name": "Dr. C. Demo",
+          "quantity": 120,
+          "quantity_unit": "mL",
+          "route": "oral",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChP1drsn3ydMfqWGk1UpG",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 2003,
+      "output_tokens": 389,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

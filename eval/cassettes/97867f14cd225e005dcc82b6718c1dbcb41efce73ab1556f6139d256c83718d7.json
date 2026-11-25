@@ -1,0 +1,68 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (eRx)\nPrescriber: Dr. A. Example\nPatient ref: PT-10001\nCompound salicylic acid 3% and urea 10% in vanishing cream base.\nApply thin layer to affected skin twice daily.\nQty: 60 g\n\n</prescription>",
+  "key": "97867f14cd225e005dcc82b6718c1dbcb41efce73ab1556f6139d256c83718d7",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_014Gm5Y3DE8HTMuTZNUUFCtq",
+        "input": {
+          "base": "vanishing cream",
+          "directions": "Apply thin layer to affected skin twice daily.",
+          "dosage_form": "cream",
+          "extraction_notes": "Received from TeleHealthSH (eRx). Dosage form inferred as cream from the vanishing cream base.",
+          "ingredients": [
+            {
+              "name": "salicylic acid",
+              "strength": 3,
+              "unit": "%"
+            },
+            {
+              "name": "urea",
+              "strength": 10,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-10001",
+          "prescriber_name": "Dr. A. Example",
+          "quantity": 60,
+          "quantity_unit": "g",
+          "route": "topical",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChP1csaAisAoqHbt2RYCD",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 2003,
+      "output_tokens": 429,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}
