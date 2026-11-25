@@ -65,7 +65,7 @@ Score per formula = 0.40·ingredient-set similarity (Jaccard on normalised names
 **Baseline** (`src/intake/baseline.py`): no LLM. A rapidfuzz token-set ratio between the raw text and each formula's name plus ingredient string, giving top 3 and a `NO_MATCH` cut-off tuned on dev.
 
 ## 7. LLM usage
-- Provider: Anthropic API. The model ID is pinned in `config.toml` (start: `claude-sonnet-5-5`; verify availability on the key). Temperature 0. Structured output through tool use / JSON schema.
+- Provider: Anthropic API. The model ID is pinned in `config.toml` (start: `claude-sonnet-5-5`; verify availability on the key). Sampling parameters (`temperature`, `top_p`, `top_k`) are not sent: the pinned model rejects them. CI determinism comes from REPLAY recordings, not sampling settings; run-to-run variance of live runs is measured in S2.7 (`--runs`) and reported. Structured output through a `strict: true` tool with `tool_choice` left at auto (forced tool choice is rejected by the pinned model), validated by Pydantic.
 - Prompts are files: `prompts/extract_v1.md`, `prompts/explain_v1.md`. Their SHA-256 is recorded in every Proposal.
 - Raw prescription text is wrapped as data in the prompt and never treated as instructions. R1-05 fires regardless of what the model does.
 - **Modes:** `REPLAY` (default, CI: missing recording = test failure), `RECORD`, `LIVE`. A recording is keyed by hash(model_id, prompt_hash, input).
