@@ -11,6 +11,10 @@ The other two SPEC §8 hard gates are their own CI jobs: zero write path (tests/
 in `test`) and the redaction check (`redaction`). Every SPEC §8 metric (eval/metrics.py) is reported per
 split and per category for the system and the baseline; soft gates are reported, never the exit code.
 
+`--runs N` (S2.7) runs the system N times over the same cases and fills the run-to-run variance section
+(eval/variance.py); metrics and the case table are from run 1, and `--enforce-gates` needs every run to
+pass. LIVE uses an SDK client with no hidden retries; transient errors are retried within `--max-retries`.
+
 The default case set is the golden set (recorded in S2.6), so CI's unchanged command covers all 60 cases.
 The seed set stays covered by tests/test_run_eval.py; `--cases <golden> <seed>` runs both. Golden cases
 carry `raw` inline; the system and the baseline both see `raw.text` plus `raw.notes`.
@@ -19,7 +23,7 @@ carry `raw` inline; the system and the baseline both see `raw.text` plus `raw.no
 import argparse
 import json
 import sys
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
@@ -27,8 +31,9 @@ from typing import Any
 import yaml
 from pydantic import BaseModel, ConfigDict, ValidationError, model_validator
 
-from eval import metrics
+from eval import metrics, variance
 from eval.metrics import AMBIGUITY_RULE, NO_MATCH, Gold, Outcome, SoftGate, Table
+from eval.variance import CallCount, Variance
 from intake.adapters.anthropic_client import Mode, ModelClient
 from intake.adapters.cassette import MissingRecordingError
 from intake.baseline import baseline_match, raw_text
@@ -162,6 +167,13 @@ class Report(BaseModel):
     table: Table = {}
     mode: Mode
     cases: str = ""
+    extra_runs: list[list[CaseResult]] = []  # runs 2..N with --runs N
+    variance: Variance | None = None
+    calls: CallCount = CallCount()
+
+    @property
+    def all_runs(self) -> list[list[CaseResult]]:
+        return [self.results, *self.extra_runs]
 
 
 # --- loading and running -----------------------------------------------------------------------
@@ -183,6 +195,8 @@ def load_case_files(paths: Sequence[Path]) -> list[EvalCase]:
 
 
 def make_client(mode: str) -> ModelClient:
+    if Mode(mode.upper()) is Mode.LIVE:
+        return variance.live_model_client()
     return ModelClient(mode=Mode(mode.upper()))
 
 
@@ -244,6 +258,46 @@ def run(cases: Sequence[EvalCase], *, client: CompletionClient, library: Library
     )
     mode = getattr(client, "mode", Mode.REPLAY)
     return Report(results=results, baseline=baseline, gates=hard_gates(results), table=table, mode=mode)
+
+
+def run_many(
+    cases: Sequence[EvalCase], *, client: CompletionClient, runs: int = 1, library: Library | None = None
+) -> Report:
+    """`run` once, then runs 2..N of the system over the same cases, and their disagreement (S2.7)."""
+    if runs < 1:
+        raise ValueError("runs must be at least 1")
+    library = library or load_library()
+    report = run(cases, client=client, library=library)
+    if runs == 1:
+        return report
+    extra = [[run_case(case, client=client, library=library) for case in cases] for _ in range(runs - 1)]
+    outcomes = [[r.outcome() for r in results] for results in [report.results, *extra]]
+    measured = variance.compute([c.case_id for c in cases], [c.category for c in cases], outcomes, library.aliases)
+    return report.model_copy(update={"extra_runs": extra, "variance": measured})
+
+
+def _run_summaries(report: Report, aliases: Mapping[str, str]) -> list[variance.RunSummary]:
+    summaries = []
+    for i, results in enumerate(report.all_runs, start=1):
+        pairs = [(r.case.gold(), r.outcome()) for r in results]
+        gates = hard_gates(results)
+        summaries.append(
+            variance.RunSummary(
+                run=i,
+                top1=metrics.top1_accuracy(pairs, aliases),
+                failed_gates=tuple(g.name for g in gates if not g.passed),
+                gates_total=len(gates),
+                errors=sum(r.proposal is None for r in results),
+            )
+        )
+    return summaries
+
+
+def _variance_section(report: Report, aliases: Mapping[str, str]) -> list[str]:
+    if report.variance is None:
+        return variance.not_measured(report.mode)
+    summaries = _run_summaries(report, aliases)
+    return variance.render(report.variance, summaries, calls=report.calls, mode=report.mode)
 
 
 # --- hard gates (SPEC §8) ----------------------------------------------------------------------
@@ -375,16 +429,9 @@ def _soft_gate_lines(soft: Sequence[SoftGate]) -> list[str]:
     return [*lines, ""]
 
 
-VARIANCE_PLACEHOLDER = [
-    "## Run-to-run variance (3 LIVE runs)",
-    "",
-    "Not measured in this run. REPLAY is deterministic by construction; the disagreement rate over",
-    "3 LIVE runs is added by S2.7 (`--runs`). This section is a placeholder until then.",
-    "",
-]
-
-
-def render_markdown(report: Report, day: date, soft: Sequence[SoftGate] = ()) -> str:
+def render_markdown(
+    report: Report, day: date, soft: Sequence[SoftGate] = (), aliases: Mapping[str, str] | None = None
+) -> str:
     results = report.results
     errors = [r for r in results if r.proposal is None]
     baseline: list[Outcome | None] = [*report.baseline] or [None] * len(results)
@@ -405,7 +452,7 @@ def render_markdown(report: Report, day: date, soft: Sequence[SoftGate] = ()) ->
         "",
         *_metric_section(report),
         *_soft_gate_lines(soft),
-        *VARIANCE_PLACEHOLDER,
+        *_variance_section(report, aliases if aliases is not None else load_library().aliases),
         "## Cases",
         "",
         "| Case | Split | Category | Expected | Got | Confidence | Flags | Expected flags | Missing flags | Baseline |",
@@ -441,11 +488,15 @@ def read_metrics_comment(text: str) -> dict[str, Any] | None:
 
 
 def write_results(
-    report: Report, day: date, results_dir: Path = DEFAULT_RESULTS_DIR, soft: Sequence[SoftGate] = ()
+    report: Report,
+    day: date,
+    results_dir: Path = DEFAULT_RESULTS_DIR,
+    soft: Sequence[SoftGate] = (),
+    aliases: Mapping[str, str] | None = None,
 ) -> Path:
     results_dir.mkdir(parents=True, exist_ok=True)
     path = results_dir / f"{day.isoformat()}.md"
-    path.write_text(render_markdown(report, day, soft), encoding="utf-8")
+    path.write_text(render_markdown(report, day, soft, aliases), encoding="utf-8")
     return path
 
 
@@ -501,13 +552,26 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS_DIR)
     parser.add_argument("--date", type=date.fromisoformat, default=None, help="Results date (default: today, UTC).")
+    parser.add_argument("--runs", type=_positive, default=1, help="Run the system N times; N >= 2 measures variance.")
+    parser.add_argument(
+        "--max-retries", type=int, default=10, help="LIVE only: transient-error retries shared by all runs."
+    )
+    parser.add_argument("--max-calls", type=_positive, default=None, help="Stop calling the model after N calls.")
     return parser
 
 
+def _positive(value: str) -> int:
+    number = int(value)
+    if number < 1:
+        raise argparse.ArgumentTypeError(f"must be at least 1, got {number}")
+    return number
+
+
 def _exit_code(report: Report, enforce_gates: bool) -> int:
-    if any(r.missing_recording for r in report.results):
+    """Any run with a missing recording exits 2; with --enforce-gates every run must pass every hard gate."""
+    if any(r.missing_recording for results in report.all_runs for r in results):
         return EXIT_MISSING_RECORDING
-    if enforce_gates and not all(g.passed for g in report.gates):
+    if enforce_gates and not all(g.passed for results in report.all_runs for g in hard_gates(results)):
         return EXIT_GATE_FAILED
     return EXIT_OK
 
@@ -522,14 +586,32 @@ def main(argv: Sequence[str] | None = None, *, client: CompletionClient | None =
     if not cases:
         print(f"error: no cases in {_cases_label(args.cases)}", file=sys.stderr)
         return EXIT_GATE_FAILED
-    report = run(cases, client=client or make_client(args.mode)).model_copy(update={"cases": _cases_label(args.cases)})
+    if args.mode == "record" and args.runs > 1:
+        print("error: --runs > 1 is not allowed with --mode record (it would re-record the same keys)", file=sys.stderr)
+        return EXIT_GATE_FAILED
+    live = client is None and args.mode == "live"
+    counted = variance.CountingClient(
+        client or make_client(args.mode), retry_budget=args.max_retries if live else 0, max_calls=args.max_calls
+    )
+    library = load_library()
+    report = run_many(cases, client=counted, runs=args.runs, library=library)
+    report = report.model_copy(update={"cases": _cases_label(args.cases), "calls": counted.count.model_copy()})
     day = args.date or datetime.now(UTC).date()
-    path = write_results(report, day, args.results_dir, _soft_gates(report, args.results_dir, day))
-    for r in report.results:
-        if r.error:
-            print(f"error: {r.case.case_id}: {r.error}", file=sys.stderr)
+    soft = _soft_gates(report, args.results_dir, day)
+    path = write_results(report, day, args.results_dir, soft, library.aliases)
+    for i, results in enumerate(report.all_runs, start=1):
+        for r in results:
+            if r.error:
+                print(f"error: run {i}: {r.case.case_id}: {r.error}", file=sys.stderr)
     for g in report.gates:
         print(f"{'PASS' if g.passed else 'FAIL'}  {g.name}: {_pct(g.passed_cases, g.total)}")
+    print(f"model calls: {counted.count.calls} (transient retries: {counted.count.retries})")
+    if report.variance is not None:
+        v = report.variance
+        print(
+            f"variance over {v.runs} runs: decision {v.decision.fmt()}, flags {v.flags.fmt()}, "
+            f"fields {v.fields.fmt()}, any {v.any.fmt()}"
+        )
     print(f"results: {path}")
     return _exit_code(report, args.enforce_gates)
 
