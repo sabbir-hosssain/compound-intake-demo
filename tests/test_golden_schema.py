@@ -47,7 +47,7 @@ def test_counts_script_agrees() -> None:
         [sys.executable, str(GOLDEN / "counts.py")], capture_output=True, text=True, check=True
     ).stdout
     assert "total cases: 60" in out
-    assert re.search(r"^ALL\s+60\s+40\s+20\s+8$", out, re.M)
+    assert re.search(r"^ALL\s+60\s+40\s+20\s+8$", out, re.MULTILINE)
 
 
 def test_unique_ids() -> None:
