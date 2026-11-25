@@ -1,6 +1,6 @@
-"""Eval harness v0 (SPEC §8): run the pipeline over the seed cases, check the hard gates, write results/.
+"""Eval harness (SPEC §8): run the system and the baseline over a case set, score, gate, write results/.
 
-    uv run python -m eval.run_eval --mode replay --enforce-gates
+    uv run python -m eval.run_eval --mode replay --enforce-gates [--cases data/golden/golden_cases.jsonl]
 
 Proposals come from `intake.pipeline.build_proposal` and are scored here; nothing is logged to the
 audit. A missing REPLAY recording is a failure (exit 2), never a fallback to a live model (invariant 4).
@@ -8,7 +8,11 @@ The results file is generated on every run and must never be edited by hand.
 
 Hard gates checked here: adversarial pass rate, unsafe-flag recall, schema-valid-or-MANUAL (all 100%).
 The other two SPEC §8 hard gates are their own CI jobs: zero write path (tests/test_architecture.py
-in `test`) and the redaction check (`redaction`). Full metrics and soft gates arrive in S2.5.
+in `test`) and the redaction check (`redaction`). Every SPEC §8 metric (eval/metrics.py) is reported per
+split and per category for the system and the baseline; soft gates are reported, never the exit code.
+
+The default case set is the seed set until the golden set has REPLAY recordings (S2.6). Golden cases
+carry `raw` inline; the system and the baseline both see `raw.text` plus `raw.notes`.
 """
 
 import argparse
@@ -19,13 +23,19 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, ValidationError
+import yaml
+from pydantic import BaseModel, ConfigDict, ValidationError, model_validator
 
+from eval import metrics
+from eval.metrics import AMBIGUITY_RULE, NO_MATCH, Gold, Outcome, SoftGate, Table
 from intake.adapters.anthropic_client import Mode, ModelClient
 from intake.adapters.cassette import MissingRecordingError
+from intake.baseline import baseline_match, raw_text
 from intake.extract import CompletionClient
-from intake.models import Proposal, ProposalStatus, Severity
+from intake.match import DEFAULT_THRESHOLDS
+from intake.models import Extraction, Proposal, ProposalStatus, RawPrescription, Severity
 from intake.pipeline import Library, build_proposal, load_library
+from intake.rules import run_pass1
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CASES = REPO_ROOT / "data" / "seed" / "seed_cases.jsonl"
@@ -40,18 +50,50 @@ KIND_TO_CATEGORY = {"clean": "clean", "see_notes": "ambiguous", "injection": "ad
 
 
 class EvalCase(BaseModel):
+    """A seed case (`file`, `kind`) or a golden case (`raw`, `split`, `category`, `expected_extraction`)."""
+
     model_config = ConfigDict(extra="ignore", frozen=True)
 
     case_id: str
-    file: str
-    kind: str
+    file: str | None = None
+    raw: RawPrescription | None = None
+    kind: str | None = None
+    category: str
+    split: str | None = None
     expected_formula_id: str | None = None
     expected_status: ProposalStatus
     expected_flags: list[str] = []
+    expected_extraction: Extraction | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _category_from_kind(cls, data: Any) -> Any:
+        if isinstance(data, dict) and not data.get("category") and data.get("kind"):
+            return {**data, "category": KIND_TO_CATEGORY.get(data["kind"], data["kind"])}
+        return data
+
+    @model_validator(mode="after")
+    def _has_input(self) -> "EvalCase":
+        if (self.file is None) == (self.raw is None):
+            raise ValueError("a case needs exactly one of `file` or `raw`")
+        return self
 
     @property
-    def category(self) -> str:
-        return KIND_TO_CATEGORY.get(self.kind, self.kind)
+    def gold_formula(self) -> str:
+        """The gold decision: a formula ID, or NO_MATCH (seed cases write it as null)."""
+        if self.expected_status is ProposalStatus.NO_MATCH or self.expected_formula_id in (None, NO_MATCH):
+            return NO_MATCH
+        return self.expected_formula_id
+
+    def gold(self) -> Gold:
+        return Gold(
+            case_id=self.case_id,
+            split=self.split,
+            category=self.category,
+            formula_id=self.gold_formula,
+            flags=tuple(self.expected_flags),
+            extraction=self.expected_extraction,
+        )
 
 
 class CaseResult(BaseModel):
@@ -84,7 +126,19 @@ class CaseResult(BaseModel):
 
     @property
     def top1_ok(self) -> bool:
-        return self.status_ok and self.top1 == self.case.expected_formula_id
+        return self.status_ok and metrics.decision(self.outcome()) == self.case.gold_formula
+
+    def outcome(self) -> Outcome:
+        p = self.proposal
+        if p is None:
+            return Outcome()
+        return Outcome(
+            status=p.status,
+            candidates=tuple(c.formula_id for c in p.candidates),
+            flags=tuple(self.flag_ids),
+            has_block=self.has_block,
+            extraction=p.extraction,
+        )
 
 
 class Gate(BaseModel):
@@ -100,8 +154,11 @@ class Gate(BaseModel):
 
 class Report(BaseModel):
     results: list[CaseResult]
+    baseline: list[Outcome] = []
     gates: list[Gate]
+    table: Table = {}
     mode: Mode
+    cases: str = ""
 
 
 # --- loading and running -----------------------------------------------------------------------
@@ -116,14 +173,21 @@ def make_client(mode: str) -> ModelClient:
     return ModelClient(mode=Mode(mode.upper()))
 
 
-def _case_path(case: EvalCase) -> Path:
-    path = Path(case.file)
+def _case_path(file: str) -> Path:
+    path = Path(file)
     return path if path.is_absolute() else REPO_ROOT / path
+
+
+def case_text(case: EvalCase) -> str:
+    """What the system and the baseline both see: `raw.text` plus `raw.notes`, or the seed file's text."""
+    if case.raw is not None:
+        return raw_text(case.raw.text, case.raw.notes)
+    return _case_path(case.file or "").read_text(encoding="utf-8")
 
 
 def run_case(case: EvalCase, *, client: CompletionClient, library: Library) -> CaseResult:
     try:
-        text = _case_path(case).read_text(encoding="utf-8")
+        text = case_text(case)
         proposal = build_proposal(text, case.case_id, client=client, library=library)
     except MissingRecordingError as error:
         return CaseResult(case=case, error=str(error), missing_recording=True)
@@ -132,11 +196,41 @@ def run_case(case: EvalCase, *, client: CompletionClient, library: Library) -> C
     return CaseResult(case=case, proposal=proposal)
 
 
+def run_baseline(case: EvalCase, library: Library) -> Outcome:
+    """No-LLM baseline: rapidfuzz match (SPEC §6) plus the pass-1 rules on the raw text, and M-01 when the
+    baseline's own margin is below T_margin. It has no extraction, so pass 2 and field accuracy don't apply."""
+    try:
+        text = case_text(case)
+    except OSError:
+        return Outcome()
+    result = baseline_match(text, library.formulas)
+    flags = run_pass1(text, known=library.known_ingredients)
+    ids = [f.rule_id for f in flags]
+    if result.margin < library.thresholds.T_margin:
+        ids.append(AMBIGUITY_RULE)
+    return Outcome(
+        status=result.status,
+        candidates=tuple(c.formula_id for c in result.candidates),
+        flags=tuple(ids),
+        has_block=any(f.severity is Severity.BLOCK for f in flags),
+        extracts=False,
+    )
+
+
 def run(cases: Sequence[EvalCase], *, client: CompletionClient, library: Library | None = None) -> Report:
     library = library or load_library()
     results = [run_case(case, client=client, library=library) for case in cases]
+    baseline = [run_baseline(case, library) for case in cases]
+    golds = [case.gold() for case in cases]
+    table = metrics.metric_table(
+        {
+            "system": list(zip(golds, [r.outcome() for r in results], strict=True)),
+            "baseline": list(zip(golds, baseline, strict=True)),
+        },
+        library.aliases,
+    )
     mode = getattr(client, "mode", Mode.REPLAY)
-    return Report(results=results, gates=hard_gates(results), mode=mode)
+    return Report(results=results, baseline=baseline, gates=hard_gates(results), table=table, mode=mode)
 
 
 # --- hard gates (SPEC §8) ----------------------------------------------------------------------
@@ -208,36 +302,79 @@ def _gate_lines(gates: Sequence[Gate]) -> list[str]:
     return lines
 
 
-def _case_line(r: CaseResult) -> str:
+def _decision_text(outcome: Outcome) -> str:
+    if outcome.status is None:
+        return "-"
+    top = metrics.decision(outcome) if outcome.status is ProposalStatus.PROPOSED else None
+    return f"{outcome.status.value} {top or '-'}"
+
+
+def _case_line(r: CaseResult, baseline: Outcome | None = None) -> str:
     c = r.case
     expected = f"{c.expected_status.value} {c.expected_formula_id or '-'}"
+    base = _decision_text(baseline) if baseline is not None else "-"
+    head = f"| {c.case_id} | {c.split or '-'} | {c.category} | {expected}"
     if r.proposal is None:
         outcome = "MISSING RECORDING" if r.missing_recording else "ERROR"
-        return f"| {c.case_id} | {c.category} | {expected} | {outcome} | | | {', '.join(c.expected_flags)} | |"
+        return f"{head} | {outcome} | | | {', '.join(c.expected_flags)} | | {base} |"
     p = r.proposal
     got = f"{p.status.value} {r.top1 or '-'}"
     return (
-        f"| {c.case_id} | {c.category} | {expected} | {got} | {p.confidence:.3f} | {', '.join(r.flag_ids)} "
-        f"| {', '.join(c.expected_flags)} | {', '.join(r.missing_flags)} |"
+        f"{head} | {got} | {p.confidence:.3f} | {', '.join(r.flag_ids)} | {', '.join(c.expected_flags)} "
+        f"| {', '.join(r.missing_flags)} | {base} |"
     )
 
 
-def _metric_lines(results: Sequence[CaseResult]) -> list[str]:
+def _summary_lines(results: Sequence[CaseResult]) -> list[str]:
     expected = sum(len(r.case.expected_flags) for r in results)
     missing = sum(len(r.missing_flags) for r in results)
     return [
         f"- Top-1 (status and formula as expected): {_pct(sum(r.top1_ok for r in results), len(results))}",
         f"- Status as expected: {_pct(sum(r.status_ok for r in results), len(results))}",
         f"- Expected-flag recall (all flags, all cases): {_pct(expected - missing, expected)}",
-        "",
-        "Informational only, not gated. Full metrics with Wilson intervals, splits and the baseline arrive in S2.5;",
-        "soft gates (top-1 drop, false-alarm rise) are not evaluated in v0.",
     ]
 
 
-def render_markdown(report: Report, day: date) -> str:
+def _metric_section(report: Report) -> list[str]:
+    return [
+        "## Metrics (SPEC §8, S2.5)",
+        "",
+        "Each cell: hits/cases, rate, [95% Wilson interval]. `n/a` = no case in that slice qualifies.",
+        "The baseline is the no-LLM rapidfuzz matcher plus the pass-1 rules on the raw text (no extraction,",
+        "so no pass-2 flags and no field accuracy); its M-01 uses its own margin against T_margin.",
+        "",
+        *metrics.render_tables(report.table),
+        "### System summary (informational)",
+        "",
+        *_summary_lines(report.results),
+        "",
+    ]
+
+
+def _soft_gate_lines(soft: Sequence[SoftGate]) -> list[str]:
+    lines = [
+        "## Soft gates (reported only; a tripped gate needs a justification in the PR, not the exit code)",
+        "",
+        "| Gate | Status | Detail |",
+        "|---|---|---|",
+    ]
+    lines += [f"| {g.name} | {'TRIPPED' if g.tripped else 'ok'} | {g.detail} |" for g in soft]
+    return [*lines, ""]
+
+
+VARIANCE_PLACEHOLDER = [
+    "## Run-to-run variance (3 LIVE runs)",
+    "",
+    "Not measured in this run. REPLAY is deterministic by construction; the disagreement rate over",
+    "3 LIVE runs is added by S2.7 (`--runs`). This section is a placeholder until then.",
+    "",
+]
+
+
+def render_markdown(report: Report, day: date, soft: Sequence[SoftGate] = ()) -> str:
     results = report.results
     errors = [r for r in results if r.proposal is None]
+    baseline: list[Outcome | None] = [*report.baseline] or [None] * len(results)
     lines = [
         f"# Eval results {day.isoformat()}",
         "",
@@ -246,44 +383,105 @@ def render_markdown(report: Report, day: date) -> str:
         "",
         f"- Mode: {report.mode.value}",
         f"- Generated at: {datetime.now(UTC).strftime('%Y-%m-%dT%H:%M:%SZ')}",
-        f"- Cases: {len(results)} (seed set v0)",
+        f"- Cases: {len(results)} from `{report.cases}`",
         *_versions(results),
         "",
-        "## Hard gates",
+        "## Hard gates (system; any FAIL fails the exit code with --enforce-gates)",
         "",
         *_gate_lines(report.gates),
         "",
+        *_metric_section(report),
+        *_soft_gate_lines(soft),
+        *VARIANCE_PLACEHOLDER,
         "## Cases",
         "",
-        "| Case | Category | Expected | Got | Confidence | Flags | Expected flags | Missing flags |",
-        "|---|---|---|---|---|---|---|---|",
-        *[_case_line(r) for r in results],
-        "",
-        "## Metrics (v0)",
-        "",
-        *_metric_lines(results),
+        "| Case | Split | Category | Expected | Got | Confidence | Flags | Expected flags | Missing flags | Baseline |",
+        "|---|---|---|---|---|---|---|---|---|---|",
+        *[_case_line(r, b) for r, b in zip(results, baseline, strict=True)],
     ]
     if errors:
         lines += ["", "## Errors", ""]
         lines += [f"- {r.case.case_id}: {r.error}" for r in errors]
+    lines += ["", _metrics_comment(report, day)]
     return "\n".join(lines) + "\n"
 
 
-def write_results(report: Report, day: date, results_dir: Path = DEFAULT_RESULTS_DIR) -> Path:
+METRICS_MARKER = "<!-- metrics-json: "
+
+
+def _metrics_comment(report: Report, day: date) -> str:
+    """Machine-readable metric counts, embedded in the results file so the next run can read the soft gates."""
+    payload = {"date": day.isoformat(), "cases": report.cases, "mode": report.mode.value}
+    data = json.dumps({**payload, "metrics": metrics.to_json(report.table)}, sort_keys=True, separators=(",", ":"))
+    return f"{METRICS_MARKER}{data} -->"
+
+
+def read_metrics_comment(text: str) -> dict[str, Any] | None:
+    for line in text.splitlines():
+        if line.startswith(METRICS_MARKER) and line.endswith(" -->"):
+            try:
+                data = json.loads(line[len(METRICS_MARKER) : -len(" -->")])
+            except json.JSONDecodeError:
+                return None
+            return data if isinstance(data, dict) else None
+    return None
+
+
+def write_results(
+    report: Report, day: date, results_dir: Path = DEFAULT_RESULTS_DIR, soft: Sequence[SoftGate] = ()
+) -> Path:
     results_dir.mkdir(parents=True, exist_ok=True)
     path = results_dir / f"{day.isoformat()}.md"
-    path.write_text(render_markdown(report, day), encoding="utf-8")
+    path.write_text(render_markdown(report, day, soft), encoding="utf-8")
     return path
+
+
+# --- soft gates against the last recorded result ------------------------------------------------
+
+
+def previous_table(results_dir: Path, day: date, cases: str) -> Table | None:
+    """Metrics from the latest results file dated before `day` for the same case set, if any."""
+    found: list[tuple[str, dict[str, Any]]] = []
+    for path in results_dir.glob("*.md"):
+        try:
+            data = read_metrics_comment(path.read_text(encoding="utf-8"))
+        except OSError:
+            continue
+        if data and data.get("cases") == cases and str(data.get("date", "")) < day.isoformat():
+            found.append((str(data["date"]), data))
+    if not found:
+        return None
+    return metrics.from_json(max(found, key=lambda item: item[0])[1]["metrics"])
+
+
+def soft_gate_limits(path: Path = DEFAULT_THRESHOLDS) -> dict[str, float]:
+    return dict(yaml.safe_load(path.read_text(encoding="utf-8"))["soft_gates"])
+
+
+def _soft_gates(report: Report, results_dir: Path, day: date) -> list[SoftGate]:
+    previous = previous_table(results_dir, day, report.cases)
+    return metrics.soft_gates(report.table.get("system", {}), (previous or {}).get("system"), soft_gate_limits())
 
 
 # --- command line ------------------------------------------------------------------------------
 
 
+def _cases_label(path: Path) -> str:
+    """The case file as a repo-relative path, or just its name (never an absolute, personal path)."""
+    resolved = Path(path).resolve()
+    return str(resolved.relative_to(REPO_ROOT)) if resolved.is_relative_to(REPO_ROOT) else resolved.name
+
+
 def _parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="python -m eval.run_eval", description="Eval harness v0 (SPEC §8).")
+    parser = argparse.ArgumentParser(prog="python -m eval.run_eval", description="Eval harness (SPEC §8).")
     parser.add_argument("--mode", choices=[m.value.lower() for m in Mode], default="replay", type=str.lower)
     parser.add_argument("--enforce-gates", action="store_true", help="Exit 1 if any hard gate fails.")
-    parser.add_argument("--cases", type=Path, default=DEFAULT_CASES, help="JSONL case file (default: seed set).")
+    parser.add_argument(
+        "--cases",
+        type=Path,
+        default=DEFAULT_CASES,
+        help="JSONL case file (default: seed set; golden set: data/golden/golden_cases.jsonl).",
+    )
     parser.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS_DIR)
     parser.add_argument("--date", type=date.fromisoformat, default=None, help="Results date (default: today, UTC).")
     return parser
@@ -303,8 +501,9 @@ def main(argv: Sequence[str] | None = None, *, client: CompletionClient | None =
     if not cases:
         print(f"error: no cases in {args.cases}", file=sys.stderr)
         return EXIT_GATE_FAILED
-    report = run(cases, client=client or make_client(args.mode))
-    path = write_results(report, args.date or datetime.now(UTC).date(), args.results_dir)
+    report = run(cases, client=client or make_client(args.mode)).model_copy(update={"cases": _cases_label(args.cases)})
+    day = args.date or datetime.now(UTC).date()
+    path = write_results(report, day, args.results_dir, _soft_gates(report, args.results_dir, day))
     for r in report.results:
         if r.error:
             print(f"error: {r.case.case_id}: {r.error}", file=sys.stderr)
