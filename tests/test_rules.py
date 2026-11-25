@@ -13,7 +13,7 @@ import intake.rules as rules_module
 from intake.adapters.anthropic_client import ModelConfig
 from intake.match import Thresholds, match
 from intake.models import Extraction, Flag, Formula, FormulaIngredient, Ingredient, Severity, Unit
-from intake.pipeline import build_proposal
+from intake.pipeline import Library, build_proposal, load_library
 from intake.rules import (
     CONTROLLED_TERMS,
     RULES_VERSION,
@@ -650,3 +650,46 @@ def test_pipeline_runs_every_pass2_rule_against_the_real_library() -> None:
     ext = _ext(_ing("urea", 250.0, Unit.PERCENT), _ing("carbamide", 10.0, Unit.PERCENT), patient_ref=None)
     proposal = build_proposal("Urea cream", "t-1", client=_FakeClient(ext))
     assert {"R2-02", "R2-03", "R2-06", "R2-07"} <= set(_ids(proposal.flags))
+
+
+# --- AC 2: dev-split unsafe and adversarial golden cases flag correctly --------------------------
+# Pass 1 on the raw text (+ Notes), pass 2 on the labelled `expected_extraction` against the real
+# library, so no model recording is needed. M-01 is left out: it needs match scores. Dev split only.
+
+GOLDEN = ROOT / "data" / "golden" / "golden_cases.jsonl"
+SPEC_BLOCK_RULES = {"R1-04", "R1-05", "R2-01", "R2-02", "R2-03"}  # BLOCK severity per SPEC §5
+
+
+def _dev_safety_cases() -> list[dict]:
+    cases = [json.loads(line) for line in GOLDEN.read_text().splitlines() if line.strip()]
+    return [c for c in cases if c["split"] == "dev" and c["category"] in {"unsafe", "adversarial"}]
+
+
+def _raw_text(raw: dict) -> str:
+    return "\n".join(part for part in (raw.get("text"), raw.get("notes")) if part)
+
+
+@pytest.fixture(scope="module")
+def library() -> Library:
+    return load_library()
+
+
+@pytest.mark.parametrize("case", _dev_safety_cases(), ids=lambda c: c["case_id"])
+def test_dev_unsafe_and_adversarial_cases_flag(case: dict, library: Library) -> None:
+    flags = run_pass1(_raw_text(case["raw"]), known=library.known_ingredients)
+    flags = run_pass2(
+        Extraction.model_validate(case["expected_extraction"]),
+        library.known_ingredients,
+        flags,
+        formulas=library.formulas,
+        aliases=library.aliases,
+        limits=library.ingredient_limits,
+    )
+    expected = {rule for rule in case["expected_flags"] if rule.startswith("R")}
+    assert expected <= set(_ids(flags)), f"missing {sorted(expected - set(_ids(flags)))}"
+    if case["category"] == "adversarial" or expected & SPEC_BLOCK_RULES:
+        assert any(f.severity is Severity.BLOCK for f in flags)
+
+
+def test_dev_safety_cases_exist() -> None:
+    assert _dev_safety_cases(), "no dev-split unsafe/adversarial golden cases found"
