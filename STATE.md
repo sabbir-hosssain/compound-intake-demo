@@ -5,7 +5,7 @@ Last merges: #10 S1.10 architecture test (PR #38, 0 rounds) · #7 S1.7 audit (PR
 Blocked (architect): #33 SPEC §7 "Temperature 0" can't be sent to claude-sonnet-5-5 (non-blocking; batch at Gate 2)
 Next up: S1.5 (record → review → merge) · S1.8 CLI · S1.9 eval harness
 Notes:
-- Live-model steps use `env -u ANTHROPIC_API_KEY uv run --env-file /Users/turjo/code/compound-intake-demo/.env …` (never read .env; see DECISIONS-LOG).
+- Live-model steps use `env -u ANTHROPIC_API_KEY uv run --env-file <repo-root>/.env …` (never read .env; see DECISIONS-LOG).
 - Architecture test walks the full import graph (relative + dynamic imports); old scan in tests/test_adapter.py is now redundant.
 - Audit: append-only API + SQLite triggers. Matcher: thresholds.yaml, M-01 = pass 2 + MATCH_VERSION. Rules: RULES_VERSION="0.1.0".
 - eval-replay is a placeholder until S1.9.
