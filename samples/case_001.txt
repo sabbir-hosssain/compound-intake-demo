@@ -1,0 +1,6 @@
+Rx from TeleHealthSH (eRx)
+Prescriber: Dr. A. Example
+Patient ref: PT-10001
+Compound salicylic acid 3% and urea 10% in vanishing cream base.
+Apply thin layer to affected skin twice daily.
+Qty: 60 g

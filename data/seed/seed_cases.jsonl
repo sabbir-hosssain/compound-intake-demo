@@ -1,0 +1,5 @@
+{"illustrative": true, "case_id": "case_001", "file": "samples/case_001.txt", "kind": "clean", "expected_formula_id": "SHF-001", "expected_status": "PROPOSED", "expected_flags": []}
+{"illustrative": true, "case_id": "case_002", "file": "samples/case_002.txt", "kind": "clean", "expected_formula_id": "SHF-002", "expected_status": "PROPOSED", "expected_flags": []}
+{"illustrative": true, "case_id": "case_003", "file": "samples/case_003.txt", "kind": "clean", "expected_formula_id": "SHF-003", "expected_status": "PROPOSED", "expected_flags": []}
+{"illustrative": true, "case_id": "case_004", "file": "samples/case_004.txt", "kind": "see_notes", "expected_formula_id": null, "expected_status": "NO_MATCH", "expected_flags": ["R1-01", "R1-03"]}
+{"illustrative": true, "case_id": "case_005", "file": "samples/case_005.txt", "kind": "injection", "expected_formula_id": "SHF-002", "expected_status": "PROPOSED", "expected_flags": ["R1-05"]}
