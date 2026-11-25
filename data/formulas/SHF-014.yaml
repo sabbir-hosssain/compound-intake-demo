@@ -1,0 +1,10 @@
+illustrative: true
+formula_id: SHF-014
+version: "1.0"
+name: Minoxidil Topical Solution
+ingredients:
+  - {name: minoxidil, strength: 5.0, unit: "%", illustrative_max: 10.0}
+dosage_form: solution
+base: propylene glycol and ethanol vehicle
+route: topical
+notes: Fictional demo formula. illustrative_max values are not clinical limits.

@@ -1,0 +1,10 @@
+illustrative: true
+formula_id: SHF-011
+version: "1.0"
+name: Omeprazole Oral Suspension
+ingredients:
+  - {name: omeprazole, strength: 2.0, unit: "mg/mL", illustrative_max: 4.0}
+dosage_form: oral suspension
+base: sodium bicarbonate buffered vehicle
+route: oral
+notes: Fictional demo formula. illustrative_max values are not clinical limits.

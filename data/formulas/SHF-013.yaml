@@ -1,0 +1,10 @@
+illustrative: true
+formula_id: SHF-013
+version: "1.0"
+name: Spironolactone Oral Suspension
+ingredients:
+  - {name: spironolactone, strength: 25.0, unit: "mg/mL", illustrative_max: 50.0}
+dosage_form: oral suspension
+base: syrup and suspending agent vehicle
+route: oral
+notes: Fictional demo formula. illustrative_max values are not clinical limits.

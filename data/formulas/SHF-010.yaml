@@ -1,0 +1,11 @@
+illustrative: true
+formula_id: SHF-010
+version: "1.0"
+name: Hydrocortisone / Clotrimazole Cream (2.5%/1%)
+ingredients:
+  - {name: hydrocortisone, strength: 2.5, unit: "%", illustrative_max: 5.0}
+  - {name: clotrimazole, strength: 1.0, unit: "%", illustrative_max: 3.0}
+dosage_form: cream
+base: vanishing cream base
+route: topical
+notes: Fictional demo formula. illustrative_max values are not clinical limits.
