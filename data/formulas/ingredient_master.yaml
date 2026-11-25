@@ -1,0 +1,8 @@
+illustrative: true
+# illustrative_max values are NOT clinical limits; they exist only to exercise rule R2-02.
+ingredients:
+  - {name: salicylic acid, aliases: [sal acid, salicylic], unit: "%", illustrative_max: 6.0}
+  - {name: urea, aliases: [carbamide], unit: "%", illustrative_max: 20.0}
+  - {name: lidocaine, aliases: [lidocaine hcl, lignocaine], unit: "%", illustrative_max: 5.0}
+  - {name: menthol, aliases: [l-menthol], unit: "%", illustrative_max: 3.0}
+  - {name: famotidine, aliases: [], unit: mg/mL, illustrative_max: 10.0}

@@ -1,0 +1,10 @@
+illustrative: true
+formula_id: SHF-003
+version: "1.0"
+name: Famotidine Oral Suspension
+ingredients:
+  - {name: famotidine, strength: 8.0, unit: mg/mL, illustrative_max: 10.0}
+dosage_form: oral suspension
+base: cherry-flavoured suspending vehicle
+route: oral
+notes: Fictional demo formula. illustrative_max values are not clinical limits.

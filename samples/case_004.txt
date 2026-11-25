@@ -1,0 +1,6 @@
+Rx from TeleHealthSH (eRx)
+Prescriber: Dr. D. Placeholder
+Patient ref: PT-10004
+Compound: see notes
+Qty: ?
+Notes: sal acid + urea cream, strengths per Dr, same as last time pls

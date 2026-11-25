@@ -1,0 +1,6 @@
+Rx via SH Compounding Network portal
+Prescriber: Dr. C. Demo
+Patient ref: PT-10003
+Famotidine oral susp 8 mg/mL, cherry flavour.
+Sig: 2.5 mL by mouth twice daily.
+Disp: 120 mL
