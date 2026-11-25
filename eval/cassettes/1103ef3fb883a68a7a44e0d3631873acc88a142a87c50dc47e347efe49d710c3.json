@@ -1,0 +1,68 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (eRx)\nPrescriber: Dr. D. Placeholder\nPatient ref: PT-10004\nCompound: see notes\nQty: ?\nNotes: sal acid + urea cream, strengths per Dr, same as last time pls\n\n</prescription>",
+  "key": "1103ef3fb883a68a7a44e0d3631873acc88a142a87c50dc47e347efe49d710c3",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_019NLZejyrYcDzgxoPnZeAfd",
+        "input": {
+          "base": null,
+          "directions": null,
+          "dosage_form": "cream",
+          "extraction_notes": "Strengths for both ingredients not written (\"strengths per Dr\", \"same as last time\") and no prior order is visible, so left null. Quantity given as \"?\" and not specified. Directions and route not stated. Compound line says \"see notes\"; ingredients taken from notes (\"sal acid\" interpreted as salicylic acid). Source: TeleHealthSH eRx.",
+          "ingredients": [
+            {
+              "name": "salicylic acid",
+              "strength": null,
+              "unit": null
+            },
+            {
+              "name": "urea",
+              "strength": null,
+              "unit": null
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-10004",
+          "prescriber_name": "Dr. D. Placeholder",
+          "quantity": null,
+          "quantity_unit": null,
+          "route": null,
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChP2XcBBbQkNqD4XmPhxb",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1995,
+      "output_tokens": 487,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}
