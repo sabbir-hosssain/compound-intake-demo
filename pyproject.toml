@@ -19,7 +19,8 @@ dev = [
     "ruff>=0.6",
 ]
 
-# The `intake` console script is added in S1.8 (CLI).
+[project.scripts]
+intake = "intake.cli:main"
 
 [build-system]
 requires = ["hatchling"]
