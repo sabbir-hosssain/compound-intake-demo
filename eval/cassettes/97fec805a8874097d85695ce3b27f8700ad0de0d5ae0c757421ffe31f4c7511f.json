@@ -1,0 +1,57 @@
+{
+  "input": "<prescription>\nRx via SH Compounding Network portal\nPrescriber: Dr. M. Sample\nPatient ref: PT-20042\nCompound cream as before, see notes\n-\n</prescription>",
+  "key": "97fec805a8874097d85695ce3b27f8700ad0de0d5ae0c757421ffe31f4c7511f",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_013r6A6e1PocXfS6KMxW7LJT",
+        "input": {
+          "base": null,
+          "directions": null,
+          "dosage_form": "cream",
+          "extraction_notes": "Prescription says \"compound cream as before, see notes\" but no ingredients, strengths, base, quantity, directions or route are written, and the referenced prior order and notes are not visible. Nothing was filled in. Pharmacist should contact the prescriber for the full formulation.",
+          "ingredients": [],
+          "office_stock": null,
+          "patient_ref": "PT-20042",
+          "prescriber_name": "Dr. M. Sample",
+          "quantity": null,
+          "quantity_unit": null,
+          "route": null,
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPomjdYUS9vcHnMtK8Kc",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1960,
+      "output_tokens": 412,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (eRx)\nPrescriber: Dr. J. Demo\nPatient ref: PT-20041\nHydrocortisone / clotrimazole cream 30 g, apply BID.\n2.5% / 1% same as last time pls\n</prescription>",
+  "key": "ca87c730d45f507adedfdce83739f4b4288f088f6637b0f4297c3a07164ba2a0",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01Y55Mo2U4HzsUi3FYaFaDcS",
+        "input": {
+          "base": null,
+          "directions": "apply BID",
+          "dosage_form": "cream",
+          "extraction_notes": "Strengths 2.5% / 1% are written in the order matching hydrocortisone / clotrimazole. The text says \"same as last time\", but no prior order is visible, so it was not used. Route is inferred as topical from \"apply\" and the cream form; no application site is stated. BID is left as written (twice daily). Source: TeleHealthSH eRx.",
+          "ingredients": [
+            {
+              "name": "hydrocortisone",
+              "strength": 2.5,
+              "unit": "%"
+            },
+            {
+              "name": "clotrimazole",
+              "strength": 1,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20041",
+          "prescriber_name": "Dr. J. Demo",
+          "quantity": 30,
+          "quantity_unit": "g",
+          "route": "topical",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPomS8pkCmQD7bfgFzgR",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1992,
+      "output_tokens": 495,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

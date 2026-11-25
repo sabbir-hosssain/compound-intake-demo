@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (fax)\nPrescriber: Dr. R. Placeholder\nPatient ref:\nMinoxidil 5% topical solution, propylene glycol/ethanol vehicle. Qty: 6000 mL. 1 mL BID.\n</prescription>",
+  "key": "b745a6d60531ed2f1ac788554962304e5eb73a8aaf18347113d9c3cf4418c8d0",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01XRRUSFmrTPz6BejH5nfhkx",
+        "input": {
+          "base": "propylene glycol/ethanol vehicle",
+          "directions": "1 mL BID",
+          "dosage_form": "solution",
+          "extraction_notes": "Patient ref is blank. Quantity of 6000 mL is written as is, but it is unusually large for 1 mL BID (about 3000 days' supply), so it may be a typo. Please verify. Prescriber name looks like a placeholder. The source is a fax from TeleHealthSH. The directions do not say where to apply, but the route is given as topical.",
+          "ingredients": [
+            {
+              "name": "minoxidil",
+              "strength": 5,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": null,
+          "prescriber_name": "Dr. R. Placeholder",
+          "quantity": 6000,
+          "quantity_unit": "mL",
+          "route": "topical",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPomz1iqaHzVdWkG87XN",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1995,
+      "output_tokens": 484,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

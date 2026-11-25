@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (fax)\nPrescriber: Dr. S. Testcase\nPatient ref: PT-20054\nFamotidine 15 mg/mL oral suspension, cherry-flavoured suspending vehicle, 150 mL. 5 mL BID.\n</prescription>",
+  "key": "cae1f159dbefa263074580274f12b7803f074b8c20a3fa9fbc6aa96ca02d0454",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01QNXexQKiZzQbYLWS1Ne9Rg",
+        "input": {
+          "base": "suspending vehicle",
+          "directions": "5 mL BID",
+          "dosage_form": "suspension",
+          "extraction_notes": "Flavouring: cherry. Received via fax from TeleHealthSH. Directions do not specify route explicitly; oral taken from the \"oral suspension\" description. BID not expanded.",
+          "ingredients": [
+            {
+              "name": "famotidine",
+              "strength": 15,
+              "unit": "mg/mL"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20054",
+          "prescriber_name": "Dr. S. Testcase",
+          "quantity": 150,
+          "quantity_unit": "mL",
+          "route": "oral",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPoob8NJoDHdCoCN4baq",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1999,
+      "output_tokens": 427,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

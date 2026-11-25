@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (fax)\nPrescriber: Dr. R. Placeholder\nPatient ref: PT-20057\nTriamcinolone 1% dental paste, adhesive oral paste base, 5 g. Apply buccal QID.\n</prescription>",
+  "key": "12c8428291cf31b446b624e836bd772b192186d0ff85216032861c4799e47cd6",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01JDxvdU2NYsnyfTNaBw12pF",
+        "input": {
+          "base": "adhesive oral paste base",
+          "directions": "Apply buccal QID",
+          "dosage_form": "paste",
+          "extraction_notes": "Received via fax from TeleHealthSH. Prescriber name appears to be a placeholder (\"Dr. R. Placeholder\") - verify prescriber identity. QID not expanded to specific interval/frequency details (assumed four times daily). Route inferred as oral from buccal application to oral mucosa.",
+          "ingredients": [
+            {
+              "name": "triamcinolone",
+              "strength": 1,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20057",
+          "prescriber_name": "Dr. R. Placeholder",
+          "quantity": 5,
+          "quantity_unit": "g",
+          "route": "oral",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPopLd2YgsvxL9GrmDYJ",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1990,
+      "output_tokens": 468,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

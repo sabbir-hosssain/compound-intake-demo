@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (fax)\nPrescriber: Dr. J. Demo\nPatient ref: PT-20023\nTacrolimus 0.1% oint (white petrolatum-based ointment base) 60 g, apply thin layer BID to eczema.\n</prescription>",
+  "key": "7df594eab681b73ef5758155567c2b16d8cf2433948b1d4acddc361f4086d4d5",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01Sx43pvNyZsX7WR8xkW4xEu",
+        "input": {
+          "base": "white petrolatum-based ointment base",
+          "directions": "Apply thin layer BID to eczema.",
+          "dosage_form": "ointment",
+          "extraction_notes": "Received via fax from TeleHealthSH. BID not expanded in the directions as written; it means twice daily.",
+          "ingredients": [
+            {
+              "name": "tacrolimus",
+              "strength": 0.1,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20023",
+          "prescriber_name": "Dr. J. Demo",
+          "quantity": 60,
+          "quantity_unit": "g",
+          "route": "topical",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPoi3Fpmny1pYA3bdmrr",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1995,
+      "output_tokens": 413,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

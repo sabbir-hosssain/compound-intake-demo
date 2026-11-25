@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (fax)\nPrescriber: Dr. K. Fictional\nPatient ref: PT-20020\nSpironolactone oral susp 25 mg/mL, syrup and suspending agent vehicle, 240 mL. 1 mL PO BID.\n</prescription>",
+  "key": "d1ae3d378fcad127a5a7cfcabcedaa22c80025b57b08b3065b11618240d915bf",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01TLLG2EC1escozx4bML3qvE",
+        "input": {
+          "base": "syrup and suspending agent vehicle",
+          "directions": "1 mL PO BID",
+          "dosage_form": "suspension",
+          "extraction_notes": "Received via fax from TeleHealthSH. Directions expanded: PO = by mouth; BID = twice daily as written (kept as written).",
+          "ingredients": [
+            {
+              "name": "spironolactone",
+              "strength": 25,
+              "unit": "mg/mL"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20020",
+          "prescriber_name": "Dr. K. Fictional",
+          "quantity": 240,
+          "quantity_unit": "mL",
+          "route": "oral",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPohKmV9LbfZQM4V87SC",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1999,
+      "output_tokens": 421,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

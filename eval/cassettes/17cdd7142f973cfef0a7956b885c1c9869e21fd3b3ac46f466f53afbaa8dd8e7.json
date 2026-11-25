@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (fax)\nPrescriber: Dr. K. Fictional\nPatient ref: PT-20014\nMinoxidil 5% topical solution (propylene glycol/ethanol vehicle) 60 mL. Apply 1 mL to scalp BID.\n</prescription>",
+  "key": "17cdd7142f973cfef0a7956b885c1c9869e21fd3b3ac46f466f53afbaa8dd8e7",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01VMCY578CT7fVkRjXgmenk8",
+        "input": {
+          "base": "propylene glycol/ethanol vehicle",
+          "directions": "Apply 1 mL to scalp BID (twice daily)",
+          "dosage_form": "solution",
+          "extraction_notes": "Received via fax from TeleHealthSH.",
+          "ingredients": [
+            {
+              "name": "minoxidil",
+              "strength": 5,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20014",
+          "prescriber_name": "Dr. K. Fictional",
+          "quantity": 60,
+          "quantity_unit": "mL",
+          "route": "topical",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPofbf9pCCNbkQ7pRUmv",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 2001,
+      "output_tokens": 400,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

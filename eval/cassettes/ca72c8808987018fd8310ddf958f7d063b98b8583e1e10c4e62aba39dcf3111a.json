@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx via SH Compounding Network portal\nPrescriber: Dr. L. Example\nPatient ref: PT-20059\nKetoprofen 10% gel 60 g. Apply TID to knee.\n</prescription>",
+  "key": "ca72c8808987018fd8310ddf958f7d063b98b8583e1e10c4e62aba39dcf3111a",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_019h26Md1BvtMjxYdpnCQN4J",
+        "input": {
+          "base": null,
+          "directions": "Apply TID to knee.",
+          "dosage_form": "gel",
+          "extraction_notes": "Submitted via SH Compounding Network portal. No base/vehicle specified. TID not expanded in directions.",
+          "ingredients": [
+            {
+              "name": "ketoprofen",
+              "strength": 10,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20059",
+          "prescriber_name": "Dr. L. Example",
+          "quantity": 60,
+          "quantity_unit": "g",
+          "route": "topical",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPopyJQTb9wU8mAnHHBZ",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1972,
+      "output_tokens": 394,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

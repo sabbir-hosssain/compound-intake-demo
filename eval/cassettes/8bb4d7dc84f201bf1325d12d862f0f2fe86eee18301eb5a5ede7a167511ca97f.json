@@ -1,0 +1,68 @@
+{
+  "input": "<prescription>\nRx via SH Compounding Network portal\nPrescriber: Dr. S. Testcase\nPatient ref: PT-20004\nLidocaine 2% + menthol 1% gel (hydroalcoholic base) topical. Qty 60 g. Apply BID PRN.\n</prescription>",
+  "key": "8bb4d7dc84f201bf1325d12d862f0f2fe86eee18301eb5a5ede7a167511ca97f",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_012DonLMB2YqfTWB4vTZGute",
+        "input": {
+          "base": "hydroalcoholic base",
+          "directions": "Apply BID PRN",
+          "dosage_form": "gel",
+          "extraction_notes": "Directions abbreviated as written (BID PRN = twice daily as needed); application site not specified.",
+          "ingredients": [
+            {
+              "name": "lidocaine",
+              "strength": 2,
+              "unit": "%"
+            },
+            {
+              "name": "menthol",
+              "strength": 1,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20004",
+          "prescriber_name": "Dr. S. Testcase",
+          "quantity": 60,
+          "quantity_unit": "g",
+          "route": "topical",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPodAYjcW2vMqgqM5SnX",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1997,
+      "output_tokens": 419,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

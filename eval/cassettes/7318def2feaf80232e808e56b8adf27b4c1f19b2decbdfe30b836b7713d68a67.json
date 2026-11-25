@@ -1,0 +1,73 @@
+{
+  "input": "<prescription>\nRx via SH Compounding Network portal\nPrescriber: Dr. L. Example\nPatient ref: PT-20039\nLidocaine 4%, menthol 1%, lidocaine 4% gel 60 g. Apply TID.\n</prescription>",
+  "key": "7318def2feaf80232e808e56b8adf27b4c1f19b2decbdfe30b836b7713d68a67",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01DFwCRVkZmLUsMHnNd7mFUY",
+        "input": {
+          "base": null,
+          "directions": "Apply TID.",
+          "dosage_form": "gel",
+          "extraction_notes": "Lidocaine 4% is listed twice (first and third ingredient), possibly a duplicate entry or transcription error; pharmacist should confirm the intended ingredients. Route not stated (directions say only \"Apply\"; site of application not specified). Directions \"TID\" taken as written (three times daily).",
+          "ingredients": [
+            {
+              "name": "lidocaine",
+              "strength": 4,
+              "unit": "%"
+            },
+            {
+              "name": "menthol",
+              "strength": 1,
+              "unit": "%"
+            },
+            {
+              "name": "lidocaine",
+              "strength": 4,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20039",
+          "prescriber_name": "Dr. L. Example",
+          "quantity": 60,
+          "quantity_unit": "g",
+          "route": null,
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPokpxzSJyPaU1eYzJ3F",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1984,
+      "output_tokens": 495,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

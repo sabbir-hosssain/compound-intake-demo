@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx via SH Compounding Network portal\nPrescriber: Dr. L. Example\nPatient ref: PT-20045\nCompound per attached\nbaclofen susp 5mg/mL sugar free syrup vehicle 300 mL 5 mL TID\n</prescription>",
+  "key": "60a02934687af1c8fe5ff603d5974c3baf1c29c1f88b2c86315579cc85f76bb9",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_0178YLKzYtxxm2gADnsDADEv",
+        "input": {
+          "base": "sugar free syrup vehicle",
+          "directions": "5 mL TID",
+          "dosage_form": "suspension",
+          "extraction_notes": "Route not written; directions do not state route (likely oral, but not stated). Directions say \"5 mL TID\" with no explicit route. \"Compound per attached\" – attachment not visible.",
+          "ingredients": [
+            {
+              "name": "baclofen",
+              "strength": 5,
+              "unit": "mg/mL"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20045",
+          "prescriber_name": "Dr. L. Example",
+          "quantity": 300,
+          "quantity_unit": "mL",
+          "route": null,
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPonWYmZE59VVE2xBAQp",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1989,
+      "output_tokens": 425,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}
