@@ -1,13 +1,12 @@
 # STATE (rewritten after every issue; one screen max)
-Milestone: M2 — golden set, baseline, metrics · Gate 2 · run started 2026-11-25 13:49Z
-Active: none (code lane next: #18 S2.8, last M2 issue) · data lane: no M2 issues left
-Last merges: #17 S2.7 variance (PR #50) · #16 S2.6 recordings (PR #49) · #15 S2.5 metrics (PR #48) · #14 S2.4 baseline (PR #47) · #13 S2.3 all rules (PR #46)
-Blocked (architect): none
-Next up: #18 S2.8 threshold tuning (dev only → eval/thresholds.proposed.yaml) · then the Gate 2 packet
-## M2 progress
-- S2.1 formulas (0 rounds) · S2.2 golden set (1) · S2.3 all rules (0) · S2.4 baseline (0) · S2.5 metrics (0) · S2.6 recordings (0) · S2.7 variance (0).
-- Hard gates on golden REPLAY: adversarial 10/10, unsafe 10/10, schema 60/60. Top-1 dev 30/35 sys vs 30/35 base; test 14/17 vs 11/17.
-- S2.7: 3 LIVE runs, 180 calls. Disagreement: decision 1/60 (g019), flags 1/60, fields 5/480, any 4/60. `run_eval --runs N` added (live-eval.yml contract closed).
-- For Gate 2: baseline flag definition (SPEC §6 divergence); R1-04 list / R2-04 / R2-05 constants and baseline cut-off outside thresholds.yaml; eval/ sets ModelClient._live to disable SDK retries; uncertain golden labels; CLAUDE.md DoD wording on STATE.md.
-- Carried: #41 (atomic audit append; M3).
-- Live-model steps: `env -u ANTHROPIC_API_KEY uv run --env-file <repo-root>/.env …`. M2 live calls: 240.
+Milestone: M2 — golden set, baseline, metrics · **COMPLETE — stopped at Gate 2** (run 2026-11-25 13:49Z → ~15:15Z)
+Active: none · waiting on the architect (Gate 2)
+Last merges: #18 S2.8 threshold tuning (PR #51) · #17 S2.7 variance (PR #50) · #16 S2.6 recordings (PR #49) · #15 S2.5 metrics (PR #48) · #14 S2.4 baseline (PR #47)
+Blocked (architect): Gate 2 — see docs/gate2-packet.md §2 (10 decisions)
+Next up: Gate 2 → apply thresholds, label fixes, `data/golden/LOCKED` → M3 (review screen, audit chain, reasons)
+## M2 summary
+- Exit criteria on the final tree: every hard gate passes on dev and test (REPLAY, 60 golden cases): adversarial 6/6 + 4/4, unsafe recall 7/7 + 3/3, schema 60/60; CI runs the golden set by default. Packet: docs/gate2-packet.md (12-case sample, proposed thresholds, system-vs-baseline table).
+- 8/8 issues closed (#11–#18, PRs #44–#51). Median fix rounds 0 (#12 took 1). Escalations 0. 521 tests.
+- Headline: unsafe-flag recall 10/10 vs baseline 2/10; top-1 dev 30/35 = baseline, test 14/17 vs 11/17; weak spots are ambiguous cases and M-01 false alarms from score ties.
+- Live calls: 240 (60 record, 180 variance). Live-model steps: `env -u ANTHROPIC_API_KEY uv run --env-file <repo-root>/.env …`.
+- Carried: #41 (atomic audit append; M3). Harness notes: docs/HARNESS.md "M2 notes".
