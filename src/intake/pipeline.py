@@ -20,7 +20,14 @@ from intake.extract import CompletionClient, ExtractStatus, extract
 from intake.library import library_version, load_alias_map, load_formulas
 from intake.match import Thresholds, load_thresholds, match
 from intake.models import AuditRecord, Formula, Proposal, ProposalStatus, Severity
-from intake.rules import RULES_VERSION, load_ingredient_names, run_pass1, run_pass2
+from intake.rules import (
+    RULES_VERSION,
+    IngredientLimit,
+    load_ingredient_limits,
+    load_ingredient_names,
+    run_pass1,
+    run_pass2,
+)
 
 GENESIS_HASH = "0" * 64
 
@@ -33,6 +40,7 @@ class Library(BaseModel):
     formulas: list[Formula]
     aliases: dict[str, str]
     known_ingredients: frozenset[str]
+    ingredient_limits: dict[str, IngredientLimit]
     thresholds: Thresholds
     version: str
 
@@ -42,6 +50,7 @@ def load_library() -> Library:
         formulas=load_formulas(),
         aliases=load_alias_map(),
         known_ingredients=load_ingredient_names(),
+        ingredient_limits=load_ingredient_limits(),
         thresholds=load_thresholds(),
         version=library_version(),
     )
@@ -57,7 +66,7 @@ def build_proposal(
 ) -> Proposal:
     """Run the pipeline on raw text. A failed extraction gives status MANUAL with the pass-1 flags kept."""
     library = library or load_library()
-    flags = run_pass1(text)
+    flags = run_pass1(text, known=library.known_ingredients)
     result = extract(text, client=client)
     common = {
         "prescription_id": prescription_id,
@@ -69,7 +78,14 @@ def build_proposal(
     }
     if result.status is ExtractStatus.MANUAL or result.extraction is None:
         return Proposal(confidence=0.0, margin=0.0, status=ProposalStatus.MANUAL, flags=flags, **common)
-    flags = run_pass2(result.extraction, library.known_ingredients, flags)
+    flags = run_pass2(
+        result.extraction,
+        library.known_ingredients,
+        flags,
+        formulas=library.formulas,
+        aliases=library.aliases,
+        limits=library.ingredient_limits,
+    )
     matched = match(result.extraction, library.formulas, library.thresholds, library.aliases, existing=flags)
     return Proposal(
         extraction=result.extraction,
