@@ -228,3 +228,7 @@ __marimo__/
 *.sqlite
 .venv/
 __pycache__/
+
+# Claude Code local state
+.claude/worktrees/
+.claude/settings.local.json
