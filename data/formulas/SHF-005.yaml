@@ -1,0 +1,11 @@
+illustrative: true
+formula_id: SHF-005
+version: "1.0"
+name: Lidocaine / Menthol Topical Gel (Low Strength)
+ingredients:
+  - {name: lidocaine, strength: 2.0, unit: "%", illustrative_max: 5.0}
+  - {name: menthol, strength: 1.0, unit: "%", illustrative_max: 3.0}
+dosage_form: gel
+base: hydroalcoholic gel base
+route: topical
+notes: Fictional demo formula. illustrative_max values are not clinical limits.

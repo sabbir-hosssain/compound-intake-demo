@@ -1,0 +1,10 @@
+illustrative: true
+formula_id: SHF-015
+version: "1.0"
+name: Tacrolimus Ointment
+ingredients:
+  - {name: tacrolimus, strength: 0.1, unit: "%", illustrative_max: 0.3}
+dosage_form: ointment
+base: white petrolatum-based ointment base
+route: topical
+notes: Fictional demo formula. illustrative_max values are not clinical limits.
