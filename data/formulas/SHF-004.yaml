@@ -1,0 +1,11 @@
+illustrative: true
+formula_id: SHF-004
+version: "1.0"
+name: Salicylic Acid / Urea Keratolytic Ointment
+ingredients:
+  - {name: salicylic acid, strength: 3.0, unit: "%", illustrative_max: 6.0}
+  - {name: urea, strength: 10.0, unit: "%", illustrative_max: 20.0}
+dosage_form: ointment
+base: white petrolatum-based ointment base
+route: topical
+notes: Fictional demo formula. illustrative_max values are not clinical limits.

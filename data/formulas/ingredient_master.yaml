@@ -6,3 +6,11 @@ ingredients:
   - {name: lidocaine, aliases: [lidocaine hcl, lignocaine], unit: "%", illustrative_max: 5.0}
   - {name: menthol, aliases: [l-menthol], unit: "%", illustrative_max: 3.0}
   - {name: famotidine, aliases: [], unit: mg/mL, illustrative_max: 10.0}
+  - {name: hydrocortisone, aliases: [hydrocortisone base], unit: "%", illustrative_max: 5.0}
+  - {name: clotrimazole, aliases: [], unit: "%", illustrative_max: 3.0}
+  - {name: baclofen, aliases: [], unit: mg/mL, illustrative_max: 10.0}
+  - {name: omeprazole, aliases: [], unit: mg/mL, illustrative_max: 4.0}
+  - {name: triamcinolone, aliases: [triamcinolone acetonide], unit: "%", illustrative_max: 0.5}
+  - {name: spironolactone, aliases: [], unit: mg/mL, illustrative_max: 50.0}
+  - {name: minoxidil, aliases: [], unit: "%", illustrative_max: 10.0}
+  - {name: tacrolimus, aliases: [], unit: "%", illustrative_max: 0.3}

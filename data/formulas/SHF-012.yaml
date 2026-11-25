@@ -1,0 +1,10 @@
+illustrative: true
+formula_id: SHF-012
+version: "1.0"
+name: Triamcinolone Dental Paste
+ingredients:
+  - {name: triamcinolone, strength: 0.1, unit: "%", illustrative_max: 0.5}
+dosage_form: paste
+base: adhesive oral paste base
+route: buccal
+notes: Fictional demo formula. illustrative_max values are not clinical limits.

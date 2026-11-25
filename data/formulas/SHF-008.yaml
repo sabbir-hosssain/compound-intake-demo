@@ -1,0 +1,10 @@
+illustrative: true
+formula_id: SHF-008
+version: "1.0"
+name: Baclofen Oral Suspension (Sugar-Free)
+ingredients:
+  - {name: baclofen, strength: 5.0, unit: "mg/mL", illustrative_max: 10.0}
+dosage_form: oral suspension
+base: sugar-free syrup vehicle
+route: oral
+notes: Fictional demo formula. illustrative_max values are not clinical limits.
