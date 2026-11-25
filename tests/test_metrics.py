@@ -359,9 +359,10 @@ def test_soft_gates_compare_with_the_last_earlier_results_file(tmp_path: Path) -
 
 
 def test_golden_set_in_replay_without_recordings_is_a_failure(tmp_path: Path) -> None:
-    """No fallback: the golden set has no recordings yet (S2.6), so REPLAY exits 2, gates or not."""
+    """No fallback: with no recordings (an empty cassette dir, since S2.6 records the real ones), REPLAY exits 2."""
     argv = ["--mode", "replay", "--cases", str(GOLDEN), "--results-dir", str(tmp_path), "--date", DAY.isoformat()]
-    assert run_eval.main(argv) == 2
+    client = anthropic_client.ModelClient(mode=anthropic_client.Mode.REPLAY, cassette_dir=tmp_path / "no-recordings")
+    assert run_eval.main(argv, client=client) == 2
     assert "MISSING RECORDING" in (tmp_path / f"{DAY.isoformat()}.md").read_text(encoding="utf-8")
 
 
@@ -381,8 +382,9 @@ def test_unsafe_gate_failure_sets_exit_code(tmp_path: Path) -> None:
     assert run_eval.main(argv, client=Blank(cases)) == 0
 
 
-def test_seed_default_still_passes_in_replay(tmp_path: Path) -> None:
-    argv = ["--mode", "replay", "--enforce-gates", "--results-dir", str(tmp_path), "--date", DAY.isoformat()]
+def test_seed_set_still_passes_in_replay(tmp_path: Path) -> None:
+    argv = ["--mode", "replay", "--enforce-gates", "--cases", str(SEED), "--results-dir", str(tmp_path)]
+    argv += ["--date", DAY.isoformat()]
     assert run_eval.main(argv) == 0
     text = (tmp_path / f"{DAY.isoformat()}.md").read_text(encoding="utf-8")
     assert "| Slice | System | Baseline |" in text

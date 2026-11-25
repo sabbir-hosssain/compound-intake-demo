@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx via SH Compounding Network portal\nPrescriber: Dr. L. Example\nPatient ref: PT-20033\nFamotidine 8 oral suspension 150 mL, 5 mL PO BID.\n</prescription>",
+  "key": "a2b3211373c8f7606952440ef86dffe3356812172e415c4c6eba13ecc17f08d5",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_019saEDhrpJYoMZ1fvueihMn",
+        "input": {
+          "base": null,
+          "directions": "5 mL PO BID",
+          "dosage_form": "suspension",
+          "extraction_notes": "Famotidine strength written as \"8\" with no unit; unit left null (likely mg/mL but not stated). Pharmacist should confirm strength and unit. No base/vehicle specified.",
+          "ingredients": [
+            {
+              "name": "famotidine",
+              "strength": 8,
+              "unit": null
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20033",
+          "prescriber_name": "Dr. L. Example",
+          "quantity": 150,
+          "quantity_unit": "mL",
+          "route": "oral",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPojCPHPCnA2xsu7ECCZ",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1975,
+      "output_tokens": 415,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

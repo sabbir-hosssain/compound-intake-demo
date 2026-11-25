@@ -1,0 +1,68 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (eRx)\nPrescriber: Dr. L. Example\nPatient ref: PT-20003\nLidocaine 4% / menthol 1% topical gel in hydroalcoholic gel base, 90 g. Apply TID to affected area.\n</prescription>",
+  "key": "b14f6336a879c5f74c1ec1a78b01ae6a3e8905e613db4ba97f75291eda699ea0",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01E8wts5VrurGQky8P2UNtCo",
+        "input": {
+          "base": "hydroalcoholic gel base",
+          "directions": "Apply three times daily (TID) to affected area.",
+          "dosage_form": "gel",
+          "extraction_notes": "Source: TeleHealthSH (eRx). Affected area not specified further.",
+          "ingredients": [
+            {
+              "name": "lidocaine",
+              "strength": 4,
+              "unit": "%"
+            },
+            {
+              "name": "menthol",
+              "strength": 1,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20003",
+          "prescriber_name": "Dr. L. Example",
+          "quantity": 90,
+          "quantity_unit": "g",
+          "route": "topical",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPocuCkusDMNnmDQL4L4",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1997,
+      "output_tokens": 421,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

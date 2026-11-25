@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (fax)\nPrescriber: Dr. R. Placeholder\nPatient ref: PT-20051\nOxycodone 5 mg/mL oral suspension 100 mL. 2 mL PO q6h PRN.\n</prescription>",
+  "key": "39973bdcb96ad25bc65d2b6709afefe22292b0cac324a3265e827d18aee8ed7d",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01TTFTX2R24xbVT3f3ATM1Xa",
+        "input": {
+          "base": null,
+          "directions": "2 mL by mouth every 6 hours as needed",
+          "dosage_form": "suspension",
+          "extraction_notes": "Source: TeleHealthSH (fax). Oxycodone is a controlled substance. Prescriber name appears to be a placeholder (\"Dr. R. Placeholder\") and no prescriber credentials/identifiers are given; verify prescriber. PRN directions give no indication/reason for use or maximum daily dose.",
+          "ingredients": [
+            {
+              "name": "oxycodone",
+              "strength": 5,
+              "unit": "mg/mL"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20051",
+          "prescriber_name": "Dr. R. Placeholder",
+          "quantity": 100,
+          "quantity_unit": "mL",
+          "route": "oral",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPonmtkDRJFdgMNWDFdH",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1990,
+      "output_tokens": 479,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

@@ -21,6 +21,7 @@ from intake.adapters.anthropic_client import ModelConfig
 from intake.models import ProposalStatus
 
 SEED = REPO / "data" / "seed" / "seed_cases.jsonl"
+GOLDEN = REPO / "data" / "golden" / "golden_cases.jsonl"
 DAY = date(2026, 11, 25)
 
 
@@ -109,11 +110,11 @@ def test_seed_run_scores_every_case() -> None:
 
 
 def test_seed_run_passes_hard_gates(tmp_path: Path) -> None:
-    assert _main(tmp_path, "--enforce-gates") == 0
+    assert _main(tmp_path, "--cases", str(SEED), "--enforce-gates") == 0
 
 
 def test_module_entry_point_runs_in_replay(tmp_path: Path) -> None:
-    """The exact CI command (plus a temp results dir) exits 0 on the seed set."""
+    """The exact CI command (plus a temp results dir) exits 0; its default case set is the golden set (S2.6)."""
     env = {**os.environ, anthropic_client.MODE_ENV: "replay"}
     out_dir = tmp_path / "results"
     result = subprocess.run(
@@ -132,7 +133,7 @@ def test_module_entry_point_runs_in_replay(tmp_path: Path) -> None:
 
 
 def test_results_file_named_by_date_and_marked_generated(tmp_path: Path) -> None:
-    _main(tmp_path)
+    _main(tmp_path, "--cases", str(SEED))
     files = sorted(p.name for p in (tmp_path / "results").iterdir())
     assert files == ["2026-11-25.md"]
     text = _results(tmp_path)
@@ -144,7 +145,7 @@ def test_results_file_named_by_date_and_marked_generated(tmp_path: Path) -> None
 
 
 def test_results_file_records_versions(tmp_path: Path) -> None:
-    _main(tmp_path)
+    _main(tmp_path, "--cases", str(SEED))
     text = _results(tmp_path)
     proposal = run_eval.run(run_eval.load_cases(SEED), client=run_eval.make_client("replay")).results[0].proposal
     assert proposal.model_id in text
@@ -159,8 +160,8 @@ def test_default_results_dir_is_repo_results() -> None:
 
 
 def test_rerun_same_day_overwrites(tmp_path: Path) -> None:
-    _main(tmp_path)
-    _main(tmp_path)
+    _main(tmp_path, "--cases", str(SEED))
+    _main(tmp_path, "--cases", str(SEED))
     assert len(list((tmp_path / "results").glob("*.md"))) == 1
 
 
@@ -227,7 +228,7 @@ def test_case_file_with_no_cases_is_an_error(tmp_path: Path) -> None:
 
 
 def test_informational_metrics_report_top1_and_flag_recall(tmp_path: Path) -> None:
-    _main(tmp_path)
+    _main(tmp_path, "--cases", str(SEED))
     text = _results(tmp_path)
     assert "Top-1" in text
     assert "Expected-flag recall" in text
@@ -237,3 +238,41 @@ def test_informational_metrics_report_top1_and_flag_recall(tmp_path: Path) -> No
 def test_mode_flag_rejects_unknown_value(tmp_path: Path) -> None:
     with pytest.raises(SystemExit):
         run_eval.main(["--mode", "bogus", "--results-dir", str(tmp_path)])
+
+
+# --- S2.6: REPLAY covers the full golden set ----------------------------------------------------
+
+
+def test_default_case_set_is_the_golden_set() -> None:
+    """CI's unchanged command (`--mode replay --enforce-gates`, no --cases) runs the golden set."""
+    assert run_eval.DEFAULT_CASES == (GOLDEN,)
+    assert run_eval._parser().parse_args([]).cases == [GOLDEN]
+
+
+def test_golden_set_has_a_recording_for_every_case() -> None:
+    """All 60 golden cases replay: no missing recording and no crash (invariant 4, no fallback)."""
+    cases = run_eval.load_cases(GOLDEN)
+    assert len(cases) == 60
+    report = run_eval.run(cases, client=run_eval.make_client("replay"))
+    missing = [r.case.case_id for r in report.results if r.missing_recording]
+    errors = [f"{r.case.case_id}: {r.error}" for r in report.results if r.error]
+    assert missing == []
+    assert errors == []
+    assert all(r.proposal is not None for r in report.results)
+
+
+def test_default_run_exits_0_with_no_missing_recording(tmp_path: Path) -> None:
+    assert _main(tmp_path) != run_eval.EXIT_MISSING_RECORDING
+    assert "MISSING RECORDING" not in _results(tmp_path)
+    assert "data/golden/golden_cases.jsonl" in _results(tmp_path)
+
+
+def test_several_case_files_run_together(tmp_path: Path) -> None:
+    assert _main(tmp_path, "--cases", str(GOLDEN), str(SEED)) == 0
+    text = _results(tmp_path)
+    assert "g001" in text and "case_001" in text
+    assert "Cases: 65 from `data/golden/golden_cases.jsonl + data/seed/seed_cases.jsonl`" in text
+
+
+def test_duplicate_case_ids_across_files_are_an_error(tmp_path: Path) -> None:
+    assert _main(tmp_path, "--cases", str(SEED), str(SEED)) == 1

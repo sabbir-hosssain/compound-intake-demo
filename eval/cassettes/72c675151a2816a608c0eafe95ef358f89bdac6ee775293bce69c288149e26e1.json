@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (fax)\nPrescriber: Dr. S. Testcase\nPatient ref: PT-20040\nTriamcinolone 0.1% in adhesive oral paste base, 5 g. Apply to ulcer buccal QID.\n</prescription>",
+  "key": "72c675151a2816a608c0eafe95ef358f89bdac6ee775293bce69c288149e26e1",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01DvETsUBxmBEaz4Kfz9aqd7",
+        "input": {
+          "base": "adhesive oral paste base",
+          "directions": "Apply to ulcer buccal QID",
+          "dosage_form": "paste",
+          "extraction_notes": "Received via fax from TeleHealthSH. Route inferred as oral (buccal/oral paste base). QID not expanded in directions as written.",
+          "ingredients": [
+            {
+              "name": "triamcinolone",
+              "strength": 0.1,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20040",
+          "prescriber_name": "Dr. S. Testcase",
+          "quantity": 5,
+          "quantity_unit": "g",
+          "route": "oral",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPom8t1BfYjfDn4DW1jD",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1992,
+      "output_tokens": 420,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

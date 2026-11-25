@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (fax)\nPrescriber: Dr. K. Fictional\nPatient ref: PT-20008\nBaclofen 5 mg/mL oral suspension, sugar-free syrup vehicle, 300 mL. 5 mL PO TID. Diabetic patient.\n</prescription>",
+  "key": "90af5ce3a4e629e261ce0226a144e9c7df1b38afa59972aa0f5e621b8264a395",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01M62YFxfYdZKCPBguZQsbpf",
+        "input": {
+          "base": "sugar-free syrup vehicle",
+          "directions": "5 mL PO TID (three times daily)",
+          "dosage_form": "suspension",
+          "extraction_notes": "Received via fax from TeleHealthSH. Patient noted as diabetic; sugar-free vehicle specified.",
+          "ingredients": [
+            {
+              "name": "baclofen",
+              "strength": 5,
+              "unit": "mg/mL"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20008",
+          "prescriber_name": "Dr. K. Fictional",
+          "quantity": 300,
+          "quantity_unit": "mL",
+          "route": "oral",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPoe8sJms7nwH6C2NuYf",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 2006,
+      "output_tokens": 418,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

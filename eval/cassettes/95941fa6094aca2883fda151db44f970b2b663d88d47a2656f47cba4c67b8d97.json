@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx via SH Compounding Network portal\nPrescriber: Dr. R. Placeholder\nPatient ref: PT-20007\nBaclofen 5 mg/mL oral suspension in cherry-flavoured suspending vehicle. Qty 300 mL. 5 mL PO TID.\n</prescription>",
+  "key": "95941fa6094aca2883fda151db44f970b2b663d88d47a2656f47cba4c67b8d97",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_019nf29Ky6EyJaB5roCutzcX",
+        "input": {
+          "base": "suspending vehicle",
+          "directions": "5 mL by mouth three times daily",
+          "dosage_form": "suspension",
+          "extraction_notes": "Cherry flavouring noted (not a base). Submitted via SH Compounding Network portal.",
+          "ingredients": [
+            {
+              "name": "baclofen",
+              "strength": 5,
+              "unit": "mg/mL"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20007",
+          "prescriber_name": "Dr. R. Placeholder",
+          "quantity": 300,
+          "quantity_unit": "mL",
+          "route": "oral",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPodsnTaUFykhrxn3tvq",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 2003,
+      "output_tokens": 405,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

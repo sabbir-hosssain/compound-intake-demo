@@ -1,0 +1,68 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (fax)\nPrescriber: Dr. J. Demo\nPatient ref: PT-20017\nHydrocortisone 1% / lidocaine 2% cream 30 g, apply BID to perianal area.\n</prescription>",
+  "key": "6192ad46325361c6260144b8f4628786508f82b248e28f6d2d34f10cab2c487a",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01Dj2Sh4BPAMjJ2qyEEPJha2",
+        "input": {
+          "base": null,
+          "directions": "Apply BID (twice daily) to perianal area.",
+          "dosage_form": "cream",
+          "extraction_notes": "Received via fax from TeleHealthSH. No cream base specified. Perianal application is external topical use; route inferred as topical.",
+          "ingredients": [
+            {
+              "name": "hydrocortisone",
+              "strength": 1,
+              "unit": "%"
+            },
+            {
+              "name": "lidocaine",
+              "strength": 2,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20017",
+          "prescriber_name": "Dr. J. Demo",
+          "quantity": 30,
+          "quantity_unit": "g",
+          "route": "topical",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPogKyrmEeEmQKztDsGP",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1986,
+      "output_tokens": 433,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "input": "<prescription>\nSalicylic acid 3% urea 10% cream vanishing cream base 60 g apply BID. Prescriber: Dr. S. Testcase. Patient ref: PT-20022\n</prescription>",
+  "key": "886b2f7aafbce1caf527b6f5b0f1605289a2561a289ccb30d843f646ac8d7190",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01TAJBkkua7PWT7cqPfF3Zf8",
+        "input": {
+          "base": "vanishing cream",
+          "directions": "apply BID",
+          "dosage_form": "cream",
+          "extraction_notes": "Directions do not specify application site or frequency expansion beyond \"BID\"; route inferred as topical from cream and \"apply\".",
+          "ingredients": [
+            {
+              "name": "salicylic acid",
+              "strength": 3,
+              "unit": "%"
+            },
+            {
+              "name": "urea",
+              "strength": 10,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20022",
+          "prescriber_name": "Dr. S. Testcase",
+          "quantity": 60,
+          "quantity_unit": "g",
+          "route": "topical",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPohq9K49rphLVdmhFJP",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1965,
+      "output_tokens": 420,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

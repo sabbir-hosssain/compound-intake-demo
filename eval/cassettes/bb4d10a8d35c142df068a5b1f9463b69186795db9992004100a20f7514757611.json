@@ -1,0 +1,68 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (eRx)\nPrescriber: Dr. L. Example\nPatient ref: PT-20009\nHydrocortisone 1% / clotrimazole 1% cream in vanishing cream base. 30 g. Apply BID x 2 weeks.\n</prescription>",
+  "key": "bb4d10a8d35c142df068a5b1f9463b69186795db9992004100a20f7514757611",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_013i2o6K3ipVNoDxXSdmSKHo",
+        "input": {
+          "base": "vanishing cream",
+          "directions": "Apply twice daily (BID) for 2 weeks.",
+          "dosage_form": "cream",
+          "extraction_notes": "Source: TeleHealthSH (eRx). Route inferred as topical from cream and \"apply\" directions; application site not specified.",
+          "ingredients": [
+            {
+              "name": "hydrocortisone",
+              "strength": 1,
+              "unit": "%"
+            },
+            {
+              "name": "clotrimazole",
+              "strength": 1,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20009",
+          "prescriber_name": "Dr. L. Example",
+          "quantity": 30,
+          "quantity_unit": "g",
+          "route": "topical",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPoeRMFEQJHmz3Vrg4vL",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1999,
+      "output_tokens": 440,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

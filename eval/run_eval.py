@@ -1,6 +1,6 @@
 """Eval harness (SPEC §8): run the system and the baseline over a case set, score, gate, write results/.
 
-    uv run python -m eval.run_eval --mode replay --enforce-gates [--cases data/golden/golden_cases.jsonl]
+    uv run python -m eval.run_eval --mode replay --enforce-gates [--cases FILE [FILE ...]]
 
 Proposals come from `intake.pipeline.build_proposal` and are scored here; nothing is logged to the
 audit. A missing REPLAY recording is a failure (exit 2), never a fallback to a live model (invariant 4).
@@ -11,7 +11,8 @@ The other two SPEC §8 hard gates are their own CI jobs: zero write path (tests/
 in `test`) and the redaction check (`redaction`). Every SPEC §8 metric (eval/metrics.py) is reported per
 split and per category for the system and the baseline; soft gates are reported, never the exit code.
 
-The default case set is the seed set until the golden set has REPLAY recordings (S2.6). Golden cases
+The default case set is the golden set (recorded in S2.6), so CI's unchanged command covers all 60 cases.
+The seed set stays covered by tests/test_run_eval.py; `--cases <golden> <seed>` runs both. Golden cases
 carry `raw` inline; the system and the baseline both see `raw.text` plus `raw.notes`.
 """
 
@@ -38,7 +39,9 @@ from intake.pipeline import Library, build_proposal, load_library
 from intake.rules import run_pass1
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_CASES = REPO_ROOT / "data" / "seed" / "seed_cases.jsonl"
+GOLDEN_CASES = REPO_ROOT / "data" / "golden" / "golden_cases.jsonl"
+SEED_CASES = REPO_ROOT / "data" / "seed" / "seed_cases.jsonl"
+DEFAULT_CASES: tuple[Path, ...] = (GOLDEN_CASES,)
 DEFAULT_RESULTS_DIR = REPO_ROOT / "results"
 
 EXIT_OK = 0
@@ -164,9 +167,19 @@ class Report(BaseModel):
 # --- loading and running -----------------------------------------------------------------------
 
 
-def load_cases(path: Path = DEFAULT_CASES) -> list[EvalCase]:
+def load_cases(path: Path = GOLDEN_CASES) -> list[EvalCase]:
     lines = Path(path).read_text(encoding="utf-8").splitlines()
     return [EvalCase.model_validate(json.loads(line)) for line in lines if line.strip()]
+
+
+def load_case_files(paths: Sequence[Path]) -> list[EvalCase]:
+    """Cases from several files, in order. A case ID seen twice raises, so no case is scored twice."""
+    cases = [case for path in paths for case in load_cases(path)]
+    ids = [case.case_id for case in cases]
+    duplicates = sorted({i for i in ids if ids.count(i) > 1})
+    if duplicates:
+        raise ValueError(f"duplicate case IDs across case files: {', '.join(duplicates)}")
+    return cases
 
 
 def make_client(mode: str) -> ModelClient:
@@ -466,10 +479,13 @@ def _soft_gates(report: Report, results_dir: Path, day: date) -> list[SoftGate]:
 # --- command line ------------------------------------------------------------------------------
 
 
-def _cases_label(path: Path) -> str:
-    """The case file as a repo-relative path, or just its name (never an absolute, personal path)."""
-    resolved = Path(path).resolve()
-    return str(resolved.relative_to(REPO_ROOT)) if resolved.is_relative_to(REPO_ROOT) else resolved.name
+def _cases_label(paths: Sequence[Path]) -> str:
+    """The case files as repo-relative paths, or just their names (never an absolute, personal path)."""
+    labels = []
+    for path in paths:
+        resolved = Path(path).resolve()
+        labels.append(str(resolved.relative_to(REPO_ROOT)) if resolved.is_relative_to(REPO_ROOT) else resolved.name)
+    return " + ".join(labels)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -479,8 +495,9 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--cases",
         type=Path,
-        default=DEFAULT_CASES,
-        help="JSONL case file (default: seed set; golden set: data/golden/golden_cases.jsonl).",
+        nargs="+",
+        default=list(DEFAULT_CASES),
+        help="JSONL case file(s) (default: the golden set; seed set: data/seed/seed_cases.jsonl).",
     )
     parser.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS_DIR)
     parser.add_argument("--date", type=date.fromisoformat, default=None, help="Results date (default: today, UTC).")
@@ -497,9 +514,13 @@ def _exit_code(report: Report, enforce_gates: bool) -> int:
 
 def main(argv: Sequence[str] | None = None, *, client: CompletionClient | None = None) -> int:
     args = _parser().parse_args(argv)
-    cases = load_cases(args.cases)
+    try:
+        cases = load_case_files(args.cases)
+    except ValueError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return EXIT_GATE_FAILED
     if not cases:
-        print(f"error: no cases in {args.cases}", file=sys.stderr)
+        print(f"error: no cases in {_cases_label(args.cases)}", file=sys.stderr)
         return EXIT_GATE_FAILED
     report = run(cases, client=client or make_client(args.mode)).model_copy(update={"cases": _cases_label(args.cases)})
     day = args.date or datetime.now(UTC).date()

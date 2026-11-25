@@ -1,0 +1,73 @@
+{
+  "input": "<prescription>\nRx via SH Compounding Network portal\nPrescriber: Dr. R. Placeholder\nPatient ref: PT-20019\nHC 1% + clotrimazole 1% cream, vanishing cream base. 45 g. Apply BID.\n</prescription>",
+  "key": "b6186f69d88b54fe98f309d68a92cb8416891c308abd08ae46383c64413e6953",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "signature": "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",
+        "thinking": "",
+        "type": "thinking"
+      },
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01HhMv2WT3FNP9BLGpiiHh7t",
+        "input": {
+          "base": "vanishing cream",
+          "directions": "Apply twice daily",
+          "dosage_form": "cream",
+          "extraction_notes": "Ingredient \"HC\" is an abbreviation and was transcribed as written; it is likely hydrocortisone but this is not stated, so the pharmacist should confirm. Route not explicitly written (directions say only \"Apply\"; application site not specified). BID expanded to twice daily.",
+          "ingredients": [
+            {
+              "name": "hc",
+              "strength": 1,
+              "unit": "%"
+            },
+            {
+              "name": "clotrimazole",
+              "strength": 1,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20019",
+          "prescriber_name": "Dr. R. Placeholder",
+          "quantity": 45,
+          "quantity_unit": "g",
+          "route": null,
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPogqHDvBjxCBchX9pQa",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1986,
+      "output_tokens": 838,
+      "output_tokens_details": {
+        "thinking_tokens": 362
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

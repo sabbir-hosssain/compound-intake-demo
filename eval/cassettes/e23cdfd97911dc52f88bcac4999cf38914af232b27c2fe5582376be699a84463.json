@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (eRx)\nPrescriber: Dr. K. Fictional\nPatient ref: PT-20052\nFamotidine 8 mg/mL oral suspension, cherry-flavoured suspending vehicle. 150 mL. 5 mL PO BID.\npt also takes oxycodone, check interactions\n</prescription>",
+  "key": "e23cdfd97911dc52f88bcac4999cf38914af232b27c2fe5582376be699a84463",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01Aj2SHXiQt9EvfY4imuqrm8",
+        "input": {
+          "base": "suspending vehicle",
+          "directions": "5 mL PO BID",
+          "dosage_form": "suspension",
+          "extraction_notes": "Cherry flavouring in the suspending vehicle. Source: TeleHealthSH (eRx). Prescription notes patient also takes oxycodone and asks to check interactions; oxycodone is not part of this compound and was not extracted as an ingredient. Pharmacist to review for interactions.",
+          "ingredients": [
+            {
+              "name": "famotidine",
+              "strength": 8,
+              "unit": "mg/mL"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20052",
+          "prescriber_name": "Dr. K. Fictional",
+          "quantity": 150,
+          "quantity_unit": "mL",
+          "route": "oral",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPoo4vvJ2oz7A4dL66cu",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 2018,
+      "output_tokens": 466,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

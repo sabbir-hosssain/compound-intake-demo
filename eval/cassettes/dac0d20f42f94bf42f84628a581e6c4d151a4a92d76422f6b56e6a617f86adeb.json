@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (fax)\nPrescriber: Dr. R. Placeholder\nPatient ref: PT-20037\nOmeprazole 2 mg/mL oral suspension, sodium bicarbonate buffered vehicle. 5 mL PO daily.\n</prescription>",
+  "key": "dac0d20f42f94bf42f84628a581e6c4d151a4a92d76422f6b56e6a617f86adeb",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_017Ht313CMGMgi9PjHcz5t3L",
+        "input": {
+          "base": "sodium bicarbonate buffered vehicle",
+          "directions": "5 mL PO daily",
+          "dosage_form": "suspension",
+          "extraction_notes": "Dispense quantity not stated. Received via fax from TeleHealthSH. Prescriber name appears to be a placeholder (\"Dr. R. Placeholder\") - verify prescriber identity.",
+          "ingredients": [
+            {
+              "name": "omeprazole",
+              "strength": 2,
+              "unit": "mg/mL"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20037",
+          "prescriber_name": "Dr. R. Placeholder",
+          "quantity": null,
+          "quantity_unit": null,
+          "route": "oral",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChPokGvf7JtrbUbYdxnFq",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1998,
+      "output_tokens": 444,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}
