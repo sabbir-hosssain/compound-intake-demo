@@ -213,7 +213,39 @@ def submit(
     known_formula_ids: Collection[str] | None = None,
     at: datetime | None = None,
 ) -> AuditRecord:
-    """Validate one decision on one pending record and append it as a new chained record."""
+    """Validate one decision on one pending record and append it as a new chained record.
+
+    The log is read, checked and appended to inside one `audit.write_lock`, so a concurrent writer
+    can neither fork the chain nor review the same record twice (#41).
+    """
+    with audit.write_lock(conn):
+        return _submit_locked(
+            conn,
+            pending,
+            action=action,
+            reason_code=reason_code,
+            reviewer=reviewer,
+            acknowledged=acknowledged,
+            chosen_formula_id=chosen_formula_id,
+            corrected_fields=corrected_fields,
+            known_formula_ids=known_formula_ids,
+            at=at,
+        )
+
+
+def _submit_locked(
+    conn: Connection,
+    pending: AuditRecord,
+    *,
+    action: ReviewActionType,
+    reason_code: str | None,
+    reviewer: str,
+    acknowledged: Collection[str],
+    chosen_formula_id: str | None,
+    corrected_fields: Mapping[str, Any] | None,
+    known_formula_ids: Collection[str] | None,
+    at: datetime | None,
+) -> AuditRecord:
     records = audit.read_all(conn)
     _check_pending(records, pending)
     review_action = build_action(

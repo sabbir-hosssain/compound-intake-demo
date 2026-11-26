@@ -116,10 +116,11 @@ def log_pending(proposal: Proposal, text: str, audit_db: Path | None = None) -> 
     """Append the proposal to the audit log as pending and return the stored record."""
     conn = audit.connect(audit_db)
     try:
-        existing = audit.read_all(conn)
-        prev_hash = existing[-1].record_hash if existing else GENESIS_HASH
-        record = pending_record(proposal, text, seq=audit.next_seq(conn), prev_hash=prev_hash)
-        audit.append(conn, record)
+        with audit.write_lock(conn):  # read -> next_seq -> append as one transaction (#41)
+            existing = audit.read_all(conn)
+            prev_hash = existing[-1].record_hash if existing else GENESIS_HASH
+            record = pending_record(proposal, text, seq=audit.next_seq(conn), prev_hash=prev_hash)
+            audit.append(conn, record)
         return record
     finally:
         conn.close()

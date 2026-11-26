@@ -8,6 +8,7 @@ import ast
 import hashlib
 import inspect
 import sqlite3
+import threading
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -529,3 +530,93 @@ def test_app_action_without_reason_writes_nothing(tmp_path: Path, monkeypatch: p
     app.run()
     assert _count(db) == 1
     assert any("reason" in e.value for e in app.error)
+
+
+# --- #41: submit reads the chain head and appends in one transaction ---------------------------
+
+CLARIFY_KWARGS: dict[str, object] = {
+    "action": ReviewActionType.CLARIFY,
+    "reason_code": ReasonCode.AMBIGUOUS_ORDER,
+    "reviewer": "pharmacist-1",
+    "acknowledged": frozenset(),
+    "known_formula_ids": KNOWN,
+}
+
+
+def _interleaved_submits(
+    db: Path, monkeypatch: pytest.MonkeyPatch, pending_a: AuditRecord, pending_b: AuditRecord
+) -> tuple[AuditRecord | Exception, AuditRecord | Exception, list[bool]]:
+    """Reviewer A reads the log, then pauses inside `build_action`; reviewer B submits in that gap."""
+    real_build_action = review.build_action
+    a_inside = threading.Event()
+    b_done = threading.Event()
+    b_finished_inside_a: list[bool] = []
+
+    def pause_first_reviewer(*args: object, **kwargs: object):
+        action = real_build_action(*args, **kwargs)
+        if not a_inside.is_set():
+            a_inside.set()
+            b_finished_inside_a.append(b_done.wait(timeout=0.5))
+        return action
+
+    monkeypatch.setattr(review, "build_action", pause_first_reviewer)
+
+    def submit_on_own_connection(pending: AuditRecord) -> AuditRecord | Exception:
+        conn = audit.connect(db)
+        try:
+            return review.submit(conn, pending, **CLARIFY_KWARGS)
+        except (ReviewError, ValueError, sqlite3.Error) as error:
+            return error
+        finally:
+            conn.close()
+
+    results: dict[str, AuditRecord | Exception] = {}
+
+    def reviewer_b() -> None:
+        a_inside.wait(timeout=5)
+        results["b"] = submit_on_own_connection(pending_b)
+        b_done.set()
+
+    thread = threading.Thread(target=reviewer_b)
+    thread.start()
+    result_a = submit_on_own_connection(pending_a)
+    thread.join(timeout=10)
+    return result_a, results["b"], b_finished_inside_a
+
+
+def _seed_two(tmp_path: Path) -> tuple[Path, AuditRecord, AuditRecord]:
+    db = tmp_path / "audit.sqlite"
+    conn = audit.connect(db)
+    try:
+        first = _log_pending(conn, _proposal(pid="rx-001"))
+        second = _log_pending(conn, _proposal(pid="rx-002"))
+    finally:
+        conn.close()
+    return db, first, second
+
+
+def test_interleaved_submits_on_different_records_keep_one_chain(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    db, first, second = _seed_two(tmp_path)
+    result_a, result_b, b_finished_inside_a = _interleaved_submits(db, monkeypatch, first, second)
+    assert isinstance(result_a, AuditRecord), result_a
+    assert isinstance(result_b, AuditRecord), result_b
+    assert b_finished_inside_a == [False]  # B waited for A's transaction
+    assert (result_a.seq, result_b.seq) == (2, 3)
+    assert result_b.prev_hash == result_a.record_hash
+    conn = audit.connect(db)
+    try:
+        assert audit.verify(conn).ok  # no fork: every prev_hash is the previous record_hash
+    finally:
+        conn.close()
+
+
+def test_interleaved_submits_on_the_same_record_review_it_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    db, first, _ = _seed_two(tmp_path)
+    result_a, result_b, _ = _interleaved_submits(db, monkeypatch, first, first)
+    assert isinstance(result_a, AuditRecord), result_a
+    assert isinstance(result_b, ReviewError) and "already reviewed" in str(result_b)
+    assert _count(db) == 3

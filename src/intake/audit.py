@@ -8,12 +8,18 @@ Chain: `record_hash = sha256(prev_hash + canonical_json(record))`, where canonic
 without its own `record_hash`, dumped in Pydantic JSON mode with sorted keys and compact separators.
 The first record links to `GENESIS_HASH`. `append` stores hashes as the caller gives them; `verify`
 recomputes the whole chain and reports the first broken link.
+
+Writers that compute `seq` and `prev_hash` from the log must do the read and the `append` inside one
+`write_lock(conn)` (SQLite `BEGIN IMMEDIATE`), so two concurrent writers cannot both build on the same
+chain head.
 """
 
 import hashlib
 import json
 import sqlite3
 import tomllib
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -72,6 +78,24 @@ def connect(path: Path | None = None) -> sqlite3.Connection:
     return conn
 
 
+@contextmanager
+def write_lock(conn: sqlite3.Connection) -> Iterator[sqlite3.Connection]:
+    """Hold SQLite's write lock (`BEGIN IMMEDIATE`) for the block; commit on exit, roll back on error.
+
+    Another connection's `write_lock` waits (up to its busy timeout) until this one ends, so a
+    read of the chain head and the `append` built on it happen as one unit.
+    """
+    if conn.in_transaction:
+        raise RuntimeError("write_lock needs a connection with no open transaction")
+    conn.execute("BEGIN IMMEDIATE")
+    try:
+        yield conn
+    except BaseException:
+        conn.rollback()
+        raise
+    conn.commit()
+
+
 def next_seq(conn: sqlite3.Connection) -> int:
     """The `seq` the next appended record must carry (0 for an empty log)."""
     (value,) = conn.execute("SELECT COALESCE(MAX(seq) + 1, 0) FROM audit_log").fetchone()
@@ -79,7 +103,10 @@ def next_seq(conn: sqlite3.Connection) -> int:
 
 
 def append(conn: sqlite3.Connection, record: AuditRecord) -> int:
-    """Insert one record and commit. `record.seq` must equal `next_seq(conn)`. Returns the seq."""
+    """Insert one record. `record.seq` must equal `next_seq(conn)`. Returns the seq.
+
+    Inside `write_lock` the insert is committed when the lock ends; otherwise it is committed here.
+    """
     if not isinstance(record, AuditRecord):
         raise TypeError(f"append expects an AuditRecord, got {type(record).__name__}")
     expected = next_seq(conn)
@@ -93,8 +120,11 @@ def append(conn: sqlite3.Connection, record: AuditRecord) -> int:
         record.at.isoformat(),
         record.model_dump_json(),
     )
-    with conn:
+    if conn.in_transaction:
         conn.execute(_INSERT, row)
+    else:
+        with conn:
+            conn.execute(_INSERT, row)
     return record.seq
 
 
