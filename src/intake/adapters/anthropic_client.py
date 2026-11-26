@@ -57,22 +57,34 @@ def default_cassette_dir(path: Path = CONFIG_PATH) -> Path:
     return REPO_ROOT / _read_config(path)["paths"]["cassettes"]
 
 
-def _make_live_client() -> Any:
+def _make_live_client(**sdk_kwargs: Any) -> Any:
     """The only place a network client is built. Imported lazily so REPLAY never touches it."""
     import anthropic
 
-    return anthropic.Anthropic()
+    return anthropic.Anthropic(**sdk_kwargs)
 
 
 class ModelClient:
-    """Sends one system prompt + one user input and returns the raw Messages API response as a dict."""
+    """Sends one system prompt + one user input and returns the raw Messages API response as a dict.
+
+    `max_retries` is handed to the SDK client when RECORD or LIVE builds it; None keeps the SDK default.
+    REPLAY ignores it and never builds a client.
+    """
 
     def __init__(
-        self, config: ModelConfig | None = None, *, mode: Mode | None = None, cassette_dir: Path | None = None
+        self,
+        config: ModelConfig | None = None,
+        *,
+        mode: Mode | None = None,
+        cassette_dir: Path | None = None,
+        max_retries: int | None = None,
     ) -> None:
+        if max_retries is not None and max_retries < 0:
+            raise ValueError(f"max_retries must be >= 0 or None, got {max_retries}")
         self.config = config or load_model_config()
         self.mode = mode or get_mode()
         self.cassette = Cassette(cassette_dir or default_cassette_dir())
+        self.max_retries = max_retries
         self._live: Any = None
 
     def complete(
@@ -101,7 +113,8 @@ class ModelClient:
         if self.mode is Mode.REPLAY:  # defence in depth; complete() already returned
             raise RuntimeError("REPLAY mode must never call a live model")
         if self._live is None:
-            self._live = _make_live_client()
+            sdk_kwargs = {} if self.max_retries is None else {"max_retries": self.max_retries}
+            self._live = _make_live_client(**sdk_kwargs)
         request: dict[str, Any] = {
             "model": self.config.model_id,
             "max_tokens": self.config.max_tokens,

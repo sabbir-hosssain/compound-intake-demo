@@ -26,6 +26,7 @@ from intake.models import Extraction, Ingredient, ProposalStatus
 SEED = REPO / "data" / "seed" / "seed_cases.jsonl"
 DAY = date(2026, 11, 25)
 P, NM, MAN = ProposalStatus.PROPOSED, ProposalStatus.NO_MATCH, ProposalStatus.MANUAL
+REAL_MAKE_LIVE_CLIENT = anthropic_client._make_live_client  # before the autouse guard replaces it
 
 
 @pytest.fixture(autouse=True)
@@ -358,6 +359,8 @@ def test_live_client_disables_sdk_retries_and_never_writes_recordings(
             self.messages = _FakeMessages()
 
     monkeypatch.setattr(anthropic, "Anthropic", _FakeAnthropic)
+    # The adapter's own factory builds the (fake) SDK client from the public `max_retries`.
+    monkeypatch.setattr(anthropic_client, "_make_live_client", REAL_MAKE_LIVE_CLIENT)
     client = variance.live_model_client(cassette_dir=tmp_path)
     assert client.mode is Mode.LIVE
     client.complete(prompt_hash="h", system="s", user_input="u")

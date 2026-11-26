@@ -195,9 +195,9 @@ def load_case_files(paths: Sequence[Path]) -> list[EvalCase]:
 
 
 def make_client(mode: str) -> ModelClient:
-    if Mode(mode.upper()) is Mode.LIVE:
-        return variance.live_model_client()
-    return ModelClient(mode=Mode(mode.upper()))
+    """LIVE gets `max_retries=0` so every HTTP attempt is a counted call; RECORD keeps the SDK default."""
+    m = Mode(mode.upper())
+    return ModelClient(mode=m, max_retries=0 if m is Mode.LIVE else None)
 
 
 def _case_path(file: str) -> Path:
