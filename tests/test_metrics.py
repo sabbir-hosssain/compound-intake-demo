@@ -174,6 +174,53 @@ def test_simulated_override_rate_counts_decisions_that_differ_from_gold() -> Non
     assert metrics.simulated_override_rate(pairs, ALIASES) == Rate(k=3, n=5)
 
 
+def test_simulated_override_counts_proposed_without_candidates_and_wrong_no_match() -> None:
+    """S3.4: top-1 ≠ gold over every case; nothing to confirm, or a NO_MATCH on a matchable case, is an override."""
+    pairs = [
+        (_gold("a"), _out(candidates=())),  # PROPOSED with nothing to confirm: override
+        (_gold("b"), _out(ProposalStatus.NO_MATCH)),  # gold has a formula: override
+        (_gold("c", formula_id=NO_MATCH), _out(candidates=("SHF-001",))),  # gold NO_MATCH: override
+        (_gold("d", category="unsafe"), _out(candidates=("SHF-001",), flags=("R2-02",), has_block=True)),  # agree
+    ]
+    assert metrics.simulated_override_rate(pairs, ALIASES) == Rate(k=3, n=4)
+
+
+def _override_spec() -> metrics.MetricSpec:
+    return next(s for s in metrics.METRICS if s.name == "simulated_override_rate")
+
+
+def test_simulated_override_is_labelled_simulated_and_says_why() -> None:
+    """S3.4 AC: labelled "simulated"; the definition says gold stands in for the pharmacist (no real overrides)."""
+    spec = _override_spec()
+    assert spec.label == "Simulated override rate"
+    assert spec.fn is metrics.simulated_override_rate
+    definition = spec.definition.lower()
+    assert "simulated" in definition and "gold" in definition and "pharmacist" in definition
+    assert "top-1" in definition and "lower is better" in definition
+
+
+def test_rendered_override_table_is_labelled_simulated() -> None:
+    pairs = [(_gold("a"), _out(candidates=("SHF-002",))), (_gold("b"), _out(candidates=("SHF-001",)))]
+    lines = metrics.render_tables(metrics.metric_table({"system": pairs, "baseline": pairs}, ALIASES))
+    i = lines.index("### Simulated override rate")
+    assert lines[i + 2] == f"_{_override_spec().definition}_"
+    assert "| all | 1/2 50% [9–91] | 1/2 50% [9–91] |" in lines[i + 4 :]
+
+
+def test_replay_results_file_has_the_simulated_override_section(tmp_path: Path) -> None:
+    """S3.4 AC end to end: a REPLAY run writes the metric under its "simulated" heading and in the JSON comment."""
+    argv = ["--mode", "replay", "--cases", str(SEED), "--results-dir", str(tmp_path), "--date", DAY.isoformat()]
+    assert run_eval.main(argv) == 0
+    text = (tmp_path / f"{DAY.isoformat()}.md").read_text(encoding="utf-8")
+    section = text.split("### Simulated override rate", 1)[1].split("###", 1)[0]
+    assert f"_{_override_spec().definition}_" in section
+    assert "| Slice | System | Baseline |" in section and "| all |" in section
+    data = run_eval.read_metrics_comment(text)
+    assert data is not None
+    k, n = data["metrics"]["system"]["all"]["simulated_override_rate"]
+    assert n == len(run_eval.load_cases(SEED)) and 0 <= k <= n
+
+
 def _extraction(**kw: Any) -> Extraction:
     base: dict[str, Any] = {
         "ingredients": [

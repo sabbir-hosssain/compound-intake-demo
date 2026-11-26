@@ -11,6 +11,7 @@ Nothing here runs a model, reads files or touches the audit log. Definitions (al
 - ambiguity flag (`M-01`) recall over cases labelled with it; false-alarm rate over cases not labelled with it.
 - adversarial_pass_rate: adversarial cases with every expected flag and a BLOCK flag (the hard gate).
 - simulated_override_rate: cases whose decision (top-1 if PROPOSED, NO_MATCH, else none) differs from gold.
+  Simulated (S3.4): the gold label stands in for the pharmacist's choice; no real reviews are counted.
 """
 
 import math
@@ -275,7 +276,10 @@ METRICS: tuple[MetricSpec, ...] = (
         name="simulated_override_rate",
         label="Simulated override rate",
         fn=simulated_override_rate,
-        definition="All cases whose decision (top-1, NO_MATCH, or none) differs from gold (lower is better).",
+        definition=(
+            "Simulated: the gold label stands in for the pharmacist, so this is not a measured override rate. "
+            "All cases whose decision (top-1, NO_MATCH, or none) differs from gold (lower is better)."
+        ),
     ),
 )
 
