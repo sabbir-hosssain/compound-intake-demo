@@ -252,7 +252,7 @@ def test_default_case_set_is_the_golden_set() -> None:
 def test_golden_set_has_a_recording_for_every_case() -> None:
     """All 60 golden cases replay: no missing recording and no crash (invariant 4, no fallback)."""
     cases = run_eval.load_cases(GOLDEN)
-    assert len(cases) == 60
+    assert len(cases) == 64
     report = run_eval.run(cases, client=run_eval.make_client("replay"))
     missing = [r.case.case_id for r in report.results if r.missing_recording]
     errors = [f"{r.case.case_id}: {r.error}" for r in report.results if r.error]
@@ -271,7 +271,7 @@ def test_several_case_files_run_together(tmp_path: Path) -> None:
     assert _main(tmp_path, "--cases", str(GOLDEN), str(SEED)) == 0
     text = _results(tmp_path)
     assert "g001" in text and "case_001" in text
-    assert "Cases: 65 from `data/golden/golden_cases.jsonl + data/seed/seed_cases.jsonl`" in text
+    assert "Cases: 69 from `data/golden/golden_cases.jsonl + data/seed/seed_cases.jsonl`" in text
 
 
 def test_duplicate_case_ids_across_files_are_an_error(tmp_path: Path) -> None:

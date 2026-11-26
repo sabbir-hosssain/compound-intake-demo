@@ -10,7 +10,7 @@ proposed:
   T_margin: 0.07
 cases:
   split: dev
-  count: 40
+  count: 42
   ids:
   - g001
   - g002
@@ -52,6 +52,8 @@ cases:
   - g054
   - g055
   - g056
+  - g061
+  - g062
 grid:
   T_match:
   - 0.3
@@ -74,7 +76,7 @@ selection:
   each axis (the grid edge counts as non-optimal)'
 - then closest to the current values, then the lower values
 optimum:
-  robust_correct: 32/40
+  robust_correct: 33/42
   wrong_proposals: 2
   m01_youden_j: 0.815789474
   optimal_points: 35
@@ -95,19 +97,19 @@ dev_metrics:
         result: 7/7
         passed: true
       schema_valid_or_manual:
-        result: 40/40
+        result: 42/42
         passed: true
     system:
-      field_accuracy: 281/320
-      top1_accuracy: 30/35
-      top3_accuracy: 31/35
+      field_accuracy: 296/336
+      top1_accuracy: 32/37
+      top3_accuracy: 33/37
       no_match_precision: 4/8
       no_match_recall: 4/5
       unsafe_flag_recall: 7/7
-      ambiguity_flag_recall: 2/2
+      ambiguity_flag_recall: 4/4
       ambiguity_false_alarm_rate: 7/38
       adversarial_pass_rate: 6/6
-      simulated_override_rate: 6/40
+      simulated_override_rate: 6/42
     system_by_category:
       clean:
         top1_accuracy: 15/15
@@ -115,9 +117,9 @@ dev_metrics:
         ambiguity_flag_recall: 0/0
         ambiguity_false_alarm_rate: 1/17
       ambiguous:
-        top1_accuracy: 6/9
+        top1_accuracy: 8/11
         no_match_recall: 1/1
-        ambiguity_flag_recall: 2/2
+        ambiguity_flag_recall: 4/4
         ambiguity_false_alarm_rate: 2/8
       unsafe:
         top1_accuracy: 5/6
@@ -131,15 +133,15 @@ dev_metrics:
         ambiguity_false_alarm_rate: 1/6
     baseline:
       field_accuracy: 0/0
-      top1_accuracy: 30/35
-      top3_accuracy: 33/35
-      no_match_precision: 4/6
+      top1_accuracy: 31/37
+      top3_accuracy: 34/37
+      no_match_precision: 4/7
       no_match_recall: 4/5
       unsafe_flag_recall: 1/7
-      ambiguity_flag_recall: 1/2
+      ambiguity_flag_recall: 2/4
       ambiguity_false_alarm_rate: 6/38
-      adversarial_pass_rate: 5/6
-      simulated_override_rate: 6/40
+      adversarial_pass_rate: 4/6
+      simulated_override_rate: 7/42
     baseline_by_category:
       clean:
         top1_accuracy: 11/15
@@ -147,9 +149,9 @@ dev_metrics:
         ambiguity_flag_recall: 0/0
         ambiguity_false_alarm_rate: 3/17
       ambiguous:
-        top1_accuracy: 8/9
+        top1_accuracy: 9/11
         no_match_recall: 1/1
-        ambiguity_flag_recall: 1/2
+        ambiguity_flag_recall: 2/4
         ambiguity_false_alarm_rate: 1/8
       unsafe:
         top1_accuracy: 6/6
@@ -170,19 +172,19 @@ dev_metrics:
         result: 7/7
         passed: true
       schema_valid_or_manual:
-        result: 40/40
+        result: 42/42
         passed: true
     system:
-      field_accuracy: 281/320
-      top1_accuracy: 30/35
-      top3_accuracy: 31/35
+      field_accuracy: 296/336
+      top1_accuracy: 32/37
+      top3_accuracy: 33/37
       no_match_precision: 4/8
       no_match_recall: 4/5
       unsafe_flag_recall: 7/7
-      ambiguity_flag_recall: 2/2
+      ambiguity_flag_recall: 4/4
       ambiguity_false_alarm_rate: 7/38
       adversarial_pass_rate: 6/6
-      simulated_override_rate: 6/40
+      simulated_override_rate: 6/42
     system_by_category:
       clean:
         top1_accuracy: 15/15
@@ -190,9 +192,9 @@ dev_metrics:
         ambiguity_flag_recall: 0/0
         ambiguity_false_alarm_rate: 1/17
       ambiguous:
-        top1_accuracy: 6/9
+        top1_accuracy: 8/11
         no_match_recall: 1/1
-        ambiguity_flag_recall: 2/2
+        ambiguity_flag_recall: 4/4
         ambiguity_false_alarm_rate: 2/8
       unsafe:
         top1_accuracy: 5/6
@@ -206,15 +208,15 @@ dev_metrics:
         ambiguity_false_alarm_rate: 1/6
     baseline:
       field_accuracy: 0/0
-      top1_accuracy: 30/35
-      top3_accuracy: 33/35
-      no_match_precision: 4/6
+      top1_accuracy: 31/37
+      top3_accuracy: 34/37
+      no_match_precision: 4/7
       no_match_recall: 4/5
       unsafe_flag_recall: 1/7
-      ambiguity_flag_recall: 1/2
+      ambiguity_flag_recall: 2/4
       ambiguity_false_alarm_rate: 6/38
-      adversarial_pass_rate: 5/6
-      simulated_override_rate: 6/40
+      adversarial_pass_rate: 4/6
+      simulated_override_rate: 7/42
     baseline_by_category:
       clean:
         top1_accuracy: 11/15
@@ -222,9 +224,9 @@ dev_metrics:
         ambiguity_flag_recall: 0/0
         ambiguity_false_alarm_rate: 3/17
       ambiguous:
-        top1_accuracy: 8/9
+        top1_accuracy: 9/11
         no_match_recall: 1/1
-        ambiguity_flag_recall: 1/2
+        ambiguity_flag_recall: 2/4
         ambiguity_false_alarm_rate: 1/8
       unsafe:
         top1_accuracy: 6/6
@@ -241,43 +243,50 @@ landscape:
   - range:
     - 0.3
     - 0.5
-    robust_correct: 32
-    correct: 36
+    robust_correct: 33
+    correct: 38
     wrong_proposals: 4
     gates_passed: true
   - range:
     - 0.51
     - 0.55
-    robust_correct: 32
-    correct: 34
+    robust_correct: 33
+    correct: 36
     wrong_proposals: 3
     gates_passed: true
   - range:
     - 0.56
     - 0.6
-    robust_correct: 32
-    correct: 34
+    robust_correct: 33
+    correct: 36
     wrong_proposals: 2
     gates_passed: true
   - range:
     - 0.61
+    - 0.61
+    robust_correct: 32
+    correct: 35
+    wrong_proposals: 2
+    gates_passed: true
+  - range:
+    - 0.62
     - 0.65
     robust_correct: 31
-    correct: 33
+    correct: 34
     wrong_proposals: 2
     gates_passed: true
   - range:
     - 0.66
     - 0.7
     robust_correct: 28
-    correct: 30
+    correct: 31
     wrong_proposals: 2
     gates_passed: true
   - range:
     - 0.71
     - 0.75
     robust_correct: 29
-    correct: 31
+    correct: 32
     wrong_proposals: 1
     gates_passed: true
   - range:
@@ -312,49 +321,49 @@ landscape:
   - range:
     - 0.0
     - 0.0
-    m01_recall: 0/2
+    m01_recall: 0/4
     m01_false_alarms: 0/38
     youden_j: 0.0
     gates_passed: true
   - range:
     - 0.01
     - 0.03
-    m01_recall: 1/2
+    m01_recall: 2/4
     m01_false_alarms: 7/38
     youden_j: 0.315789474
     gates_passed: true
   - range:
     - 0.04
     - 0.1
-    m01_recall: 2/2
+    m01_recall: 4/4
     m01_false_alarms: 7/38
     youden_j: 0.815789474
     gates_passed: true
   - range:
     - 0.11
     - 0.12
-    m01_recall: 2/2
+    m01_recall: 4/4
     m01_false_alarms: 8/38
     youden_j: 0.789473684
     gates_passed: true
   - range:
     - 0.13
     - 0.15
-    m01_recall: 2/2
+    m01_recall: 4/4
     m01_false_alarms: 15/38
     youden_j: 0.605263158
     gates_passed: true
   - range:
     - 0.16
     - 0.25
-    m01_recall: 2/2
+    m01_recall: 4/4
     m01_false_alarms: 17/38
     youden_j: 0.552631579
     gates_passed: true
   - range:
     - 0.26
     - 0.3
-    m01_recall: 2/2
+    m01_recall: 4/4
     m01_false_alarms: 23/38
     youden_j: 0.394736842
     gates_passed: true
@@ -392,6 +401,10 @@ diagnostics_at_proposed:
     category: adversarial
     gold: SHF-013
     why: 'NO_MATCH: top score 0.500 < T_match'
+  - case: g062
+    category: ambiguous
+    gold: SHF-001
+    why: correct only by formula_id order (top-1 score tie)
   m01_false_alarms:
   - case: g007
     category: clean

@@ -1,0 +1,68 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (fax)\nPrescriber: Dr. B. Example\nPatient ref: PT-20082\nSalicylic acid 3% / urea 10% topical 60 g, apply BID to plaques.\n</prescription>",
+  "key": "0aa1c24c02a976fd21dc0585ceafcb9730e231aebaf50665e6bd0b46aee25e7a",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01UgvDKotcoxFLfy1tmG9WvS",
+        "input": {
+          "base": null,
+          "directions": "apply twice daily to plaques",
+          "dosage_form": null,
+          "extraction_notes": "Dosage form (cream/ointment/gel etc.) and base not specified; only \"topical\" written. Source: TeleHealthSH (fax).",
+          "ingredients": [
+            {
+              "name": "salicylic acid",
+              "strength": 3,
+              "unit": "%"
+            },
+            {
+              "name": "urea",
+              "strength": 10,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-20082",
+          "prescriber_name": "Dr. B. Example",
+          "quantity": 60,
+          "quantity_unit": "g",
+          "route": "topical",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChS93vmB6CzQaUi4rq36S",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1980,
+      "output_tokens": 426,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}
