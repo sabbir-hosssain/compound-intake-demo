@@ -9,8 +9,9 @@ and in order, followed by any new ones. No function here removes, edits or downg
 S1.4: R1-01, R1-05, R2-01. S2.3: R1-02, R1-03, R1-04, R2-02 … R2-07. The ambiguity flag M-01 is
 raised by the matcher (`match.py`), because it needs the scores.
 
-Every table below (controlled terms, form/route pairs, quantity ceilings) is illustrative demo data,
-not clinical or legal reference material.
+Every table used here (controlled terms, form/route pairs, quantity ceilings) is illustrative demo data,
+not clinical or legal reference material. Controlled terms and form/route pairs live in data/rules/;
+quantity ceilings are `quantity_max` in eval/thresholds.yaml. All are loaded at import and fail loudly.
 """
 
 import math
@@ -325,29 +326,35 @@ _FORM_WORDS: dict[str, str] = {
     "spray": "spray", "powder": "powder", "shampoo": "shampoo",
 }  # fmt: skip
 
-# R2-04: routes each form can plausibly be given by (illustrative, non-sterile only).
-_FORM_ROUTES: dict[str, frozenset[str]] = {
-    "cream": frozenset({"topical", "transdermal", "vaginal", "rectal"}),
-    "ointment": frozenset({"topical", "rectal", "vaginal"}),
-    "gel": frozenset({"topical", "transdermal", "vaginal", "rectal", "oral", "buccal"}),
-    "lotion": frozenset({"topical"}),
-    "foam": frozenset({"topical", "rectal"}),
-    "paste": frozenset({"topical", "buccal", "oral"}),
-    "solution": frozenset({"topical", "oral", "nasal", "otic"}),
-    "suspension": frozenset({"oral", "rectal", "topical"}),
-    "syrup": frozenset({"oral"}),
-    "elixir": frozenset({"oral"}),
-    "capsule": frozenset({"oral", "vaginal"}),
-    "tablet": frozenset({"oral", "sublingual", "buccal", "vaginal"}),
-    "troche": frozenset({"oral", "buccal", "sublingual"}),
-    "lozenge": frozenset({"oral", "buccal", "sublingual"}),
-    "suppository": frozenset({"rectal", "vaginal"}),
-    "spray": frozenset({"topical", "nasal", "oral"}),
-    "powder": frozenset({"topical", "oral"}),
-    "shampoo": frozenset({"topical"}),
-}
+# R2-04: routes each form can plausibly be given by (illustrative, non-sterile only), kept in
+# data/rules/form_routes.yaml. Its keys must be exactly the forms above; its routes must be known routes.
+DEFAULT_FORM_ROUTES = Path(__file__).resolve().parents[2] / "data" / "rules" / "form_routes.yaml"
 
-# R2-05: quantity units -> (kind, factor to the kind's base unit), and an illustrative ceiling per kind.
+
+def load_form_routes(path: Path = DEFAULT_FORM_ROUTES) -> dict[str, frozenset[str]]:
+    """Form -> allowed routes from the R2-04 data file. Missing file: FileNotFoundError; malformed: ValueError."""
+    data = yaml.safe_load(path.read_text())
+    forms = data.get("forms") if isinstance(data, dict) else None
+    if not isinstance(forms, dict) or not forms:
+        raise ValueError(f"{path}: no 'forms' mapping; R2-04 cannot run without its form/route table.")
+    expected, known_routes = set(_FORM_WORDS.values()), set(_ROUTE_WORDS.values())
+    if set(forms) != expected:
+        missing, unknown = sorted(expected - set(forms)), sorted(set(forms) - expected)
+        raise ValueError(f"{path}: forms must match R2-04's form words (missing {missing}, unknown {unknown}).")
+    table: dict[str, frozenset[str]] = {}
+    for form, routes in forms.items():
+        if not isinstance(routes, list) or not routes or not all(isinstance(r, str) for r in routes):
+            raise ValueError(f"{path}: '{form}' must have a non-empty list of route names.")
+        if not set(routes) <= known_routes:
+            raise ValueError(f"{path}: '{form}' has unknown route(s) {sorted(set(routes) - known_routes)}.")
+        table[form] = frozenset(routes)
+    return table
+
+
+FORM_ROUTES: dict[str, frozenset[str]] = load_form_routes()
+
+# R2-05: quantity units -> (kind, factor to the kind's base unit). The illustrative ceiling per kind is
+# `quantity_max` in eval/thresholds.yaml (protected).
 _QUANTITY_UNITS: dict[str, tuple[str, float]] = {
     **{u: ("g", 1.0) for u in ("g", "gm", "gms", "gram", "grams")},
     "kg": ("g", 1000.0),
@@ -361,7 +368,24 @@ _QUANTITY_UNITS: dict[str, tuple[str, float]] = {
         )
     },
 }  # fmt: skip
-_QUANTITY_MAX: dict[str, float] = {"g": 1000.0, "ml": 1000.0, "count": 500.0}
+DEFAULT_THRESHOLDS = Path(__file__).resolve().parents[2] / "eval" / "thresholds.yaml"
+
+
+def load_quantity_max(path: Path = DEFAULT_THRESHOLDS) -> dict[str, float]:
+    """R2-05 ceiling per quantity kind from `quantity_max`. Missing file: FileNotFoundError; malformed: ValueError."""
+    data = yaml.safe_load(path.read_text())
+    ceilings = data.get("quantity_max") if isinstance(data, dict) else None
+    kinds = {kind for kind, _ in _QUANTITY_UNITS.values()}
+    if not isinstance(ceilings, dict) or set(ceilings) != kinds:
+        raise ValueError(f"{path}: 'quantity_max' must map exactly the kinds {sorted(kinds)} to a ceiling.")
+    for kind, value in ceilings.items():
+        valid = isinstance(value, int | float) and not isinstance(value, bool) and math.isfinite(value) and value > 0
+        if not valid:
+            raise ValueError(f"{path}: quantity_max.{kind} must be a positive finite number, got {value!r}.")
+    return {kind: float(value) for kind, value in ceilings.items()}
+
+
+QUANTITY_MAX: dict[str, float] = load_quantity_max()
 
 
 def _canonical(name: str, aliases: Mapping[str, str]) -> str:
@@ -480,7 +504,7 @@ def r2_04_dosage_form_and_route(extraction: Extraction) -> list[Flag]:
     routes = _phrases_in(extraction.route or "", _ROUTE_WORDS)
     forms = _phrases_in(form, _FORM_WORDS)  # type: ignore[arg-type]
     implied = _phrases_in(form, _ROUTE_WORDS)  # type: ignore[arg-type]
-    allowed = set().union(*(_FORM_ROUTES[f] for f in forms)) if forms else set()
+    allowed = set().union(*(FORM_ROUTES[f] for f in forms)) if forms else set()
     conflict = bool(routes) and ((forms and not routes & allowed) or (implied and not routes & implied))
     if conflict:
         message = f"Dosage form '{form}' conflicts with route '{extraction.route}'."
@@ -499,7 +523,7 @@ def _quantity_problem(quantity: float | None, unit: str | None) -> str | None:
     if known is None:
         return f"Quantity unit '{unit}' is not recognised."
     kind, factor = known
-    if quantity * factor > _QUANTITY_MAX[kind] * (1 + _FLOAT_TOL):
+    if quantity * factor > QUANTITY_MAX[kind] * (1 + _FLOAT_TOL):
         return f"Quantity {quantity:g} {unit} is implausibly large."
     return None
 

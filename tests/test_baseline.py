@@ -1,8 +1,10 @@
 """S2.4 baseline matcher (SPEC §6): rapidfuzz token-set ratio, no LLM."""
 
 import ast
+import io
 import json
 import time
+import tokenize
 from pathlib import Path
 
 import pytest
@@ -189,6 +191,66 @@ def test_dev_quality_floor() -> None:
     top3 = sum(g in {c.formula_id for c in r.candidates} for r, g in matchable)
     assert top3 == len(matchable)
     assert sum(decision_correct(r, g) for r, g in results) >= 34
+
+
+# --- S3.7: cut-off read from eval/thresholds.yaml ----------------------------------------------
+
+THRESHOLDS_FILE = ROOT / "eval" / "thresholds.yaml"
+
+
+def test_cutoff_comes_from_thresholds_yaml() -> None:
+    assert baseline.load_no_match_cutoff(THRESHOLDS_FILE) == pytest.approx(0.80)
+    assert NO_MATCH_CUTOFF == pytest.approx(0.80)
+
+
+def test_cutoff_is_not_a_literal_in_baseline_source() -> None:
+    source = Path(baseline.__file__).read_text(encoding="utf-8")
+    numbers = [
+        float(tok.string)
+        for tok in tokenize.generate_tokens(io.StringIO(source).readline)
+        if tok.type == tokenize.NUMBER
+    ]
+    assert 0.8 not in numbers
+
+
+def test_load_cutoff_reads_the_given_file(tmp_path: Path) -> None:
+    path = tmp_path / "t.yaml"
+    path.write_text("T_match: 0.5\nbaseline_no_match_cutoff: 0.42\n")
+    assert baseline.load_no_match_cutoff(path) == pytest.approx(0.42)
+
+
+def test_load_cutoff_fails_loudly_when_file_missing(tmp_path: Path) -> None:
+    with pytest.raises(FileNotFoundError):
+        baseline.load_no_match_cutoff(tmp_path / "missing.yaml")
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "",
+        "T_match: 0.5\n",
+        "baseline_no_match_cutoff:\n",
+        "baseline_no_match_cutoff: high\n",
+        "baseline_no_match_cutoff: true\n",
+        "baseline_no_match_cutoff: [0.8]\n",
+        "baseline_no_match_cutoff: -0.1\n",
+        "baseline_no_match_cutoff: 1.5\n",
+        "baseline_no_match_cutoff: .nan\n",
+        "- baseline_no_match_cutoff\n",
+    ],
+)
+def test_load_cutoff_fails_loudly_when_key_missing_or_malformed(tmp_path: Path, content: str) -> None:
+    path = tmp_path / "t.yaml"
+    path.write_text(content)
+    with pytest.raises(ValueError):
+        baseline.load_no_match_cutoff(path)
+
+
+def test_load_cutoff_accepts_integer_bounds(tmp_path: Path) -> None:
+    path = tmp_path / "t.yaml"
+    for value in ("0", "1"):
+        path.write_text(f"baseline_no_match_cutoff: {value}\n")
+        assert baseline.load_no_match_cutoff(path) == float(value)
 
 
 # --- AC 2: runtime -----------------------------------------------------------------------------

@@ -764,3 +764,170 @@ def test_dev_unsafe_and_adversarial_cases_flag(case: dict, library: Library) -> 
 
 def test_dev_safety_cases_exist() -> None:
     assert _dev_safety_cases(), "no dev-split unsafe/adversarial golden cases found"
+
+
+# --- S3.7: R2-05 ceilings from eval/thresholds.yaml, R2-04 table from data/rules/form_routes.yaml --
+
+THRESHOLDS_FILE = ROOT / "eval" / "thresholds.yaml"
+FORM_ROUTES_FILE = ROOT / "data" / "rules" / "form_routes.yaml"
+
+# The values as they stood in rules.py before S3.7. Out of scope to change any of them.
+PRE_S37_QUANTITY_MAX = {"g": 1000.0, "ml": 1000.0, "count": 500.0}
+PRE_S37_FORM_ROUTES = {
+    "cream": frozenset({"topical", "transdermal", "vaginal", "rectal"}),
+    "ointment": frozenset({"topical", "rectal", "vaginal"}),
+    "gel": frozenset({"topical", "transdermal", "vaginal", "rectal", "oral", "buccal"}),
+    "lotion": frozenset({"topical"}),
+    "foam": frozenset({"topical", "rectal"}),
+    "paste": frozenset({"topical", "buccal", "oral"}),
+    "solution": frozenset({"topical", "oral", "nasal", "otic"}),
+    "suspension": frozenset({"oral", "rectal", "topical"}),
+    "syrup": frozenset({"oral"}),
+    "elixir": frozenset({"oral"}),
+    "capsule": frozenset({"oral", "vaginal"}),
+    "tablet": frozenset({"oral", "sublingual", "buccal", "vaginal"}),
+    "troche": frozenset({"oral", "buccal", "sublingual"}),
+    "lozenge": frozenset({"oral", "buccal", "sublingual"}),
+    "suppository": frozenset({"rectal", "vaginal"}),
+    "spray": frozenset({"topical", "nasal", "oral"}),
+    "powder": frozenset({"topical", "oral"}),
+    "shampoo": frozenset({"topical"}),
+}
+
+_GOOD_QUANTITY_MAX = "quantity_max: { g: 1000, ml: 1000, count: 500 }\n"
+
+
+def _write(tmp_path: Path, name: str, content: str) -> Path:
+    path = tmp_path / name
+    path.write_text(content)
+    return path
+
+
+def test_quantity_max_comes_from_thresholds_yaml() -> None:
+    assert rules_module.load_quantity_max(THRESHOLDS_FILE) == PRE_S37_QUANTITY_MAX
+    assert rules_module.QUANTITY_MAX == PRE_S37_QUANTITY_MAX
+
+
+def test_quantity_max_constant_removed_from_rules() -> None:
+    assert not hasattr(rules_module, "_QUANTITY_MAX")
+    source = Path(inspect.getsourcefile(rules_module) or "").read_text()
+    assert "_QUANTITY_MAX" not in source
+
+
+def test_load_quantity_max_reads_the_given_file(tmp_path: Path) -> None:
+    path = _write(tmp_path, "t.yaml", "T_match: 0.5\nquantity_max: { g: 10, ml: 20.5, count: 3 }\n")
+    assert rules_module.load_quantity_max(path) == {"g": 10.0, "ml": 20.5, "count": 3.0}
+
+
+def test_r2_05_uses_the_loaded_ceilings(monkeypatch: pytest.MonkeyPatch) -> None:
+    ext = _ext(_ing("examplol", 1.0, Unit.PERCENT), quantity=60, quantity_unit="g")
+    assert "R2-05" not in _ids(_p2(ext))
+    monkeypatch.setattr(rules_module, "QUANTITY_MAX", {"g": 50.0, "ml": 1000.0, "count": 500.0})
+    assert "R2-05" in _ids(_p2(ext))
+
+
+def test_load_quantity_max_fails_loudly_when_file_missing(tmp_path: Path) -> None:
+    with pytest.raises(FileNotFoundError):
+        rules_module.load_quantity_max(tmp_path / "missing.yaml")
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "",
+        "T_match: 0.5\n",
+        "quantity_max:\n",
+        "quantity_max: []\n",
+        "quantity_max: { g: 1000, ml: 1000 }\n",
+        "quantity_max: { g: 1000, ml: 1000, count: 500, kg: 1 }\n",
+        "quantity_max: { g: 1000, ml: 1000, count: lots }\n",
+        "quantity_max: { g: 1000, ml: 1000, count: true }\n",
+        "quantity_max: { g: 1000, ml: 1000, count: 0 }\n",
+        "quantity_max: { g: -1, ml: 1000, count: 500 }\n",
+        "quantity_max: { g: .nan, ml: 1000, count: 500 }\n",
+        "quantity_max: { g: .inf, ml: 1000, count: 500 }\n",
+        "- quantity_max\n",
+    ],
+)
+def test_load_quantity_max_fails_loudly_when_key_missing_or_malformed(tmp_path: Path, content: str) -> None:
+    with pytest.raises(ValueError):
+        rules_module.load_quantity_max(_write(tmp_path, "t.yaml", content))
+
+
+def test_good_quantity_max_fixture_is_accepted(tmp_path: Path) -> None:
+    # Guards the malformed cases above: they fail for the reason given, not because the fixture shape is wrong.
+    assert rules_module.load_quantity_max(_write(tmp_path, "t.yaml", _GOOD_QUANTITY_MAX)) == PRE_S37_QUANTITY_MAX
+
+
+def test_form_routes_file_has_the_pre_s37_table_unchanged() -> None:
+    assert rules_module.load_form_routes(FORM_ROUTES_FILE) == PRE_S37_FORM_ROUTES
+    assert rules_module.FORM_ROUTES == PRE_S37_FORM_ROUTES
+
+
+def test_form_routes_file_says_illustrative() -> None:
+    text = FORM_ROUTES_FILE.read_text()
+    assert "illustrative: true" in text
+    assert "not clinical" in text.split("\n\n", 1)[0].casefold()
+
+
+def test_no_form_route_table_left_in_rules_source() -> None:
+    assert not hasattr(rules_module, "_FORM_ROUTES")
+    source = Path(inspect.getsourcefile(rules_module) or "").read_text()
+    assert "frozenset({" not in source
+
+
+def _routes_yaml(forms: dict[str, list[str]]) -> str:
+    lines = ["illustrative: true", "forms:"]
+    lines += [f"  {form}: [{', '.join(routes)}]" for form, routes in forms.items()]
+    return "\n".join(lines) + "\n"
+
+
+_GOOD_ROUTES = {form: sorted(routes) for form, routes in PRE_S37_FORM_ROUTES.items()}
+
+
+def test_load_form_routes_reads_the_given_file(tmp_path: Path) -> None:
+    forms = {**_GOOD_ROUTES, "lotion": ["topical", "transdermal"]}
+    loaded = rules_module.load_form_routes(_write(tmp_path, "r.yaml", _routes_yaml(forms)))
+    assert loaded["lotion"] == frozenset({"topical", "transdermal"})
+
+
+def test_load_form_routes_fails_loudly_when_file_missing(tmp_path: Path) -> None:
+    with pytest.raises(FileNotFoundError):
+        rules_module.load_form_routes(tmp_path / "missing.yaml")
+
+
+def _without(form: str) -> dict[str, list[str]]:
+    return {k: v for k, v in _GOOD_ROUTES.items() if k != form}
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "",
+        "illustrative: true\n",
+        "forms:\n",
+        "forms: [cream]\n",
+        "- cream\n",
+        _routes_yaml(_without("shampoo")),  # a form R2-04 recognises has no routes
+        _routes_yaml({**_GOOD_ROUTES, "widget": ["topical"]}),  # a form R2-04 never recognises
+        _routes_yaml({**_GOOD_ROUTES, "cream": ["topical", "moon"]}),  # a route R2-04 never recognises
+        _routes_yaml({**_GOOD_ROUTES, "cream": []}),
+        _routes_yaml(_GOOD_ROUTES).replace("  lotion: [topical]", "  lotion: topical"),
+        _routes_yaml(_GOOD_ROUTES).replace("  lotion: [topical]", "  lotion: [1]"),
+    ],
+)
+def test_load_form_routes_fails_loudly_when_file_empty_or_malformed(tmp_path: Path, content: str) -> None:
+    with pytest.raises(ValueError):
+        rules_module.load_form_routes(_write(tmp_path, "r.yaml", content))
+
+
+def test_good_form_routes_fixture_is_accepted(tmp_path: Path) -> None:
+    path = _write(tmp_path, "r.yaml", _routes_yaml(_GOOD_ROUTES))
+    assert rules_module.load_form_routes(path) == PRE_S37_FORM_ROUTES
+
+
+def test_r2_04_uses_the_loaded_table(monkeypatch: pytest.MonkeyPatch) -> None:
+    ext = _ext(_ing("examplol", 1.0, Unit.PERCENT), dosage_form="lotion", route="oral")
+    assert "R2-04" in _ids(_p2(ext))
+    monkeypatch.setattr(rules_module, "FORM_ROUTES", {**PRE_S37_FORM_ROUTES, "lotion": frozenset({"oral"})})
+    assert "R2-04" not in _ids(_p2(ext))
