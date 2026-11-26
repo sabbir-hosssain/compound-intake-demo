@@ -2,8 +2,8 @@
 Milestone: M3 — review screen, audit chain, reasons · **COMPLETE — exit criteria pass on main** (2026-11-26, main 593e4bf)
 Active: none
 Last merges: #62 + #23 `intake demo` (PR #83) · #57 S3.9 (PR #81) · #56 S3.8 (PR #79) · #55 S3.7 (PR #77) · #54 S3.6 (PR #75)
-Blocked (architect): none. For the architect: (a) confirm the #56 fixture change in tests/test_rules.py (identical assertions, per SPEC §6); (b) narrow the worktree guard's "eval" pattern and decide on local redaction in worktrees (docs/HARNESS.md M3 notes 3–4)
-Next up: M4 (#24–#28). Carried from M3, not needed for exit: #64 store acknowledged_flags · #69 wire the explanation into CLI, demo and review screen
+Blocked (architect): none · M3 items decided 2026-11-26 (#56 confirmed; allow rules for eval commands; reviewer quotes head SHA; DECISIONS-LOG)
+Next up: M4 — #69 explanation in CLI/demo/review first, then #24–#28; #64 acknowledged flags (cut first if late) → Gate 3
 ## M3 summary
 - **Exit criterion:** a fresh clone of main with no API key and no .env runs `make demo`, which exits 0 and prints "3/3 demo cases match their fixtures (mode REPLAY)", writing no audit DB. On the same clone: 817 tests pass, and REPLAY `--enforce-gates` passes adversarial 10/10, unsafe recall 10/10, schema 64/64.
 - **Issues:** 11 closed: #19 review screen · #20 audit chain + `intake audit verify` · #21 explanation v1 · #22 override metric (pinned) · #23 + #62 demo fixtures and `intake demo` · #41 atomic append (also fixed a chain fork and double review in `review.submit`) · #54–#57 Gate 2 follow-ups. Median fix rounds 0 (#23 took 2). 0 escalations.
