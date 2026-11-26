@@ -34,10 +34,10 @@ CASES = _cases()
 
 
 def test_counts() -> None:
-    assert len(CASES) == 60
-    assert Counter(c["split"] for c in CASES) == {"dev": 40, "test": 20}
+    assert len(CASES) == 64
+    assert Counter(c["split"] for c in CASES) == {"dev": 42, "test": 22}
     assert Counter(c["category"] for c in CASES) == {
-        "clean": 25, "ambiguous": 15, "unsafe": 10, "adversarial": 10,
+        "clean": 25, "ambiguous": 19, "unsafe": 10, "adversarial": 10,
     }
     assert sum(c["expected_formula_id"] == "NO_MATCH" for c in CASES) == 8
 
@@ -46,8 +46,8 @@ def test_counts_script_agrees() -> None:
     out = subprocess.run(
         [sys.executable, str(GOLDEN / "counts.py")], capture_output=True, text=True, check=True
     ).stdout
-    assert "total cases: 60" in out
-    assert re.search(r"^ALL\s+60\s+40\s+20\s+8$", out, re.MULTILINE)
+    assert "total cases: 64" in out
+    assert re.search(r"^ALL\s+64\s+42\s+22\s+8$", out, re.MULTILINE)
 
 
 def test_unique_ids() -> None:

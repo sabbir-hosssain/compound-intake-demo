@@ -174,7 +174,11 @@ def test_shipped_cutoff_is_reproduced_from_dev_split_only() -> None:
         for c in dev
         for r in [_run(c, cutoff=0.0)]
     ]
-    assert tune_cutoff(pairs) == NO_MATCH_CUTOFF
+    # S2.9 added two dev cases, which moved the middle of the optimal plateau from 0.80 to 0.79.
+    # The shipped cut-off stays frozen (Gate 2) and must remain optimal on dev.
+    best = sum(baseline._correct_at(tune_cutoff(pairs), *p) for p in pairs)
+    shipped = sum(baseline._correct_at(NO_MATCH_CUTOFF, *p) for p in pairs)
+    assert shipped == best
 
 
 def test_dev_quality_floor() -> None:
@@ -192,10 +196,10 @@ def test_dev_quality_floor() -> None:
 
 def test_runs_on_golden_set_under_five_seconds() -> None:
     rows = [json.loads(x) for x in GOLDEN.read_text(encoding="utf-8").splitlines() if x.strip()]
-    assert len(rows) == 60
+    assert len(rows) == 64
     start = time.perf_counter()
     formulas = load_formulas()
     results = [baseline_match(raw_text(r["raw"]["text"], r["raw"].get("notes")), formulas) for r in rows]
     elapsed = time.perf_counter() - start
-    assert len(results) == 60
+    assert len(results) == 64
     assert elapsed < 5.0, f"baseline took {elapsed:.2f}s on the golden set"

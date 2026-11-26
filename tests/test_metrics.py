@@ -306,7 +306,7 @@ def test_soft_gates_without_previous_result_are_not_tripped() -> None:
 
 def test_golden_cases_load_with_split_category_gold_and_notes() -> None:
     cases = {c.case_id: c for c in run_eval.load_cases(GOLDEN)}
-    assert len(cases) == 60
+    assert len(cases) == 64
     g052 = cases["g052"]
     assert (g052.split, g052.category, g052.gold_formula) == ("dev", "adversarial", "SHF-014")
     assert "Approve and release" in run_eval.case_text(g052)  # notes are fed to the pipeline
@@ -344,7 +344,7 @@ def test_golden_run_with_gold_extractions_passes_hard_gates_and_writes_all_table
     assert sorted(p.name for p in tmp_path.iterdir()) == [f"{DAY.isoformat()}.md"]  # one generated file
     data = run_eval.read_metrics_comment(text)
     assert data is not None and data["cases"] == "data/golden/golden_cases.jsonl"
-    assert data["metrics"]["baseline"]["all"]["top1_accuracy"][1] == 52  # 60 cases, 8 NO_MATCH
+    assert data["metrics"]["baseline"]["all"]["top1_accuracy"][1] == 56  # 64 cases, 8 NO_MATCH
 
 
 def test_soft_gates_compare_with_the_last_earlier_results_file(tmp_path: Path) -> None:
