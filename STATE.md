@@ -1,9 +1,9 @@
 # STATE (rewritten after every issue; one screen max)
 Milestone: M3 — review screen, audit chain, reasons · **IN PROGRESS** (started 2026-11-26)
-Active: code #22 S3.4 override metric (builder) · data: idle (#23 closes with #62)
-Last merges: #21 S3.3 explanation (PR #68) · #20 S3.2 audit chain (PR #66) · #23 fixtures (PR #61) · #19 S3.1 review screen (PR #63) · M3 STATE (PR #65, #67)
+Active: code #41 atomic audit append (builder) · data: idle (#23 closes with #62)
+Last merges: #22 S3.4 override metric (PR #71) · #21 S3.3 explanation (PR #68) · #20 S3.2 audit chain (PR #66) · #23 fixtures (PR #61) · #19 S3.1 review screen (PR #63)
 Blocked (architect): none
-Next up (code): #41 atomic audit append · #54–#57 Gate 2 follow-ups · #62 `intake demo` + demo recordings (M3 exit path) · #64 acknowledged_flags · #69 wire explanation into CLI/demo/screen
+Next up (code): #54–#57 Gate 2 follow-ups · #62 `intake demo` + demo recordings (M3 exit path) · #64 acknowledged_flags · #69 wire explanation
 ## M3 start: locked golden set, REPLAY `--enforce-gates` on main 0fd0456
 - Hard gates: adversarial 10/10, unsafe recall 10/10, schema 64/64.
 - Test split (22): top-1 16/19 (baseline 11/19) · top-3 17/19 (13/19) · unsafe recall 3/3 (1/3) · adversarial 4/4 · M-01 recall 2/2 · M-01 false alarms 7/20 (6/20) · NO_MATCH precision 2/4, recall 2/3 · simulated override 4/22 (9/22) · fields 151/176.
@@ -12,6 +12,8 @@ Next up (code): #41 atomic audit append · #54–#57 Gate 2 follow-ups · #62 `i
 - Gap: acknowledged flags are not stored, so #64 was filed. The CLI fallback was not built because the screen is done.
 ## #20 S3.2 (PR #66)
 - Chain helpers moved to `audit.py`. `intake audit verify` reports the first broken link (exit 3). 24 tamper tests; 602 tests. 0 fix rounds. Limit: truncating the newest records still verifies, since the expected length isn't stored anywhere.
+## #22 S3.4 (PR #71)
+- The metric already existed from S2.5. This PR pins the label and definition ("gold stands in for the pharmacist") with 4 tests. 691 tests. 0 fix rounds.
 ## #21 S3.3 (PR #68)
 - `prompts/explain_v1.md` and `explain.add_reasons`: reasons must cite each flag's rule ID and the top candidate's 5 component scores, otherwise a fixed fallback text is used. The result has no decision fields; a hostile-reply test proves this. 687 tests. 0 fix rounds.
 - **58 live RECORD calls** (budget 80; 6 cases share recordings). Not yet called by the pipeline, CLI or eval, so #69 was filed.
