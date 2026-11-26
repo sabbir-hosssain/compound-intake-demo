@@ -1,9 +1,11 @@
 # STATE (rewritten after every issue; one screen max)
-Milestone: M3 — review screen, audit chain, reasons · **COMPLETE — exit criteria pass on main** (2026-11-26, main 593e4bf)
-Active: none
-Last merges: #62 + #23 `intake demo` (PR #83) · #57 S3.9 (PR #81) · #56 S3.8 (PR #79) · #55 S3.7 (PR #77) · #54 S3.6 (PR #75)
-Blocked (architect): none · M3 items decided 2026-11-26 (#56 confirmed; allow rules for eval commands; reviewer quotes head SHA; DECISIONS-LOG)
-Next up: M4 — #69 explanation in CLI/demo/review first, then #24–#28; #64 acknowledged flags (cut first if late) → Gate 3
+Milestone: M4 — publish · Gate 3 · started 2026-11-26
+Active: #28 S4.5 final results (lane:code, next)
+Last merges: #69 explanation in CLI/demo/review (PR #86) · #62 + #23 `intake demo` (PR #83) · #57 S3.9 (PR #81) · #56 S3.8 (PR #79) · #55 S3.7 (PR #77)
+Blocked (architect): none · #25 (ADRs, protected) will need `architect-approved` at Gate 3
+Next up: #28 final results (no tag; tag plan goes to Gate 3) → #24 README → #27 DEMO.md → #26 HARNESS.md → #25 ADRs · #64 last, cut first if late
+## M4 progress
+- #69 (PR #86): reasons shown in `intake run`, `intake demo` and the review screen; pending audit record carries `reasons`. 5 live RECORD calls, 0 retries. 839 tests; REPLAY gates adversarial 10/10, unsafe 10/10, schema 64/64. 0 fix rounds.
 ## M3 summary
 - **Exit criterion:** a fresh clone of main with no API key and no .env runs `make demo`, which exits 0 and prints "3/3 demo cases match their fixtures (mode REPLAY)", writing no audit DB. On the same clone: 817 tests pass, and REPLAY `--enforce-gates` passes adversarial 10/10, unsafe recall 10/10, schema 64/64.
 - **Issues:** 11 closed: #19 review screen · #20 audit chain + `intake audit verify` · #21 explanation v1 · #22 override metric (pinned) · #23 + #62 demo fixtures and `intake demo` · #41 atomic append (also fixed a chain fork and double review in `review.submit`) · #54–#57 Gate 2 follow-ups. Median fix rounds 0 (#23 took 2). 0 escalations.
