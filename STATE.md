@@ -1,9 +1,9 @@
 # STATE (rewritten after every issue; one screen max)
 Milestone: M2 — golden set, baseline, metrics · **COMPLETE — stopped at Gate 2**; pre-lock fix #53 merged 2026-11-26 (PR #58)
-Active: none · **Waiting on the architect to review g061–g064, then create `data/golden/LOCKED`**
+Active: none · Gate 2 complete: golden set locked 2026-11-26 (64 cases)
 Last merges: #53 S2.9 pre-lock golden fixes (PR #58) · Gate 2 (PR #52) · #18 S2.8 (PR #51) · #17 S2.7 (PR #50) · #16 S2.6 (PR #49)
 Blocked (architect): none · Architect decisions on #53: cutoff-test change accepted; g062 [R2-04, M-01] and the g062/g064 exact ties accepted (DECISIONS-LOG)
-Next up: architect creates `data/golden/LOCKED` → M3 (incl. Gate 2 follow-ups: controlled list file, constants from config, M-01 not on NO_MATCH, public max_retries)
+Next up: M3 — first re-run the eval on test with the locked labels, then M3 (incl. Gate 2 follow-ups: controlled list file, constants from config, M-01 not on NO_MATCH, public max_retries)
 ## S2.9 (#53)
 - Golden set is now 64 cases (dev 42, test 22). g056 labelled R1-01, R1-05, R2-04, R2-05. g061–g064 are new ambiguous M-01 cases.
 - REPLAY `--enforce-gates`: adversarial 10/10, unsafe recall 10/10, schema 64/64. Ambiguity recall dev 4/4, test 2/2. 525 tests.
