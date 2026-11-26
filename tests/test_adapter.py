@@ -3,7 +3,7 @@
 import ast
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar
 
 import anthropic
 import pytest
@@ -214,6 +214,73 @@ def test_live_calls_live_and_does_not_save(tmp_path: Path, fake_live: _FakeAnthr
     assert out["id"] == "msg_fake"
     assert "tools" not in fake_live.messages.calls[0]
     assert list(tmp_path.iterdir()) == []
+
+
+# --- max_retries (S3.9) -----------------------------------------------------------
+
+
+class _KwargsAnthropic:
+    """Stands in for anthropic.Anthropic and records the kwargs it was built with."""
+
+    built: ClassVar[list[dict[str, Any]]] = []
+
+    def __init__(self, **kwargs: Any) -> None:
+        type(self).built.append(kwargs)
+        self.messages = _FakeMessages()
+
+
+@pytest.fixture
+def sdk_kwargs(monkeypatch: pytest.MonkeyPatch) -> list[dict[str, Any]]:
+    built: list[dict[str, Any]] = []
+    monkeypatch.setattr(_KwargsAnthropic, "built", built)
+    monkeypatch.setattr(anthropic, "Anthropic", _KwargsAnthropic)
+    return built
+
+
+@pytest.mark.parametrize("mode", [Mode.RECORD, Mode.LIVE])
+@pytest.mark.parametrize("retries", [0, 3])
+def test_max_retries_is_passed_to_the_sdk_client(
+    tmp_path: Path, sdk_kwargs: list[dict[str, Any]], mode: Mode, retries: int
+) -> None:
+    client = ModelClient(CONFIG, mode=mode, cassette_dir=tmp_path, max_retries=retries)
+    assert client.max_retries == retries
+    client.complete(prompt_hash=PROMPT_HASH, system="sys", user_input=INPUT)
+    client.complete(prompt_hash=PROMPT_HASH, system="sys", user_input=INPUT)
+    assert sdk_kwargs == [{"max_retries": retries}]  # built once, with the setting
+
+
+@pytest.mark.parametrize("mode", [Mode.RECORD, Mode.LIVE])
+def test_default_max_retries_keeps_the_sdk_default(
+    tmp_path: Path, sdk_kwargs: list[dict[str, Any]], mode: Mode
+) -> None:
+    client = ModelClient(CONFIG, mode=mode, cassette_dir=tmp_path)
+    assert client.max_retries is None
+    client.complete(prompt_hash=PROMPT_HASH, system="sys", user_input=INPUT)
+    assert sdk_kwargs == [{}]
+
+
+def test_replay_with_max_retries_never_constructs_a_live_client(tmp_path: Path, no_live_client: None) -> None:
+    client = ModelClient(CONFIG, mode=Mode.REPLAY, cassette_dir=tmp_path, max_retries=0)
+    with pytest.raises(MissingRecordingError):
+        client.complete(prompt_hash=PROMPT_HASH, system="sys", user_input=INPUT)
+
+
+def test_negative_max_retries_is_rejected(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="max_retries"):
+        ModelClient(CONFIG, mode=Mode.LIVE, cassette_dir=tmp_path, max_retries=-1)
+
+
+def test_nothing_outside_adapters_touches_the_private_live_client() -> None:
+    """Gate 2 decision 9: callers use `max_retries`, not `ModelClient._live`. Adapter tests are white-box."""
+    roots = [REPO / "src", REPO / "app", REPO / "scripts", REPO / "eval"]
+    offenders = [
+        str(path.relative_to(REPO))
+        for root in roots
+        if root.is_dir()
+        for path in root.rglob("*.py")
+        if ADAPTERS not in path.parents and "._live" in path.read_text(encoding="utf-8").replace("._live_", "")
+    ]
+    assert offenders == []
 
 
 # --- invariant 1 ---------------------------------------------------------------

@@ -206,14 +206,9 @@ class CountingClient:
 def live_model_client(cassette_dir: Path | None = None) -> ModelClient:
     """A LIVE ModelClient whose SDK client has `max_retries=0`, so every HTTP attempt is a counted call.
 
-    LIVE never writes recordings (ModelClient only saves in RECORD). Pre-building `_live` is the one
-    reach into the adapter; the request it sends is unchanged.
+    LIVE never writes recordings (ModelClient only saves in RECORD). Retries are done by `CountingClient`.
     """
-    import anthropic
-
-    client = ModelClient(mode=Mode.LIVE, cassette_dir=cassette_dir)
-    client._live = anthropic.Anthropic(max_retries=0)
-    return client
+    return ModelClient(mode=Mode.LIVE, cassette_dir=cassette_dir, max_retries=0)
 
 
 # --- results section -----------------------------------------------------------------------------

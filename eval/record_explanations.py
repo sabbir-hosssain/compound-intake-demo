@@ -27,11 +27,7 @@ NOW = datetime(2026, 11, 26, tzinfo=UTC)  # not part of the explain input; fixed
 
 
 def _record_client() -> ModelClient:
-    import anthropic
-
-    client = ModelClient(mode=Mode.RECORD)
-    client._live = anthropic.Anthropic(max_retries=0)  # same reach as eval.variance.live_model_client
-    return client
+    return ModelClient(mode=Mode.RECORD, max_retries=0)  # CountingClient does the (counted) retries
 
 
 def main(argv: Sequence[str] | None = None) -> int:
