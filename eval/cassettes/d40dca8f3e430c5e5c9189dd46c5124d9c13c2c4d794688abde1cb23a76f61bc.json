@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"1.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-008\",\n   \"rank\": 1,\n   \"score\": \"0.85\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-007\",\n   \"rank\": 2,\n   \"score\": \"0.75\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-003\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"0.85\",\n \"extraction\": {\n  \"base\": \"sugar-free syrup vehicle\",\n  \"dosage_form\": \"suspension\",\n  \"ingredients\": [\n   {\n    \"name\": \"baclofen\",\n    \"strength\": 5.0,\n    \"unit\": \"mg/mL\"\n   }\n  ],\n  \"route\": \"oral\"\n },\n \"flags\": [],\n \"margin\": \"0.10\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "d40dca8f3e430c5e5c9189dd46c5124d9c13c2c4d794688abde1cb23a76f61bc",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "Status is PROPOSED with confidence 0.85 and margin 0.10, so the system has put forward a top match for your review, and the lead over the runner-up is fairly narrow. The top candidate is SHF-008, with ingredients=1.00, strength=1.00, dosage_form=0.00, base=1.00, route=1.00. The dosage_form component pulled the score down: the extraction reads \"suspension\", and that did not match this formula. The runner-up, SHF-007, scored 0.75 with the same dosage_form=0.00 and also base=0.00, which accounts for its lower score. No flags fired on this proposal, so there are no BLOCK or REVIEW items to acknowledge. The decision stays with you.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEcef4M8BfjFbt54hLF",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1455,
+      "output_tokens": 237,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"1.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-013\",\n   \"rank\": 1,\n   \"score\": \"0.60\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-003\",\n   \"rank\": 2,\n   \"score\": \"0.10\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-006\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"0.60\",\n \"extraction\": {\n  \"base\": \"syrup and suspending agent vehicle\",\n  \"dosage_form\": \"suspension\",\n  \"ingredients\": [\n   {\n    \"name\": \"spironolactone\",\n    \"strength\": 2.0,\n    \"unit\": \"mg/mL\"\n   }\n  ],\n  \"route\": \"oral\"\n },\n \"flags\": [\n  {\n   \"message\": \"Possible unit error: 'spironolactone' 2 mg/mL is 0.08x the nearest library strength.\",\n   \"rule_id\": \"R2-03\",\n   \"severity\": \"BLOCK\"\n  }\n ],\n \"margin\": \"0.50\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "94ebfa9efccdac597eb72aeaf69c2b62113bb73a2b956af038a734908095bac7",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "Status is PROPOSED with confidence=0.60 and margin=0.50, so there is a leading candidate for you to review, but it is not a strong match and the decision stays with you. The top candidate is SHF-013, scored with ingredients=1.00, strength=0.00, dosage_form=0.00, base=1.00, route=1.00. Strength and dosage_form pulled the score down to 0.60, since neither matched the extracted 2 mg/mL spironolactone suspension. The runner-up, SHF-003, scored only 0.10, which accounts for the wide margin. One flag fired: R2-03 with severity BLOCK, which warns of a possible unit error because 2 mg/mL is 0.08x the nearest library strength. Because it is a BLOCK flag, CONFIRM is disabled, and the strength and units on the original prescription need to be checked before anything else.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEk9qh471kZNrRxoVAh",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1537,
+      "output_tokens": 289,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"1.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-015\",\n   \"rank\": 1,\n   \"score\": \"1.00\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"1.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-004\",\n   \"rank\": 2,\n   \"score\": \"0.35\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-001\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"1.00\",\n \"extraction\": {\n  \"base\": \"white petrolatum-based ointment base\",\n  \"dosage_form\": \"ointment\",\n  \"ingredients\": [\n   {\n    \"name\": \"tacrolimus\",\n    \"strength\": 0.1,\n    \"unit\": \"%\"\n   }\n  ],\n  \"route\": \"topical\"\n },\n \"flags\": [],\n \"margin\": \"0.65\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "4fa2de54f7d28fafc3a759ee57a5513f32946b717917731595fdd2f5c761e2ad",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is PROPOSED, with confidence=1.00 and margin=0.65, so the system has put forward a single formula for you to review and decide on. The top candidate is SHF-015, and all five of its components are at full marks: ingredients=1.00, strength=1.00, dosage_form=1.00, base=1.00, route=1.00. No component pulled the score down. The extraction it was scored on is tacrolimus 0.1% in a white petrolatum-based ointment base, applied topically. The runner-up, SHF-004, scored 0.35, with ingredients=0.00 and strength=0.00, and the third candidate, SHF-001, scored 0.10. No flags fired, so there is no BLOCK or REVIEW item to acknowledge, but the decision remains yours.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEf9TEFfbKQitK4VXdz",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1453,
+      "output_tokens": 256,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

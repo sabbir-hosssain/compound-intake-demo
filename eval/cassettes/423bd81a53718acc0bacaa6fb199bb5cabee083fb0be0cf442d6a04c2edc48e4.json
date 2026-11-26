@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-003\",\n   \"rank\": 1,\n   \"score\": \"0.50\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-006\",\n   \"rank\": 2,\n   \"score\": \"0.50\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-007\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"0.50\",\n \"extraction\": {\n  \"base\": null,\n  \"dosage_form\": \"suspension\",\n  \"ingredients\": [\n   {\n    \"name\": \"famotidine\",\n    \"strength\": 8.0,\n    \"unit\": null\n   }\n  ],\n  \"route\": \"oral\"\n },\n \"flags\": [\n  {\n   \"message\": \"Number with no unit next to an ingredient: 'famotidine 8'.\",\n   \"rule_id\": \"R1-02\",\n   \"severity\": \"REVIEW\"\n  },\n  {\n   \"message\": \"Possible unit error: 'famotidine' 8 has no unit.\",\n   \"rule_id\": \"R2-03\",\n   \"severity\": \"BLOCK\"\n  },\n  {\n   \"message\": \"Ambiguous match: margin 0.00 below T_margin 0.07.\",\n   \"rule_id\": \"M-01\",\n   \"severity\": \"REVIEW\"\n  }\n ],\n \"margin\": \"0.00\",\n \"status\": \"NO_MATCH\"\n}\n</facts>",
+  "key": "423bd81a53718acc0bacaa6fb199bb5cabee083fb0be0cf442d6a04c2edc48e4",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is NO_MATCH with confidence=0.50 and margin=0.00, so no formula was matched well enough to propose and you will need to review this intake yourself. The top candidate is SHF-003, with ingredients=1.00, strength=0.00, dosage_form=0.00, base=0.00, route=1.00. Strength, dosage form and base pulled the score down, leaving only the ingredient and route matches. The runner-up, SHF-006, has the same score of 0.50 and identical component scores, which is why the margin is 0.00.\n\nThree flags fired. R2-03 is a BLOCK: the extracted famotidine value of 8 has no unit, a possible unit error, so CONFIRM is disabled. R1-02 is a REVIEW flag about the same unitless number next to famotidine, and it must be acknowledged before CONFIRM. M-01 is also a REVIEW flag: the margin of 0.00 is below the T_margin of 0.07, so the match is ambiguous, and it must be acknowledged before CONFIRM.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEg43otfxfuM4UoY8iW",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1631,
+      "output_tokens": 345,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

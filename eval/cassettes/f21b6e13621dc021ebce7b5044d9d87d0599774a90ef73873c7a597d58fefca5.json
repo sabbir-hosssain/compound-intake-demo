@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"1.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-012\",\n   \"rank\": 1,\n   \"score\": \"0.65\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-003\",\n   \"rank\": 2,\n   \"score\": \"0.10\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-006\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"0.65\",\n \"extraction\": {\n  \"base\": \"adhesive oral paste base\",\n  \"dosage_form\": \"paste\",\n  \"ingredients\": [\n   {\n    \"name\": \"triamcinolone\",\n    \"strength\": 1.0,\n    \"unit\": \"%\"\n   }\n  ],\n  \"route\": \"oral\"\n },\n \"flags\": [\n  {\n   \"message\": \"Strength 1 % for 'triamcinolone' is above its illustrative max 0.5 %.\",\n   \"rule_id\": \"R2-02\",\n   \"severity\": \"BLOCK\"\n  },\n  {\n   \"message\": \"Possible unit error: 'triamcinolone' 1 % is 10x the nearest library strength.\",\n   \"rule_id\": \"R2-03\",\n   \"severity\": \"BLOCK\"\n  }\n ],\n \"margin\": \"0.55\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "f21b6e13621dc021ebce7b5044d9d87d0599774a90ef73873c7a597d58fefca5",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is PROPOSED, with confidence 0.65 and margin 0.55, so the system offers a top formula for your review, but the decision remains yours. The top candidate is SHF-012, scored ingredients=1.00, strength=0.00, dosage_form=1.00, base=1.00, route=0.00. Strength and route pulled the score down: the extracted strength of triamcinolone 1 % did not match the formula, and the oral route scored no match. The runner-up, SHF-003, scored only 0.10, which accounts for the wide margin.\n\nTwo BLOCK flags fired, so CONFIRM is disabled. R2-02 (BLOCK) says the strength of 1 % for triamcinolone is above its illustrative maximum of 0.5 %. R2-03 (BLOCK) says this may be a unit error, since 1 % is 10x the nearest library strength. Both need your attention before this proposal can move forward.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEkMbcQixWt6QWW1T6d",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1596,
+      "output_tokens": 305,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

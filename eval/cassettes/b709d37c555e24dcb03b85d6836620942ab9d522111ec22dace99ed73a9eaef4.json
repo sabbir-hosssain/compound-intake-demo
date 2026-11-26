@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-007\",\n   \"rank\": 1,\n   \"score\": \"0.65\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-008\",\n   \"rank\": 2,\n   \"score\": \"0.65\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-001\",\n   \"rank\": 3,\n   \"score\": \"0.00\"\n  }\n ],\n \"confidence\": \"0.65\",\n \"extraction\": {\n  \"base\": \"sugar free syrup vehicle\",\n  \"dosage_form\": \"suspension\",\n  \"ingredients\": [\n   {\n    \"name\": \"baclofen\",\n    \"strength\": 5.0,\n    \"unit\": \"mg/mL\"\n   }\n  ],\n  \"route\": null\n },\n \"flags\": [\n  {\n   \"message\": \"Ambiguous match: margin 0.00 below T_margin 0.07.\",\n   \"rule_id\": \"M-01\",\n   \"severity\": \"REVIEW\"\n  }\n ],\n \"margin\": \"0.00\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "b709d37c555e24dcb03b85d6836620942ab9d522111ec22dace99ed73a9eaef4",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "Status is PROPOSED with confidence=0.65 and margin=0.00, so the system offers a top match for your review, but the top two candidates are tied and nothing separates them. The top candidate is SHF-007, with ingredients=1.00, strength=1.00, dosage_form=0.00, base=0.00, route=0.00. Dosage form, base and route all scored zero and pulled the score down, while the baclofen ingredient and the 5.0 mg/mL strength matched fully. The runner-up SHF-008 has exactly the same component scores and the same score of 0.65, so the data gives no basis to prefer one over the other. The extraction has no route (null), which is consistent with the route score of 0.00. One flag fired: M-01 (REVIEW), which says the match is ambiguous because the margin of 0.00 is below T_margin of 0.07. This REVIEW flag must be acknowledged before CONFIRM can be used, and the choice between the tied formulas is left to you.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEidUnEAKt7ivJKxZUo",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1518,
+      "output_tokens": 323,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-010\",\n   \"rank\": 1,\n   \"score\": \"0.90\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.50\"\n   },\n   \"formula_id\": \"SHF-009\",\n   \"rank\": 2,\n   \"score\": \"0.78\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-001\",\n   \"rank\": 3,\n   \"score\": \"0.25\"\n  }\n ],\n \"confidence\": \"0.90\",\n \"extraction\": {\n  \"base\": \"vanishing cream\",\n  \"dosage_form\": \"cream\",\n  \"ingredients\": [\n   {\n    \"name\": \"hydrocortisone\",\n    \"strength\": 2.5,\n    \"unit\": \"%\"\n   },\n   {\n    \"name\": \"clotrimazole\",\n    \"strength\": 1.0,\n    \"unit\": \"%\"\n   }\n  ],\n  \"route\": \"topical\"\n },\n \"flags\": [],\n \"margin\": \"0.12\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "e4cd82951223ba4d72b8043d4e9702807ab3c00c241b8b3c1a8050767bf9e3e5",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "Status is PROPOSED with confidence=0.90 and margin=0.12, so the match is a suggestion for you to review and decide on, not a settled result. The top candidate is SHF-010, with ingredients=1.00, strength=1.00, dosage_form=1.00, base=0.00, route=1.00. Only the base component pulled its score down. The extracted base is \"vanishing cream\", and that component scored 0.00 for this formula. The runner-up, SHF-009, scored 0.78 and also has base=0.00, and its strength=0.50 is the other reason it trails. No flags fired, so no BLOCK or REVIEW items are attached to this proposal. The decision remains yours.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEd2w1D8gUSyqRyx6Qz",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1486,
+      "output_tokens": 227,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}
