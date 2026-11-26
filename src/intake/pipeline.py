@@ -4,18 +4,17 @@ The proposal is logged to the audit as a PENDING record (`review_action = None`)
 or creates a ReviewAction: only a pharmacist's review (S3.1) commits a decision (ADR-0001).
 Flags flow through every step as `[*existing, *new]`, so no step can drop one (invariant 2).
 
-The hash chain here follows SPEC §10 (`sha256(prev_hash + canonical_json(record))`) so v0 records
-are already linked; S3.2 owns `intake audit verify`.
+Records are hash-linked with `intake.audit.chain_hash` (SPEC §10); `intake audit verify` checks them.
 """
 
 import hashlib
-import json
 from datetime import UTC, datetime
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict
 
 from intake import audit
+from intake.audit import GENESIS_HASH, chain_hash
 from intake.extract import CompletionClient, ExtractStatus, extract
 from intake.library import library_version, load_alias_map, load_formulas
 from intake.match import Thresholds, load_thresholds, match
@@ -28,8 +27,6 @@ from intake.rules import (
     run_pass1,
     run_pass2,
 )
-
-GENESIS_HASH = "0" * 64
 
 
 class Library(BaseModel):
@@ -99,16 +96,6 @@ def build_proposal(
 
 
 # --- audit (pending only) ----------------------------------------------------------------------
-
-
-def canonical_json(record: AuditRecord) -> str:
-    """The record minus its own hash, as sorted, compact JSON."""
-    payload = record.model_dump(mode="json", exclude={"record_hash"})
-    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-
-
-def chain_hash(prev_hash: str, record: AuditRecord) -> str:
-    return hashlib.sha256((prev_hash + canonical_json(record)).encode("utf-8")).hexdigest()
 
 
 def pending_record(proposal: Proposal, text: str, *, seq: int, prev_hash: str) -> AuditRecord:

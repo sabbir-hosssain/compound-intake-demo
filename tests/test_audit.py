@@ -21,7 +21,18 @@ MUTATION_NAME = re.compile(
     r"update|delete|remove|drop|truncate|clear|edit|modify|replace|purge|erase|amend|overwrite|set_|vacuum",
     re.IGNORECASE,
 )
-EXPECTED_PUBLIC_API = {"db_path", "connect", "append", "next_seq", "read_all"}
+EXPECTED_PUBLIC_API = {
+    "db_path",
+    "connect",
+    "append",
+    "next_seq",
+    "read_all",
+    # S3.2: read-only hash-chain helpers and verify.
+    "canonical_json",
+    "chain_hash",
+    "verify",
+    "VerifyResult",
+}
 
 
 def _proposal(pid: str = "rx-001") -> Proposal:
