@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-009\",\n   \"rank\": 1,\n   \"score\": \"0.55\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-010\",\n   \"rank\": 2,\n   \"score\": \"0.55\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-001\",\n   \"rank\": 3,\n   \"score\": \"0.15\"\n  }\n ],\n \"confidence\": \"0.55\",\n \"extraction\": {\n  \"base\": null,\n  \"dosage_form\": \"cream\",\n  \"ingredients\": [\n   {\n    \"name\": \"hydrocortisone\",\n    \"strength\": null,\n    \"unit\": null\n   },\n   {\n    \"name\": \"clotrimazole\",\n    \"strength\": null,\n    \"unit\": null\n   }\n  ],\n  \"route\": null\n },\n \"flags\": [\n  {\n   \"message\": \"Description points elsewhere: 'see notes'.\",\n   \"rule_id\": \"R1-01\",\n   \"severity\": \"REVIEW\"\n  },\n  {\n   \"message\": \"Refers to a prior order the system cannot see: 'usual'.\",\n   \"rule_id\": \"R1-03\",\n   \"severity\": \"REVIEW\"\n  },\n  {\n   \"message\": \"Quantity is missing.\",\n   \"rule_id\": \"R2-05\",\n   \"severity\": \"REVIEW\"\n  }\n ],\n \"margin\": \"0.00\",\n \"status\": \"NO_MATCH\"\n}\n</facts>",
+  "key": "f7284d2e866e33772b336aa85073a719d84c83a2c8483f3c753d086c3598e90f",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is NO_MATCH with confidence 0.55 and margin 0.00, so the system found no formula it could propose and the pharmacist needs to work this one out manually. The top candidate is SHF-009 with ingredients=1.00, strength=0.00, dosage_form=1.00, base=0.00, route=0.00. Ingredients and dosage form matched, while strength, base and route all scored zero, which pulled the score down. The extraction had no strength, base or route to compare. The runner-up SHF-010 has the same score of 0.55 and identical component scores, so nothing separates the two candidates.\n\nThree REVIEW flags fired, and each must be acknowledged before CONFIRM. R1-01 (REVIEW) says the description points elsewhere with \"see notes\". R1-03 (REVIEW) says the order refers to a prior order the system cannot see, \"usual\". R2-05 (REVIEW) says the quantity is missing. No BLOCK flags fired.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSHt6T7m3XQzDh4v6oqu",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1636,
+      "output_tokens": 320,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

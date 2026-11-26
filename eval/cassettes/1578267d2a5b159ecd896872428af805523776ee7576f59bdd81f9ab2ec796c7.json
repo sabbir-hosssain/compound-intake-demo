@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-002\",\n   \"rank\": 1,\n   \"score\": \"0.25\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-005\",\n   \"rank\": 2,\n   \"score\": \"0.25\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-001\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"0.25\",\n \"extraction\": {\n  \"base\": null,\n  \"dosage_form\": \"gel\",\n  \"ingredients\": [\n   {\n    \"name\": \"ketoprofen\",\n    \"strength\": 10.0,\n    \"unit\": \"%\"\n   }\n  ],\n  \"route\": \"topical\"\n },\n \"flags\": [\n  {\n   \"message\": \"Ingredient not in the ingredient master: 'ketoprofen'.\",\n   \"rule_id\": \"R2-01\",\n   \"severity\": \"BLOCK\"\n  }\n ],\n \"margin\": \"0.00\",\n \"status\": \"NO_MATCH\"\n}\n</facts>",
+  "key": "1578267d2a5b159ecd896872428af805523776ee7576f59bdd81f9ab2ec796c7",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "Status is NO_MATCH with confidence=0.25 and margin=0.00, so the system found no formula it considers a usable match and the pharmacist will need to handle this prescription without a proposed formula. The top candidate is SHF-002, with ingredients=0.00, strength=0.00, dosage_form=1.00, base=0.00, route=1.00. Ingredients, strength and base pulled the score down, and only dosage form (gel) and route (topical) agreed with the extraction. The runner-up SHF-005 has the same score of 0.25 and identical component scores, which is why the margin is 0.00 and the top two cannot be told apart. The one flag is R2-01, severity BLOCK: the ingredient 'ketoprofen' is not in the ingredient master, so CONFIRM is disabled for this intake.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSHuMPK3xtYopYtnobHr",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1508,
+      "output_tokens": 270,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

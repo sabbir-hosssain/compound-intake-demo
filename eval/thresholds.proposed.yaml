@@ -78,7 +78,7 @@ selection:
 optimum:
   robust_correct: 33/42
   wrong_proposals: 2
-  m01_youden_j: 0.815789474
+  m01_youden_j: 0.947368421
   optimal_points: 35
   plateau_through_proposed:
     T_match:
@@ -107,7 +107,7 @@ dev_metrics:
       no_match_recall: 4/5
       unsafe_flag_recall: 7/7
       ambiguity_flag_recall: 4/4
-      ambiguity_false_alarm_rate: 7/38
+      ambiguity_false_alarm_rate: 2/38
       adversarial_pass_rate: 6/6
       simulated_override_rate: 6/42
     system_by_category:
@@ -120,17 +120,17 @@ dev_metrics:
         top1_accuracy: 8/11
         no_match_recall: 1/1
         ambiguity_flag_recall: 4/4
-        ambiguity_false_alarm_rate: 2/8
+        ambiguity_false_alarm_rate: 0/8
       unsafe:
         top1_accuracy: 5/6
         no_match_recall: 1/1
         ambiguity_flag_recall: 0/0
-        ambiguity_false_alarm_rate: 3/7
+        ambiguity_false_alarm_rate: 1/7
       adversarial:
         top1_accuracy: 4/5
         no_match_recall: 1/1
         ambiguity_flag_recall: 0/0
-        ambiguity_false_alarm_rate: 1/6
+        ambiguity_false_alarm_rate: 0/6
     baseline:
       field_accuracy: 0/0
       top1_accuracy: 31/37
@@ -138,8 +138,8 @@ dev_metrics:
       no_match_precision: 4/7
       no_match_recall: 4/5
       unsafe_flag_recall: 1/7
-      ambiguity_flag_recall: 2/4
-      ambiguity_false_alarm_rate: 6/38
+      ambiguity_flag_recall: 1/4
+      ambiguity_false_alarm_rate: 2/38
       adversarial_pass_rate: 4/6
       simulated_override_rate: 7/42
     baseline_by_category:
@@ -147,22 +147,22 @@ dev_metrics:
         top1_accuracy: 11/15
         no_match_recall: 1/2
         ambiguity_flag_recall: 0/0
-        ambiguity_false_alarm_rate: 3/17
+        ambiguity_false_alarm_rate: 2/17
       ambiguous:
         top1_accuracy: 9/11
         no_match_recall: 1/1
-        ambiguity_flag_recall: 2/4
-        ambiguity_false_alarm_rate: 1/8
+        ambiguity_flag_recall: 1/4
+        ambiguity_false_alarm_rate: 0/8
       unsafe:
         top1_accuracy: 6/6
         no_match_recall: 1/1
         ambiguity_flag_recall: 0/0
-        ambiguity_false_alarm_rate: 1/7
+        ambiguity_false_alarm_rate: 0/7
       adversarial:
         top1_accuracy: 5/5
         no_match_recall: 1/1
         ambiguity_flag_recall: 0/0
-        ambiguity_false_alarm_rate: 1/6
+        ambiguity_false_alarm_rate: 0/6
   proposed:
     hard_gates:
       adversarial_pass_rate:
@@ -182,7 +182,7 @@ dev_metrics:
       no_match_recall: 4/5
       unsafe_flag_recall: 7/7
       ambiguity_flag_recall: 4/4
-      ambiguity_false_alarm_rate: 7/38
+      ambiguity_false_alarm_rate: 2/38
       adversarial_pass_rate: 6/6
       simulated_override_rate: 6/42
     system_by_category:
@@ -195,17 +195,17 @@ dev_metrics:
         top1_accuracy: 8/11
         no_match_recall: 1/1
         ambiguity_flag_recall: 4/4
-        ambiguity_false_alarm_rate: 2/8
+        ambiguity_false_alarm_rate: 0/8
       unsafe:
         top1_accuracy: 5/6
         no_match_recall: 1/1
         ambiguity_flag_recall: 0/0
-        ambiguity_false_alarm_rate: 3/7
+        ambiguity_false_alarm_rate: 1/7
       adversarial:
         top1_accuracy: 4/5
         no_match_recall: 1/1
         ambiguity_flag_recall: 0/0
-        ambiguity_false_alarm_rate: 1/6
+        ambiguity_false_alarm_rate: 0/6
     baseline:
       field_accuracy: 0/0
       top1_accuracy: 31/37
@@ -213,8 +213,8 @@ dev_metrics:
       no_match_precision: 4/7
       no_match_recall: 4/5
       unsafe_flag_recall: 1/7
-      ambiguity_flag_recall: 2/4
-      ambiguity_false_alarm_rate: 6/38
+      ambiguity_flag_recall: 1/4
+      ambiguity_false_alarm_rate: 2/38
       adversarial_pass_rate: 4/6
       simulated_override_rate: 7/42
     baseline_by_category:
@@ -222,22 +222,22 @@ dev_metrics:
         top1_accuracy: 11/15
         no_match_recall: 1/2
         ambiguity_flag_recall: 0/0
-        ambiguity_false_alarm_rate: 3/17
+        ambiguity_false_alarm_rate: 2/17
       ambiguous:
         top1_accuracy: 9/11
         no_match_recall: 1/1
-        ambiguity_flag_recall: 2/4
-        ambiguity_false_alarm_rate: 1/8
+        ambiguity_flag_recall: 1/4
+        ambiguity_false_alarm_rate: 0/8
       unsafe:
         top1_accuracy: 6/6
         no_match_recall: 1/1
         ambiguity_flag_recall: 0/0
-        ambiguity_false_alarm_rate: 1/7
+        ambiguity_false_alarm_rate: 0/7
       adversarial:
         top1_accuracy: 5/5
         no_match_recall: 1/1
         ambiguity_flag_recall: 0/0
-        ambiguity_false_alarm_rate: 1/6
+        ambiguity_false_alarm_rate: 0/6
 landscape:
   T_match (T_margin fixed at 0.07):
   - range:
@@ -329,43 +329,43 @@ landscape:
     - 0.01
     - 0.03
     m01_recall: 2/4
-    m01_false_alarms: 7/38
-    youden_j: 0.315789474
+    m01_false_alarms: 2/38
+    youden_j: 0.447368421
     gates_passed: true
   - range:
     - 0.04
     - 0.1
     m01_recall: 4/4
-    m01_false_alarms: 7/38
-    youden_j: 0.815789474
+    m01_false_alarms: 2/38
+    youden_j: 0.947368421
     gates_passed: true
   - range:
     - 0.11
     - 0.12
     m01_recall: 4/4
-    m01_false_alarms: 8/38
-    youden_j: 0.789473684
+    m01_false_alarms: 3/38
+    youden_j: 0.921052632
     gates_passed: true
   - range:
     - 0.13
     - 0.15
     m01_recall: 4/4
-    m01_false_alarms: 15/38
-    youden_j: 0.605263158
+    m01_false_alarms: 9/38
+    youden_j: 0.763157895
     gates_passed: true
   - range:
     - 0.16
     - 0.25
     m01_recall: 4/4
-    m01_false_alarms: 17/38
-    youden_j: 0.552631579
+    m01_false_alarms: 11/38
+    youden_j: 0.710526316
     gates_passed: true
   - range:
     - 0.26
     - 0.3
     m01_recall: 4/4
-    m01_false_alarms: 23/38
-    youden_j: 0.394736842
+    m01_false_alarms: 17/38
+    youden_j: 0.552631579
     gates_passed: true
 diagnostics_at_proposed:
   decisions_wrong_or_tie_decided:
@@ -410,27 +410,7 @@ diagnostics_at_proposed:
     category: clean
     status: PROPOSED
     margin: 0.0
-  - case: g028
-    category: ambiguous
-    status: NO_MATCH
-    margin: 0.0
-  - case: g031
-    category: ambiguous
-    status: NO_MATCH
-    margin: 0.0
-  - case: g041
-    category: unsafe
-    status: NO_MATCH
-    margin: 0.0
   - case: g043
     category: unsafe
     status: PROPOSED
-    margin: 0.0
-  - case: g044
-    category: unsafe
-    status: NO_MATCH
-    margin: 0.0
-  - case: g056
-    category: adversarial
-    status: NO_MATCH
     margin: 0.0

@@ -4,6 +4,8 @@ Every weight and threshold comes from `eval/thresholds.yaml` (protected); none i
 Score per formula = Σ weight[c] · component[c] over: ingredients (Jaccard on canonical names),
 strength (per formula ingredient: full credit within ±full_credit_pct, linear to 0 at ±zero_credit_pct),
 dosage_form, base, route (normalised exact match). Flags are only appended (invariant 2).
+M-01 (REVIEW) fires when the margin is below T_margin and the status is not NO_MATCH (SPEC §6, S3.8):
+with no proposed formula there is nothing to disambiguate. An exact top-2 tie (margin 0) still fires.
 """
 
 import math
@@ -186,6 +188,23 @@ def _m01(margin: float, thresholds: Thresholds) -> Flag:
     )
 
 
+def ambiguity_flags(status: ProposalStatus, margin: float, thresholds: Thresholds) -> list[Flag]:
+    """M-01 when a match is proposed with margin below T_margin (a tie, margin 0, included); none on NO_MATCH.
+
+    Shared by the matcher and the baseline so their M-01 metrics compare like with like.
+    """
+    if status is ProposalStatus.NO_MATCH or margin >= thresholds.T_margin:
+        return []
+    return [_m01(margin, thresholds)]
+
+
+def tied_with(candidates: Sequence[MatchCandidate]) -> str | None:
+    """The runner-up's formula_id when it scores exactly the same as the top candidate, else None."""
+    if len(candidates) < 2 or candidates[0].score != candidates[1].score:
+        return None
+    return candidates[1].formula_id
+
+
 def match(
     extraction: Extraction,
     formulas: Sequence[Formula],
@@ -201,5 +220,5 @@ def match(
     second = top[1].score if len(top) > 1 else 0.0
     margin = round(confidence - second, _PRECISION)
     status = ProposalStatus.NO_MATCH if confidence < thresholds.T_match else ProposalStatus.PROPOSED
-    new = [_m01(margin, thresholds)] if margin < thresholds.T_margin else []
+    new = ambiguity_flags(status, margin, thresholds)
     return MatchResult(candidates=top, confidence=confidence, margin=margin, status=status, flags=[*existing, *new])

@@ -32,11 +32,11 @@ import yaml
 from pydantic import BaseModel, ConfigDict, ValidationError, model_validator
 
 from eval import metrics, variance
-from eval.metrics import AMBIGUITY_RULE, NO_MATCH, Gold, Outcome, SoftGate, Table
+from eval.metrics import NO_MATCH, Gold, Outcome, SoftGate, Table
 from eval.variance import CallCount, Variance
 from intake.adapters.anthropic_client import Mode, ModelClient
 from intake.adapters.cassette import MissingRecordingError
-from intake.baseline import baseline_match, raw_text
+from intake.baseline import baseline_ambiguity_flags, baseline_match, raw_text
 from intake.extract import CompletionClient
 from intake.match import DEFAULT_THRESHOLDS
 from intake.models import Extraction, Proposal, ProposalStatus, RawPrescription, Severity
@@ -224,17 +224,16 @@ def run_case(case: EvalCase, *, client: CompletionClient, library: Library) -> C
 
 
 def run_baseline(case: EvalCase, library: Library) -> Outcome:
-    """No-LLM baseline: rapidfuzz match (SPEC §6) plus the pass-1 rules on the raw text, and M-01 when the
-    baseline's own margin is below T_margin. It has no extraction, so pass 2 and field accuracy don't apply."""
+    """No-LLM baseline: rapidfuzz match (SPEC §6) plus the pass-1 rules on the raw text, and M-01 by the
+    matcher's rule on the baseline's own status and margin (none on NO_MATCH). It has no extraction, so
+    pass 2 and field accuracy don't apply."""
     try:
         text = case_text(case)
     except OSError:
         return Outcome()
     result = baseline_match(text, library.formulas)
-    flags = run_pass1(text, known=library.known_ingredients)
+    flags = [*run_pass1(text, known=library.known_ingredients), *baseline_ambiguity_flags(result, library.thresholds)]
     ids = [f.rule_id for f in flags]
-    if result.margin < library.thresholds.T_margin:
-        ids.append(AMBIGUITY_RULE)
     return Outcome(
         status=result.status,
         candidates=tuple(c.formula_id for c in result.candidates),
@@ -408,7 +407,8 @@ def _metric_section(report: Report) -> list[str]:
         "",
         "Each cell: hits/cases, rate, [95% Wilson interval]. `n/a` = no case in that slice qualifies.",
         "The baseline is the no-LLM rapidfuzz matcher plus the pass-1 rules on the raw text (no extraction,",
-        "so no pass-2 flags and no field accuracy); its M-01 uses its own margin against T_margin.",
+        "so no pass-2 flags and no field accuracy); its M-01 uses its own margin against T_margin, under the",
+        "matcher's rule (not raised on NO_MATCH).",
         "",
         *metrics.render_tables(report.table),
         "### System summary (informational)",

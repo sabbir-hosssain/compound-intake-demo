@@ -17,7 +17,7 @@ from intake import audit
 from intake.audit import GENESIS_HASH, chain_hash
 from intake.extract import CompletionClient, ExtractStatus, extract
 from intake.library import library_version, load_alias_map, load_formulas
-from intake.match import Thresholds, load_thresholds, match
+from intake.match import Thresholds, load_thresholds, match, tied_with
 from intake.models import AuditRecord, Formula, Proposal, ProposalStatus, Severity
 from intake.rules import (
     RULES_VERSION,
@@ -150,9 +150,11 @@ def _candidate_lines(proposal: Proposal) -> list[str]:
     if not proposal.candidates:
         return ["  (none)"]
     lines = []
+    tie = tied_with(proposal.candidates)
     for rank, cand in enumerate(proposal.candidates, start=1):
         parts = ", ".join(f"{k} {v:.2f}" for k, v in cand.component_scores.items())
-        lines.append(f"  {rank}. {cand.formula_id} v{cand.formula_version}  score {cand.score:.3f}  ({parts})")
+        note = f"  [tied with {tie}]" if rank == 1 and tie else ""
+        lines.append(f"  {rank}. {cand.formula_id} v{cand.formula_version}  score {cand.score:.3f}  ({parts}){note}")
     return lines
 
 

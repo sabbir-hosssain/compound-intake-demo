@@ -3,7 +3,9 @@
 Score per formula = rapidfuzz token-set ratio (0-1) between the raw prescription text and the formula's
 name plus its ingredient string ("<name> <strength><unit>" per ingredient). Top 3 are returned; the
 result is NO_MATCH when the top score is below `NO_MATCH_CUTOFF`, read from `baseline_no_match_cutoff` in
-eval/thresholds.yaml (protected). It was tuned on the dev split only with `tune_cutoff` (DECISIONS-LOG #14). The baseline adds no flags and never calls a model.
+eval/thresholds.yaml (protected). It was tuned on the dev split only with `tune_cutoff` (DECISIONS-LOG #14).
+`baseline_match` adds no flags and never calls a model; `baseline_ambiguity_flags` gives the baseline's own
+M-01 under the matcher's rule (`intake.match.ambiguity_flags`: none on NO_MATCH, ties on proposals flag).
 """
 
 from collections.abc import Sequence
@@ -12,8 +14,8 @@ from pathlib import Path
 import yaml
 from rapidfuzz import fuzz, utils
 
-from intake.match import DEFAULT_THRESHOLDS, TOP_K, MatchResult
-from intake.models import Formula, MatchCandidate, ProposalStatus
+from intake.match import DEFAULT_THRESHOLDS, TOP_K, MatchResult, Thresholds, ambiguity_flags
+from intake.models import Flag, Formula, MatchCandidate, ProposalStatus
 
 BASELINE_VERSION = "0.1.0"
 NO_MATCH = "NO_MATCH"
@@ -67,6 +69,11 @@ def baseline_match(text: str, formulas: Sequence[Formula], cutoff: float = NO_MA
     status = ProposalStatus.NO_MATCH if confidence < cutoff else ProposalStatus.PROPOSED
     margin = round(confidence - second, _PRECISION)
     return MatchResult(candidates=top, confidence=confidence, margin=margin, status=status)
+
+
+def baseline_ambiguity_flags(result: MatchResult, thresholds: Thresholds) -> list[Flag]:
+    """The baseline's M-01 from its own status and margin, by the same rule as the matcher."""
+    return ambiguity_flags(result.status, result.margin, thresholds)
 
 
 def decision_correct(result: MatchResult, gold: str) -> bool:

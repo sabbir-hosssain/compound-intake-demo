@@ -17,6 +17,7 @@ import streamlit as st
 
 from intake import audit, review
 from intake.library import load_alias_map, load_formulas
+from intake.match import tied_with
 from intake.models import AuditRecord, Proposal, ReviewActionType, Severity
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -66,6 +67,9 @@ def _show_candidates(proposal: Proposal) -> None:
         | {k: round(v, 3) for k, v in c.component_scores.items()}
         for rank, c in enumerate(proposal.candidates, start=1)
     ]
+    tie = tied_with(proposal.candidates)
+    if tie:
+        st.warning(f"{proposal.candidates[0].formula_id} is tied with {tie} (equal scores; ranked by formula ID).")
     st.table(rows)
 
 

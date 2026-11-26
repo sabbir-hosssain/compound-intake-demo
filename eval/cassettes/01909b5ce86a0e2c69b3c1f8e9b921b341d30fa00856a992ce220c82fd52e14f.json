@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"0.33\",\n    \"route\": \"0.00\",\n    \"strength\": \"0.50\"\n   },\n   \"formula_id\": \"SHF-009\",\n   \"rank\": 1,\n   \"score\": \"0.41\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"0.33\",\n    \"route\": \"0.00\",\n    \"strength\": \"0.50\"\n   },\n   \"formula_id\": \"SHF-010\",\n   \"rank\": 2,\n   \"score\": \"0.41\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-001\",\n   \"rank\": 3,\n   \"score\": \"0.15\"\n  }\n ],\n \"confidence\": \"0.41\",\n \"extraction\": {\n  \"base\": \"vanishing cream\",\n  \"dosage_form\": \"cream\",\n  \"ingredients\": [\n   {\n    \"name\": \"hc\",\n    \"strength\": 1.0,\n    \"unit\": \"%\"\n   },\n   {\n    \"name\": \"clotrimazole\",\n    \"strength\": 1.0,\n    \"unit\": \"%\"\n   }\n  ],\n  \"route\": null\n },\n \"flags\": [\n  {\n   \"message\": \"Ingredient not in the ingredient master: 'hc'.\",\n   \"rule_id\": \"R2-01\",\n   \"severity\": \"BLOCK\"\n  }\n ],\n \"margin\": \"0.00\",\n \"status\": \"NO_MATCH\"\n}\n</facts>",
+  "key": "01909b5ce86a0e2c69b3c1f8e9b921b341d30fa00856a992ce220c82fd52e14f",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is NO_MATCH, so no formula was proposed and the pharmacist needs to review this prescription without a suggested match; confidence is 0.41 and margin is 0.00. The top candidate is SHF-009 with ingredients=0.33, strength=0.50, dosage_form=1.00, base=0.00, route=0.00. Ingredients, strength, base and route pulled the score down, and only dosage_form matched fully. The runner-up SHF-010 has the same score of 0.41 and identical component scores, which is why the margin is 0.00 and the two cannot be told apart. The extraction shows route as null, which fits the route=0.00 score. One flag fired: R2-01 (BLOCK) says the ingredient 'hc' is not in the ingredient master, so CONFIRM is disabled.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSHsdJij7XsbbznG7ft6",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1542,
+      "output_tokens": 267,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}
