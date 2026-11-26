@@ -40,7 +40,7 @@ raw text ─► Rules pass 1 (raw) ─► LLM extract ─► schema validation �
 | R1-01 | Description is empty, "see notes", or similar | REVIEW |
 | R1-02 | A number appears with no unit next to an ingredient-like token | REVIEW |
 | R1-03 | Refers to an unseen prior order ("as before", "same as last", "usual") | REVIEW |
-| R1-04 | Contains a term from the synthetic controlled-substance list | BLOCK (controlled workflow) |
+| R1-04 | Contains a term from the controlled-substance list (`data/rules/controlled_terms.yaml`, illustrative), anywhere in the raw text including Notes | BLOCK (controlled workflow) |
 | R1-05 | Contains instruction-like text aimed at the system ("ignore", "approve", "mark verified", "system:") | BLOCK |
 
 **Pass 2 (extracted fields vs library):**
@@ -49,8 +49,8 @@ raw text ─► Rules pass 1 (raw) ─► LLM extract ─► schema validation �
 | R2-01 | Ingredient not in the ingredient master | BLOCK |
 | R2-02 | Strength above that ingredient's illustrative max | BLOCK |
 | R2-03 | Strength ≥10× or ≤0.1× the nearest library strength (unit-error suspicion) | BLOCK |
-| R2-04 | Dosage form missing, or conflicts with the route | REVIEW |
-| R2-05 | Quantity missing or implausible | REVIEW |
+| R2-04 | Dosage form missing, or conflicts with the route (form↔route table in `data/rules/form_routes.yaml`) | REVIEW |
+| R2-05 | Quantity missing or above the ceilings in `eval/thresholds.yaml` (`quantity_max`) | REVIEW |
 | R2-06 | Prescriber or patient reference missing | REVIEW |
 | R2-07 | Duplicate ingredient | REVIEW |
 
@@ -59,10 +59,10 @@ raw text ─► Rules pass 1 (raw) ─► LLM extract ─► schema validation �
 ## 6. Matching (code, `src/intake/match.py`)
 Score per formula = 0.40·ingredient-set similarity (Jaccard on normalised names) + 0.25·strength agreement (per ingredient, within ±10% = 1, decaying to 0 at ±50%) + 0.15·dosage form + 0.10·base + 0.10·route.
 - `confidence` = top score; `margin` = top − second.
-- `NO_MATCH` if confidence < **T_match** (start 0.60). An ambiguity flag `M-01 (REVIEW)` fires if margin < **T_margin** (start 0.10).
+- `NO_MATCH` if confidence < **T_match** (start 0.60). An ambiguity flag `M-01 (REVIEW)` fires if margin < **T_margin** (start 0.10) and the status is not `NO_MATCH` (with no proposed formula there is nothing to disambiguate). A tie between the top two candidates on a proposed match still raises M-01. Gate 2 values: T_match 0.58, T_margin 0.07.
 - The weights and thresholds live in `eval/thresholds.yaml` (**protected**). They're tuned on the dev split only, and frozen at Gate 2.
 
-**Baseline** (`src/intake/baseline.py`): no LLM. A rapidfuzz token-set ratio between the raw text and each formula's name plus ingredient string, giving top 3 and a `NO_MATCH` cut-off tuned on dev.
+**Baseline** (`src/intake/baseline.py`): no LLM. A rapidfuzz token-set ratio between the raw text and each formula's name plus ingredient string, giving top 3 and a `NO_MATCH` cut-off tuned on dev (`baseline_no_match_cutoff` in `eval/thresholds.yaml`). So that flag metrics compare like with like, the baseline raises the pass-1 raw-text rules (R1-01…R1-05) and M-01 on its own margin; it raises no pass-2 flags, because it extracts no fields.
 
 ## 7. LLM usage
 - Provider: Anthropic API. The model ID is pinned in `config.toml` (start: `claude-sonnet-5-5`; verify availability on the key). Sampling parameters (`temperature`, `top_p`, `top_k`) are not sent: the pinned model rejects them. CI determinism comes from REPLAY recordings, not sampling settings; run-to-run variance of live runs is measured in S2.7 (`--runs`) and reported. Structured output through a `strict: true` tool with `tool_choice` left at auto (forced tool choice is rejected by the pinned model), validated by Pydantic.

@@ -3,8 +3,8 @@
 # Dev split only, REPLAY recordings, only T_match and T_margin varied. No test-split metric is computed.
 # Ratios are hits/cases. Synthetic, illustrative data.
 current:
-  T_match: 0.6
-  T_margin: 0.1
+  T_match: 0.58
+  T_margin: 0.07
 proposed:
   T_match: 0.58
   T_margin: 0.07

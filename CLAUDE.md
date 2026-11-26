@@ -25,7 +25,7 @@ A public demo: free-text compound prescription → LLM extraction → code-score
 src/intake/{models,rules,extract,explain,match,baseline,audit,cli}.py · src/intake/adapters/ · prompts/ · data/formulas/ · data/golden/ · eval/ · app/review.py · results/ · docs/ · scripts/
 
 ## Definition of done (per issue)
-AC checked in the PR · tests added and passing · CI green · reviewer-approved · STATE.md rewritten · new decisions appended to DECISIONS-LOG.md.
+AC checked in the PR · tests added and passing · CI green · reviewer-approved · STATE.md rewritten (by the orchestrator, at merge) · new decisions appended to DECISIONS-LOG.md.
 
 ## Style
 Python 3.12, type hints, Pydantic v2, small functions, no frameworks beyond the stack in docs/SPEC.md. Prefer boring code.
