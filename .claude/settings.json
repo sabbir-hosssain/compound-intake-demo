@@ -1,10 +1,21 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(uv run python -m eval.run_eval --mode replay *)",
+      "Bash(uv run python -m eval.tune *)",
+      "Bash(make eval)",
+      "Bash(make demo)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
         "matcher": "Edit|Write|MultiEdit|NotebookEdit",
         "hooks": [
-          { "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect_paths.py\"" }
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect_paths.py\""
+          }
         ]
       }
     ],
@@ -12,7 +23,10 @@
       {
         "matcher": "startup|resume|clear|compact",
         "hooks": [
-          { "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_context.py\"" }
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_context.py\""
+          }
         ]
       }
     ]
