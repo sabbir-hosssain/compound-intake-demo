@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-015\",\n   \"rank\": 1,\n   \"score\": \"0.90\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-004\",\n   \"rank\": 2,\n   \"score\": \"0.25\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-001\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"0.90\",\n \"extraction\": {\n  \"base\": \"white petrolatum\",\n  \"dosage_form\": \"ointment\",\n  \"ingredients\": [\n   {\n    \"name\": \"tacrolimus\",\n    \"strength\": 0.1,\n    \"unit\": \"%\"\n   }\n  ],\n  \"route\": \"topical\"\n },\n \"flags\": [],\n \"margin\": \"0.65\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "a75e7907cac603fdccdadcd054d15c47f17963bd1e563bed50dc6da82b78400a",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is PROPOSED, with confidence=0.90 and margin=0.65, so the system has a clear top candidate for you to review; the decision is still yours. The top candidate is SHF-015, with component scores ingredients=1.00, strength=1.00, dosage_form=1.00, base=0.00, route=1.00. Only the base component pulled the score down, since the extracted base (white petrolatum) received no credit against this formula. The runner-up, SHF-004, scored 0.25, well behind. No flags fired on this proposal, so there are no BLOCK or REVIEW items to acknowledge.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEdxLDUYw3Rm9daMri9",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1447,
+      "output_tokens": 199,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

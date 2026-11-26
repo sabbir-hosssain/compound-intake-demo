@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-006\",\n   \"rank\": 1,\n   \"score\": \"0.75\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-003\",\n   \"rank\": 2,\n   \"score\": \"0.50\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-007\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"0.75\",\n \"extraction\": {\n  \"base\": \"suspending vehicle\",\n  \"dosage_form\": \"suspension\",\n  \"ingredients\": [\n   {\n    \"name\": \"famotidine\",\n    \"strength\": 4.0,\n    \"unit\": \"mg/mL\"\n   }\n  ],\n  \"route\": \"oral\"\n },\n \"flags\": [],\n \"margin\": \"0.25\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "552b35722d1ece560e342a158332a184df26df79cfa81e0efa002e80e4c7e337",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is PROPOSED with confidence=0.75 and margin=0.25, so there is a candidate for you to review, but the match is not a clean one and the decision stays with you. The top candidate is SHF-006, with ingredients=1.00, strength=1.00, dosage_form=0.00, base=0.00, route=1.00. The dosage form and base components pulled its score down, even though the request (famotidine 4.0 mg/mL, oral suspension in a suspending vehicle) matched on ingredients, strength and route. The runner-up, SHF-003, scored 0.50, because its strength component was also 0.00. No flags fired, so there are no BLOCK or REVIEW items to acknowledge, but you should still check the dosage form and base mismatches yourself.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEcFR4dhpVLVfAp4hDh",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1450,
+      "output_tokens": 252,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

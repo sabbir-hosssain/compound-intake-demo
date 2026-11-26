@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"0.50\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-014\",\n   \"rank\": 1,\n   \"score\": \"0.70\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.50\",\n    \"route\": \"0.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-012\",\n   \"rank\": 2,\n   \"score\": \"0.45\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-001\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"0.70\",\n \"extraction\": {\n  \"base\": null,\n  \"dosage_form\": \"solution\",\n  \"ingredients\": [\n   {\n    \"name\": \"minoxidil\",\n    \"strength\": 5.0,\n    \"unit\": \"%\"\n   },\n   {\n    \"name\": \"triamcinolone\",\n    \"strength\": 0.1,\n    \"unit\": \"%\"\n   }\n  ],\n  \"route\": \"topical\"\n },\n \"flags\": [],\n \"margin\": \"0.25\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "e64b407cbb836c0a8eceba1f95a37487587c621d8e7eab288f04ed714b8aa372",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "Status is PROPOSED with confidence=0.70 and margin=0.25, so the pharmacist has a top candidate to review, not a settled match. The top candidate is SHF-014, with ingredients=0.50, strength=1.00, dosage_form=1.00, base=0.00, route=1.00. The ingredients and base components pulled the score down: ingredients is only half matched, and base is 0.00 (the extraction has no base value). The runner-up, SHF-012, scored 0.45, which accounts for the 0.25 margin. No flags fired, so there are no BLOCK or REVIEW items to acknowledge. The pharmacist still makes the decision.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEeLHL46kG5R9eRpmgP",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1478,
+      "output_tokens": 219,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

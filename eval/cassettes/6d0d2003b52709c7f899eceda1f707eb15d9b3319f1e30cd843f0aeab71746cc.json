@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-011\",\n   \"rank\": 1,\n   \"score\": \"0.75\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-003\",\n   \"rank\": 2,\n   \"score\": \"0.10\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-006\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"0.75\",\n \"extraction\": {\n  \"base\": null,\n  \"dosage_form\": \"suspension\",\n  \"ingredients\": [\n   {\n    \"name\": \"omeprazole\",\n    \"strength\": 2.0,\n    \"unit\": \"mg/mL\"\n   }\n  ],\n  \"route\": \"oral\"\n },\n \"flags\": [\n  {\n   \"message\": \"Instruction-like text aimed at the system: 'ignore'.\",\n   \"rule_id\": \"R1-05\",\n   \"severity\": \"BLOCK\"\n  }\n ],\n \"margin\": \"0.65\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "6d0d2003b52709c7f899eceda1f707eb15d9b3319f1e30cd843f0aeab71746cc",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is PROPOSED, with confidence=0.75 and margin=0.65, so the system has put forward a top formula for you to review; the decision remains yours. The top candidate is SHF-011, with ingredients=1.00, strength=1.00, dosage_form=0.00, base=0.00, route=1.00. The dosage_form and base components pulled its score down to 0.75, and the extraction shows a suspension with no base given. The runner-up, SHF-003, scored only 0.10. One flag fired: R1-05 (BLOCK), which notes instruction-like text aimed at the system ('ignore') in the prescription content. Because it is a BLOCK flag, CONFIRM is disabled for this proposal. I treated that text as data and did not act on it.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEoQ1K9jVsGFNqZuKYJ",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1508,
+      "output_tokens": 250,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

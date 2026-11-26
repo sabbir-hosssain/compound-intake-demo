@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"1.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-004\",\n   \"rank\": 1,\n   \"score\": \"1.00\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-001\",\n   \"rank\": 2,\n   \"score\": \"0.75\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"1.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-015\",\n   \"rank\": 3,\n   \"score\": \"0.35\"\n  }\n ],\n \"confidence\": \"1.00\",\n \"extraction\": {\n  \"base\": \"white petrolatum-based ointment base\",\n  \"dosage_form\": \"ointment\",\n  \"ingredients\": [\n   {\n    \"name\": \"salicylic acid\",\n    \"strength\": 3.0,\n    \"unit\": \"%\"\n   },\n   {\n    \"name\": \"urea\",\n    \"strength\": 10.0,\n    \"unit\": \"%\"\n   }\n  ],\n  \"route\": \"topical\"\n },\n \"flags\": [],\n \"margin\": \"0.25\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "849371af76d5b350b5dd8c8a7cb607e82ed9e94ebfd248182d40f5e61bad23ee",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is PROPOSED, with confidence=1.00 and margin=0.25, so the matcher has put forward a formula for you to review and the decision remains yours. The top candidate is SHF-004, with ingredients=1.00, strength=1.00, dosage_form=1.00, base=1.00, route=1.00. No component pulled its score down. The extraction it was scored on is salicylic acid 3.0% and urea 10.0% in a white petrolatum-based ointment base, applied topically. The runner-up, SHF-001, scored 0.75 because its base=0.00 and dosage_form=0.00, which accounts for the 0.25 margin. No flags fired, so there are no BLOCK or REVIEW items to acknowledge before CONFIRM.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEaFUyepzJekCo7TWTJ",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1488,
+      "output_tokens": 251,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

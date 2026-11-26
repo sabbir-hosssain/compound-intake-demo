@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-002\",\n   \"rank\": 1,\n   \"score\": \"0.80\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"0.50\"\n   },\n   \"formula_id\": \"SHF-005\",\n   \"rank\": 2,\n   \"score\": \"0.68\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-001\",\n   \"rank\": 3,\n   \"score\": \"0.00\"\n  }\n ],\n \"confidence\": \"0.80\",\n \"extraction\": {\n  \"base\": null,\n  \"dosage_form\": \"gel\",\n  \"ingredients\": [\n   {\n    \"name\": \"lidocaine\",\n    \"strength\": 4.0,\n    \"unit\": \"%\"\n   },\n   {\n    \"name\": \"menthol\",\n    \"strength\": 1.0,\n    \"unit\": \"%\"\n   },\n   {\n    \"name\": \"lidocaine\",\n    \"strength\": 4.0,\n    \"unit\": \"%\"\n   }\n  ],\n  \"route\": null\n },\n \"flags\": [\n  {\n   \"message\": \"Duplicate ingredient 'lidocaine': 'lidocaine', 'lidocaine'.\",\n   \"rule_id\": \"R2-07\",\n   \"severity\": \"REVIEW\"\n  }\n ],\n \"margin\": \"0.12\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "17b3373d4ad74ffc69d99540a6dc185d0877111e9f0184ada6fa41e439298409",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "Status is PROPOSED with confidence=0.80 and margin=0.12, so the system has a top candidate for you to review, but the lead over the runner-up is small and the decision stays with you.\n\nThe top candidate is SHF-002, with ingredients=1.00, strength=1.00, dosage_form=1.00, base=0.00, route=1.00 pulled apart as follows: base=0.00 and route=0.00 dragged the score down. To be exact, the scores are ingredients=1.00, strength=1.00, dosage_form=1.00, base=0.00, route=0.00. The extraction had no base or route (both null), which fits those two zeros. The runner-up, SHF-005, scored 0.68 and differs only in strength=0.50.\n\nOne flag fired: R2-07, severity REVIEW. It notes that lidocaine appears twice in the extracted ingredients (both at 4.0 %), so the duplicate should be checked against the original prescription. A REVIEW flag must be acknowledged before CONFIRM is available.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEhXhFTML11dwBZ19Lu",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1587,
+      "output_tokens": 338,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

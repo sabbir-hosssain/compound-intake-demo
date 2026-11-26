@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-007\",\n   \"rank\": 1,\n   \"score\": \"0.75\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-008\",\n   \"rank\": 2,\n   \"score\": \"0.75\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-003\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"0.75\",\n \"extraction\": {\n  \"base\": \"suspending vehicle\",\n  \"dosage_form\": \"suspension\",\n  \"ingredients\": [\n   {\n    \"name\": \"baclofen\",\n    \"strength\": 5.0,\n    \"unit\": \"mg/mL\"\n   }\n  ],\n  \"route\": \"oral\"\n },\n \"flags\": [\n  {\n   \"message\": \"Ambiguous match: margin 0.00 below T_margin 0.07.\",\n   \"rule_id\": \"M-01\",\n   \"severity\": \"REVIEW\"\n  }\n ],\n \"margin\": \"0.00\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "7b6f16dd4bf0abda0fdc5befd18f42dd9151ed1d34231d74c5b6482eedc9d505",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is PROPOSED with confidence=0.75 and margin=0.00, so the system has put forward a top formula but it is tied with the runner-up and needs your judgment to separate them. The top candidate is SHF-007, with ingredients=1.00, strength=1.00, dosage_form=0.00, base=0.00, route=1.00. The dosage_form and base components pulled the score down, since neither matched the extracted suspension in a suspending vehicle. The runner-up SHF-008 has the same score of 0.75 and identical component scores, which is why the margin is zero. One flag fired: M-01 with severity REVIEW, saying the match is ambiguous because the margin of 0.00 is below the T_margin of 0.07. A REVIEW flag must be acknowledged before CONFIRM, and no BLOCK flags are present. The decision between SHF-007 and SHF-008 remains yours.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEcSovdRUs5YbmmTfAU",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1517,
+      "output_tokens": 298,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

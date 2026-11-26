@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-001\",\n   \"rank\": 1,\n   \"score\": \"0.80\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-004\",\n   \"rank\": 2,\n   \"score\": \"0.65\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-009\",\n   \"rank\": 3,\n   \"score\": \"0.15\"\n  }\n ],\n \"confidence\": \"0.80\",\n \"extraction\": {\n  \"base\": null,\n  \"dosage_form\": \"cream\",\n  \"ingredients\": [\n   {\n    \"name\": \"salicylic acid\",\n    \"strength\": 3.0,\n    \"unit\": \"%\"\n   },\n   {\n    \"name\": \"urea\",\n    \"strength\": 10.0,\n    \"unit\": \"%\"\n   }\n  ],\n  \"route\": null\n },\n \"flags\": [\n  {\n   \"message\": \"Instruction-like text aimed at the system: 'ignore'.\",\n   \"rule_id\": \"R1-05\",\n   \"severity\": \"BLOCK\"\n  }\n ],\n \"margin\": \"0.15\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "097c274191be9552b33b42ebc89cc17ba7f246374aa8d72ebdbea9e54ca27355",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is PROPOSED with confidence 0.80 and margin 0.15, so the match is a proposal for you to review, not a decision. The top candidate is SHF-001, with ingredients=1.00, strength=1.00, dosage_form=1.00, base=0.00, route=0.00. The score was pulled down by base and route, both 0.00, which fits the extraction having no base or route (both null). The runner-up is SHF-004 at 0.65, which matches on ingredients and strength but scores dosage_form=0.00.\n\nOne flag fired: R1-05 with severity BLOCK, reporting instruction-like text aimed at the system (the word 'ignore'). Because it is a BLOCK flag, CONFIRM is disabled for this proposal. I treated that text as data only and did not act on it.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEnZAh226mvdJcNaXpb",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1536,
+      "output_tokens": 263,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

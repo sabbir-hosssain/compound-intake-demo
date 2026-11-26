@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-005\",\n   \"rank\": 1,\n   \"score\": \"0.90\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.50\"\n   },\n   \"formula_id\": \"SHF-002\",\n   \"rank\": 2,\n   \"score\": \"0.78\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-001\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"0.90\",\n \"extraction\": {\n  \"base\": \"hydroalcoholic base\",\n  \"dosage_form\": \"gel\",\n  \"ingredients\": [\n   {\n    \"name\": \"lidocaine\",\n    \"strength\": 2.0,\n    \"unit\": \"%\"\n   },\n   {\n    \"name\": \"menthol\",\n    \"strength\": 1.0,\n    \"unit\": \"%\"\n   }\n  ],\n  \"route\": \"topical\"\n },\n \"flags\": [],\n \"margin\": \"0.12\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "b28a45889854263f5b7d5a42221845ee545a33433fa27f6d97ef1a5fbce2aeae",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is PROPOSED, with confidence 0.90 and margin 0.12, so the top formula is offered for your review and the decision stays with you. The top candidate is SHF-005, with ingredients=1.00, strength=1.00, dosage_form=1.00, base=0.00, route=1.00. Only the base component pulled the score down, since it scored 0.00 against the extracted hydroalcoholic base. The runner-up, SHF-002, scored 0.78, with the same base=0.00 and a lower strength=0.50. No flags fired, so there are no BLOCK or REVIEW checks to acknowledge on this proposal.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEbvfhuffUFjQeBrw5F",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1484,
+      "output_tokens": 210,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

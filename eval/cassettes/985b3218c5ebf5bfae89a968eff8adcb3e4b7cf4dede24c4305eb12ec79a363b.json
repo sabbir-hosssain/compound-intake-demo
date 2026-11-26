@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-001\",\n   \"rank\": 1,\n   \"score\": \"0.75\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-004\",\n   \"rank\": 2,\n   \"score\": \"0.75\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-002\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"0.75\",\n \"extraction\": {\n  \"base\": null,\n  \"dosage_form\": null,\n  \"ingredients\": [\n   {\n    \"name\": \"salicylic acid\",\n    \"strength\": 3.0,\n    \"unit\": \"%\"\n   },\n   {\n    \"name\": \"urea\",\n    \"strength\": 10.0,\n    \"unit\": \"%\"\n   }\n  ],\n  \"route\": \"topical\"\n },\n \"flags\": [\n  {\n   \"message\": \"Dosage form is missing.\",\n   \"rule_id\": \"R2-04\",\n   \"severity\": \"REVIEW\"\n  },\n  {\n   \"message\": \"Ambiguous match: margin 0.00 below T_margin 0.07.\",\n   \"rule_id\": \"M-01\",\n   \"severity\": \"REVIEW\"\n  }\n ],\n \"margin\": \"0.00\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "985b3218c5ebf5bfae89a968eff8adcb3e4b7cf4dede24c4305eb12ec79a363b",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is PROPOSED with confidence=0.75 and margin=0.00, so the system offers a top candidate but the two leading formulas are tied and the pharmacist has to choose between them. The top candidate is SHF-001, with ingredients=1.00, strength=1.00, dosage_form=0.00, base=0.00, route=1.00. Dosage form and base pulled the score down, which fits the extraction having no dosage form or base. The runner-up SHF-004 has the same component scores and the same score of 0.75, so nothing in the data separates it from SHF-001.\n\nTwo flags fired, both REVIEW severity. R2-04 says the dosage form is missing, and M-01 says the match is ambiguous because the margin of 0.00 is below T_margin of 0.07. Neither flag is BLOCK, so CONFIRM is not disabled by them, but each REVIEW flag must be acknowledged before CONFIRM.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEq4Ts3SbmJitfkhqMZ",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1589,
+      "output_tokens": 307,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

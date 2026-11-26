@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-015\",\n   \"rank\": 1,\n   \"score\": \"0.55\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"1.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-004\",\n   \"rank\": 2,\n   \"score\": \"0.15\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"0.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-001\",\n   \"rank\": 3,\n   \"score\": \"0.00\"\n  }\n ],\n \"confidence\": \"0.55\",\n \"extraction\": {\n  \"base\": null,\n  \"dosage_form\": \"ointment\",\n  \"ingredients\": [\n   {\n    \"name\": \"tacrolimus\",\n    \"strength\": null,\n    \"unit\": null\n   }\n  ],\n  \"route\": null\n },\n \"flags\": [\n  {\n   \"message\": \"Refers to a prior order the system cannot see: 'same as last'.\",\n   \"rule_id\": \"R1-03\",\n   \"severity\": \"REVIEW\"\n  }\n ],\n \"margin\": \"0.40\",\n \"status\": \"NO_MATCH\"\n}\n</facts>",
+  "key": "ebac97921c5b489dd196f529eb85fef2f04517a86d03b6c6ed76141e34c0bcb1",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is NO_MATCH, so no formula was proposed and the pharmacist needs to work this intake up manually; the top score was confidence=0.55 with margin=0.40 over the second candidate. The best-scoring candidate was SHF-015, with ingredients=1.00, strength=0.00, dosage_form=1.00, base=0.00, route=0.00. Strength, base and route pulled the score down. The extraction had no strength, base or route for tacrolimus, so only ingredients and dosage form (ointment) matched. The runner-up, SHF-004, scored 0.15. One flag fired: R1-03 (REVIEW), because the prescription refers to a prior order the system cannot see (\"same as last\"). It must be acknowledged before CONFIRM, and the pharmacist will need to establish the missing details from another source.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSEgkxSB9jVcGNDvR9Nj",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1499,
+      "output_tokens": 272,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}
