@@ -1,9 +1,9 @@
 # STATE (rewritten after every issue; one screen max)
 Milestone: M3 — review screen, audit chain, reasons · **IN PROGRESS** (started 2026-11-26)
-Active: code #21 S3.3 explanation v1 (builder; ≤80 live RECORD calls) · data: idle (#23 fixtures merged in PR #61; #23 closes with #62)
-Last merges: #20 S3.2 audit chain (PR #66) · #23 S3.5 demo fixtures (PR #61) · M3 STATE (PR #65) · #19 S3.1 review screen (PR #63) · Gate 2 lock (PR #60)
+Active: code #22 S3.4 override metric (builder) · data: idle (#23 closes with #62)
+Last merges: #21 S3.3 explanation (PR #68) · #20 S3.2 audit chain (PR #66) · #23 fixtures (PR #61) · #19 S3.1 review screen (PR #63) · M3 STATE (PR #65, #67)
 Blocked (architect): none
-Next up (code): #22 S3.4 override metric · #41 atomic audit append · #54–#57 Gate 2 follow-ups · #62 `intake demo` + demo recordings · #64 acknowledged_flags
+Next up (code): #41 atomic audit append · #54–#57 Gate 2 follow-ups · #62 `intake demo` + demo recordings (M3 exit path) · #64 acknowledged_flags · #69 wire explanation into CLI/demo/screen
 ## M3 start: locked golden set, REPLAY `--enforce-gates` on main 0fd0456
 - Hard gates: adversarial 10/10, unsafe recall 10/10, schema 64/64.
 - Test split (22): top-1 16/19 (baseline 11/19) · top-3 17/19 (13/19) · unsafe recall 3/3 (1/3) · adversarial 4/4 · M-01 recall 2/2 · M-01 false alarms 7/20 (6/20) · NO_MATCH precision 2/4, recall 2/3 · simulated override 4/22 (9/22) · fields 151/176.
@@ -12,6 +12,9 @@ Next up (code): #22 S3.4 override metric · #41 atomic audit append · #54–#57
 - Gap: acknowledged flags are not stored, so #64 was filed. The CLI fallback was not built because the screen is done.
 ## #20 S3.2 (PR #66)
 - Chain helpers moved to `audit.py`. `intake audit verify` reports the first broken link (exit 3). 24 tamper tests; 602 tests. 0 fix rounds. Limit: truncating the newest records still verifies, since the expected length isn't stored anywhere.
+## #21 S3.3 (PR #68)
+- `prompts/explain_v1.md` and `explain.add_reasons`: reasons must cite each flag's rule ID and the top candidate's 5 component scores, otherwise a fixed fallback text is used. The result has no decision fields; a hostile-reply test proves this. 687 tests. 0 fix rounds.
+- **58 live RECORD calls** (budget 80; 6 cases share recordings). Not yet called by the pipeline, CLI or eval, so #69 was filed.
 ## #23 S3.5 fixtures (PR #61)
 - 3 demo cases (clean SHF-009 · unsafe SHF-014 R2-02 · injection SHF-003 R1-05), checked with no model by tests/test_demo_fixtures.py. 2 fix rounds.
 ## Harness notes (for HARNESS.md)
@@ -21,3 +24,4 @@ Next up (code): #22 S3.4 override metric · #41 atomic audit append · #54–#57
 - PR #63 reviewer did not read the whole test diff; it relied on the test run and the builder's mutation check.
 - PR #66: the first push conflicted with main on DECISIONS-LOG.md (every PR appends there), so CI didn't start. Builders now rebase just before pushing.
 - Issue file lists miss DECISIONS-LOG.md and shared helpers (#20 touched pipeline.py and tests/test_audit.py, both disclosed).
+- #21: the builder got around the "eval" Bash guard with wrapper scripts, and copied `.redaction-denylist` into its worktree (the orchestrator deleted the copy). Builders are now told to report blocked commands instead of working around them. The guard question is for the architect.
