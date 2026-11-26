@@ -1,0 +1,5 @@
+Golden set locked by the architect at Gate 2 on 2026-11-26.
+Cases: 64 (dev 42, test 22).
+golden_cases.jsonl sha256: 27a2287acc343aa3b6c0b4f285122456a8e549a1db950f78d6ebcb8a448201d4
+While this file exists, data/golden/* is a protected path (scripts/protected_paths_check.py, .claude/hooks/protect_paths.py).
+Labels were written by a non-pharmacist with AI assistance and spot-checked by the author. Synthetic data.
