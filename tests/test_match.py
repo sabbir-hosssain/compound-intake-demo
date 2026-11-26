@@ -10,12 +10,14 @@ from intake.library import library_version, load_alias_map, load_formulas
 from intake.match import (
     MATCH_VERSION,
     Thresholds,
+    ambiguity_flags,
     load_thresholds,
     match,
     score_formula,
     strength_credit,
+    tied_with,
 )
-from intake.models import Extraction, Flag, Ingredient, ProposalStatus, Severity, Unit
+from intake.models import Extraction, Flag, Ingredient, MatchCandidate, ProposalStatus, Severity, Unit
 
 ROOT = Path(__file__).resolve().parents[1]
 FORMULAS = ROOT / "data" / "formulas"
@@ -312,3 +314,109 @@ def test_existing_flags_kept_first_and_unchanged(formulas, thresholds, aliases):
 
     clear = match(_exact(shf1), formulas, thresholds, aliases, existing=existing)
     assert clear.flags == existing
+
+
+# --- S3.8 (#56): no M-01 on NO_MATCH; ties on proposals still flag -----------------------------
+
+
+def _clone_pair(formulas):
+    shf1 = _by_id(formulas, "SHF-001")
+    return shf1, [shf1, shf1.model_copy(update={"formula_id": "SHF-901"})]
+
+
+@pytest.mark.parametrize(
+    ("status", "margin", "raised"),
+    [
+        (ProposalStatus.PROPOSED, 0.0, True),  # exact top-2 tie
+        (ProposalStatus.PROPOSED, 0.01, True),
+        (ProposalStatus.PROPOSED, 0.5, False),
+        (ProposalStatus.NO_MATCH, 0.0, False),  # nothing proposed, nothing to disambiguate
+        (ProposalStatus.NO_MATCH, 0.01, False),
+        (ProposalStatus.NO_MATCH, 0.5, False),
+    ],
+)
+def test_ambiguity_rule(status, margin, raised, thresholds):
+    tm = thresholds.model_copy(update={"T_margin": 0.07})
+    flags = ambiguity_flags(status, margin, tm)
+    assert [f.rule_id for f in flags] == (["M-01"] if raised else [])
+
+
+def test_ambiguity_rule_boundary_is_strict(thresholds):
+    assert ambiguity_flags(ProposalStatus.PROPOSED, thresholds.T_margin, thresholds) == []
+
+
+def test_no_m01_on_no_match_even_with_tied_top_two(formulas, thresholds, aliases):
+    shf1, pair = _clone_pair(formulas)
+    strict = thresholds.model_copy(update={"T_match": 1.5})  # nothing can reach it: always NO_MATCH
+    result = match(_exact(shf1), pair, strict, aliases)
+    assert result.status == ProposalStatus.NO_MATCH
+    assert result.margin == 0.0
+    assert [f.rule_id for f in result.flags] == []
+
+
+def test_no_m01_on_low_confidence_no_match(formulas, thresholds, aliases):
+    extraction = Extraction(ingredients=[Ingredient(name="zinc oxide", strength=20.0, unit=Unit.PERCENT)])
+    result = match(extraction, formulas, thresholds, aliases)
+    assert result.status == ProposalStatus.NO_MATCH
+    assert result.margin < thresholds.T_margin  # would have raised M-01 before S3.8
+    assert "M-01" not in [f.rule_id for f in result.flags]
+
+
+def test_exact_tie_on_proposal_still_raises_m01(formulas, thresholds, aliases):
+    shf1, pair = _clone_pair(formulas)
+    result = match(_exact(shf1), pair, thresholds, aliases)
+    assert result.status == ProposalStatus.PROPOSED
+    assert result.margin == 0.0
+    assert [f.rule_id for f in result.flags] == ["M-01"]
+
+
+def test_small_nonzero_margin_on_proposal_raises_m01(formulas, thresholds, aliases):
+    result = match(_exact(_by_id(formulas, "SHF-003")), formulas, thresholds, aliases)
+    assert result.status == ProposalStatus.PROPOSED
+    wide = thresholds.model_copy(update={"T_margin": result.margin + 0.01})
+    flagged = match(_exact(_by_id(formulas, "SHF-003")), formulas, wide, aliases)
+    assert 0 < flagged.margin < wide.T_margin
+    assert [f.rule_id for f in flagged.flags] == ["M-01"]
+
+
+def test_no_match_keeps_existing_flags_as_prefix(formulas, thresholds, aliases):
+    existing = [
+        Flag(rule_id="R1-01", rule_version="0.1.0", severity=Severity.REVIEW, message="x", source_pass=1),
+        Flag(rule_id="R2-01", rule_version="0.1.0", severity=Severity.BLOCK, message="y", source_pass=2),
+    ]
+    shf1, pair = _clone_pair(formulas)
+    strict = thresholds.model_copy(update={"T_match": 1.5})
+    result = match(_exact(shf1), pair, strict, aliases, existing=existing)
+    assert result.status == ProposalStatus.NO_MATCH
+    assert result.flags[: len(existing)] == existing
+    assert result.flags == existing  # nothing new, nothing removed
+
+
+def test_existing_m01_is_never_removed_on_no_match(formulas, thresholds, aliases):
+    """Not raising M-01 is not a removal: an M-01 passed in stays, even on NO_MATCH."""
+    prior = Flag(rule_id="M-01", rule_version="0.0.1", severity=Severity.REVIEW, message="prior", source_pass=2)
+    shf1, pair = _clone_pair(formulas)
+    strict = thresholds.model_copy(update={"T_match": 1.5})
+    result = match(_exact(shf1), pair, strict, aliases, existing=[prior])
+    assert result.flags == [prior]
+
+
+def _cand(fid: str, score: float) -> MatchCandidate:
+    return MatchCandidate(formula_id=fid, formula_version="1.0", score=score, component_scores={})
+
+
+def test_tied_with_names_the_runner_up_on_equal_scores():
+    assert tied_with([_cand("SHF-001", 0.8), _cand("SHF-002", 0.8), _cand("SHF-003", 0.1)]) == "SHF-002"
+
+
+@pytest.mark.parametrize(
+    "candidates",
+    [[], [("SHF-001", 0.8)], [("SHF-001", 0.8), ("SHF-002", 0.79)]],
+)
+def test_tied_with_is_none_without_a_tie(candidates):
+    assert tied_with([_cand(f, s) for f, s in candidates]) is None
+
+
+def test_tied_with_on_matcher_output(formulas, thresholds, aliases):
+    shf1, pair = _clone_pair(formulas)
+    assert tied_with(match(_exact(shf1), pair, thresholds, aliases).candidates) == "SHF-901"

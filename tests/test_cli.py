@@ -177,6 +177,26 @@ def test_block_flag_shows_confirm_disabled() -> None:
     assert out.index("BLOCK") < out.index("REVIEW")  # BLOCK flags listed first
 
 
+def _with_candidates(scores: list[tuple[str, float]]) -> Any:
+    from intake.models import MatchCandidate
+
+    base = pipeline.build_proposal("Cream, apply twice daily.\n", "x", client=FakeClient(NO_TOOL_CALL))
+    cands = [MatchCandidate(formula_id=f, formula_version="1.0", score=s, component_scores={}) for f, s in scores]
+    return base.model_copy(update={"candidates": cands})
+
+
+def test_tied_top_two_shown_in_output() -> None:
+    """S3.8 (#56): the review output says when the top two candidates are tied."""
+    out = pipeline.format_proposal(_with_candidates([("SHF-003", 0.75), ("SHF-007", 0.75), ("SHF-001", 0.2)]))
+    first = next(line for line in out.splitlines() if line.strip().startswith("1. SHF-003"))
+    assert "tied with SHF-007" in first
+
+
+def test_untied_output_has_no_tie_note() -> None:
+    out = pipeline.format_proposal(_with_candidates([("SHF-003", 0.75), ("SHF-007", 0.70)]))
+    assert "tied with" not in out
+
+
 def test_no_block_flag_does_not_claim_confirm_disabled(db: Path, capsys: pytest.CaptureFixture[str]) -> None:
     main(["run", str(CASE_001), "--audit-db", str(db)])
     proposal = _records(db)[0].proposal

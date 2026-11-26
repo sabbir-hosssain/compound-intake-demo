@@ -12,6 +12,7 @@ import pytest
 from intake import baseline
 from intake.baseline import (
     NO_MATCH_CUTOFF,
+    baseline_ambiguity_flags,
     baseline_match,
     decision_correct,
     formula_string,
@@ -19,7 +20,7 @@ from intake.baseline import (
     tune_cutoff,
 )
 from intake.library import load_formulas
-from intake.match import TOP_K, MatchResult
+from intake.match import TOP_K, MatchResult, ambiguity_flags, load_thresholds
 from intake.models import Formula, ProposalStatus
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -265,3 +266,50 @@ def test_runs_on_golden_set_under_five_seconds() -> None:
     elapsed = time.perf_counter() - start
     assert len(results) == 64
     assert elapsed < 5.0, f"baseline took {elapsed:.2f}s on the golden set"
+
+
+# --- S3.8 (#56): the baseline's M-01 follows the matcher's rule --------------------------------
+
+THRESHOLDS = load_thresholds()
+
+
+def test_baseline_m01_on_tied_proposal() -> None:
+    twins = [TOY[0], TOY[0].model_copy(update={"formula_id": "SHF-905"}), *TOY[1:]]
+    result = baseline_match(formula_string(TOY[0]), twins, cutoff=0.0)
+    assert result.status == ProposalStatus.PROPOSED and result.margin == 0.0
+    flags = baseline_ambiguity_flags(result, THRESHOLDS)
+    assert [f.rule_id for f in flags] == ["M-01"]
+
+
+def test_baseline_no_m01_on_no_match() -> None:
+    result = baseline_match("zzz unrelated", TOY, cutoff=0.99)
+    assert result.status == ProposalStatus.NO_MATCH and result.margin < THRESHOLDS.T_margin
+    assert baseline_ambiguity_flags(result, THRESHOLDS) == []
+
+
+def test_baseline_no_m01_on_clear_proposal() -> None:
+    result = baseline_match(formula_string(TOY[1]), TOY, cutoff=0.0)
+    assert result.status == ProposalStatus.PROPOSED and result.margin >= THRESHOLDS.T_margin
+    assert baseline_ambiguity_flags(result, THRESHOLDS) == []
+
+
+@pytest.mark.parametrize("split", ["dev", "test"])
+def test_baseline_m01_uses_the_matcher_rule_on_golden(split: str) -> None:
+    for case in _golden(split):
+        result = _run(case)
+        assert baseline_ambiguity_flags(result, THRESHOLDS) == ambiguity_flags(result.status, result.margin, THRESHOLDS)
+        if result.status == ProposalStatus.NO_MATCH:
+            assert baseline_ambiguity_flags(result, THRESHOLDS) == [], case["case_id"]
+
+
+def test_eval_baseline_raises_no_m01_on_no_match() -> None:
+    from eval import run_eval
+    from intake import pipeline
+
+    library = pipeline.load_library()
+    for case in run_eval.load_cases(GOLDEN):
+        outcome = run_eval.run_baseline(case, library)
+        expected = baseline_ambiguity_flags(baseline_match(run_eval.case_text(case), library.formulas), THRESHOLDS)
+        assert ("M-01" in outcome.flags) == bool(expected), case.case_id
+        if outcome.status == ProposalStatus.NO_MATCH:
+            assert "M-01" not in outcome.flags, case.case_id

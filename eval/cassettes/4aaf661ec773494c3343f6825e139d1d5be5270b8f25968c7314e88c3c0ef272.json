@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-003\",\n   \"rank\": 1,\n   \"score\": \"0.50\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-006\",\n   \"rank\": 2,\n   \"score\": \"0.50\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-007\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"0.50\",\n \"extraction\": {\n  \"base\": \"suspending vehicle\",\n  \"dosage_form\": \"suspension\",\n  \"ingredients\": [\n   {\n    \"name\": \"famotidine\",\n    \"strength\": 15.0,\n    \"unit\": \"mg/mL\"\n   }\n  ],\n  \"route\": \"oral\"\n },\n \"flags\": [\n  {\n   \"message\": \"Strength 15 mg/mL for 'famotidine' is above its illustrative max 10 mg/mL.\",\n   \"rule_id\": \"R2-02\",\n   \"severity\": \"BLOCK\"\n  }\n ],\n \"margin\": \"0.00\",\n \"status\": \"NO_MATCH\"\n}\n</facts>",
+  "key": "4aaf661ec773494c3343f6825e139d1d5be5270b8f25968c7314e88c3c0ef272",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is NO_MATCH, so no formula was close enough to propose; confidence is 0.50 and margin is 0.00, which means the top two candidates are tied and the pharmacist will need to review this manually. The top candidate is SHF-003, with ingredients=1.00, strength=0.00, dosage_form=0.00, base=0.00, route=1.00. Strength, dosage form and base all scored zero and pulled the score down, while only ingredients and route matched. The runner-up SHF-006 has the same score of 0.50 and identical component scores, so the data does not separate the two. One flag fired: R2-02 with severity BLOCK, noting that the requested famotidine strength of 15 mg/mL is above the illustrative maximum of 10 mg/mL. Because it is a BLOCK flag, CONFIRM is disabled for this intake.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSHu91RS73jGQ16rViTP",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1530,
+      "output_tokens": 281,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

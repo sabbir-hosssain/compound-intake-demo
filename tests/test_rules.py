@@ -14,7 +14,7 @@ from pydantic import ValidationError
 import intake.rules as rules_module
 from intake.adapters.anthropic_client import ModelConfig
 from intake.match import Thresholds, match
-from intake.models import Extraction, Flag, Formula, FormulaIngredient, Ingredient, Severity, Unit
+from intake.models import Extraction, Flag, Formula, FormulaIngredient, Ingredient, ProposalStatus, Severity, Unit
 from intake.pipeline import Library, build_proposal, load_library
 from intake.rules import (
     CONTROLLED_TERMS,
@@ -620,9 +620,14 @@ T_THRESHOLDS = Thresholds.model_validate(
 )
 
 
+def _ambiguous_proposed() -> Extraction:
+    # Both the 1% cream and the 4% gel strengths are given and no form: both formulas score alike
+    # and above T_match, so the match is PROPOSED with a top-2 tie (S3.8: M-01 only fires on proposals).
+    return _ext(_ing("examplol", 1.0, Unit.PERCENT), _ing("examplol", 4.0, Unit.PERCENT), dosage_form=None)
+
+
 def test_m_01_fires_when_margin_below_t_margin() -> None:
-    # 2.5% sits between the 1% cream and the 4% gel; with no form given, both score alike.
-    ext = _ext(_ing("examplol", 2.5, Unit.PERCENT), dosage_form=None)
+    ext = _ambiguous_proposed()
     result = match(ext, T_FORMULAS, T_THRESHOLDS, T_ALIASES)
     assert result.margin < T_THRESHOLDS.T_margin
     flags = _only(result.flags, "M-01")
@@ -638,10 +643,22 @@ def test_m_01_does_not_fire_on_a_clear_winner() -> None:
 
 def test_m_01_keeps_earlier_flags() -> None:
     earlier = _p2(_ext(_ing("examplol", 40.0, Unit.PERCENT), dosage_form=None, patient_ref=None))
-    ext = _ext(_ing("examplol", 2.5, Unit.PERCENT), dosage_form=None)
+    ext = _ambiguous_proposed()
     result = match(ext, T_FORMULAS, T_THRESHOLDS, T_ALIASES, existing=earlier)
     assert result.flags[: len(earlier)] == earlier
     assert "M-01" in _ids(result.flags)
+
+
+def test_m_01_not_raised_on_no_match_with_small_margin() -> None:
+    """S3.8 (#56): the pre-amendment fixture. 2.5% sits between the 1% cream and the 4% gel; with no form
+    given both score alike but below T_match, so the result is NO_MATCH and M-01 does not fire."""
+    earlier = _p2(_ext(_ing("examplol", 40.0, Unit.PERCENT), dosage_form=None, patient_ref=None))
+    ext = _ext(_ing("examplol", 2.5, Unit.PERCENT), dosage_form=None)
+    result = match(ext, T_FORMULAS, T_THRESHOLDS, T_ALIASES, existing=earlier)
+    assert result.status is ProposalStatus.NO_MATCH
+    assert result.margin < T_THRESHOLDS.T_margin
+    assert result.flags == earlier
+    assert "M-01" not in _ids(result.flags)
 
 
 # --- coverage: every SPEC §5 rule has a firing fixture ------------------------------------------
