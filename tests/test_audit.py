@@ -32,6 +32,8 @@ EXPECTED_PUBLIC_API = {
     "chain_hash",
     "verify",
     "VerifyResult",
+    # #41: hold the write lock from reading the chain head to the insert (no new write path).
+    "write_lock",
 }
 
 
@@ -233,3 +235,47 @@ def test_connect_defaults_to_config_path(tmp_path: Path, monkeypatch: pytest.Mon
     audit.append(c, _record(0))
     c.close()
     assert target.exists()
+
+
+# --- #41: write_lock ------------------------------------------------------------
+
+
+def test_write_lock_commits_the_append(tmp_path: Path) -> None:
+    path = tmp_path / "audit.sqlite"
+    c1 = audit.connect(path)
+    with audit.write_lock(c1):
+        audit.append(c1, _record(audit.next_seq(c1)))
+        assert c1.in_transaction  # append does not commit early inside the lock
+    assert not c1.in_transaction
+    c1.close()
+    c2 = audit.connect(path)
+    assert audit.read_all(c2) == [_record(0)]
+    c2.close()
+
+
+def test_write_lock_rolls_back_on_error(conn: sqlite3.Connection) -> None:
+    with pytest.raises(RuntimeError, match="boom"), audit.write_lock(conn):
+        audit.append(conn, _record(0))
+        raise RuntimeError("boom")
+    assert not conn.in_transaction
+    assert audit.read_all(conn) == []
+
+
+def test_write_lock_excludes_a_second_writer(tmp_path: Path) -> None:
+    path = tmp_path / "audit.sqlite"
+    c1 = audit.connect(path)
+    c2 = audit.connect(path)
+    c2.execute("PRAGMA busy_timeout = 50")
+    with audit.write_lock(c1):
+        with pytest.raises(sqlite3.OperationalError, match="locked"), audit.write_lock(c2):
+            pass
+        assert not c2.in_transaction
+    with audit.write_lock(c2):  # free again once c1 commits
+        audit.append(c2, _record(0))
+    c1.close()
+    c2.close()
+
+
+def test_write_lock_refuses_a_connection_already_in_a_transaction(conn: sqlite3.Connection) -> None:
+    with audit.write_lock(conn), pytest.raises(RuntimeError, match="transaction"), audit.write_lock(conn):
+        pass
