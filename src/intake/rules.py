@@ -156,49 +156,23 @@ _PRIOR_ORDER = re.compile(
     re.IGNORECASE,
 )
 
-# R1-04: SYNTHETIC controlled-substance list. Illustrative only: not a legal schedule and not complete.
-# Any hit routes the order to the controlled workflow (BLOCK); none of these are in the formula library.
-CONTROLLED_TERMS: tuple[str, ...] = (
-    "alprazolam",
-    "amphetamine",
-    "anabolic steroid",
-    "barbiturate",
-    "benzodiazepine",
-    "buprenorphine",
-    "cannabis",
-    "carisoprodol",
-    "clonazepam",
-    "cocaine",
-    "codeine",
-    "diazepam",
-    "dronabinol",
-    "fentanyl",
-    "heroin",
-    "hydrocodone",
-    "hydromorphone",
-    "ketamine",
-    "lorazepam",
-    "marijuana",
-    "meperidine",
-    "methadone",
-    "methylphenidate",
-    "midazolam",
-    "modafinil",
-    "morphine",
-    "nandrolone",
-    "opiate",
-    "opioid",
-    "opium",
-    "oxandrolone",
-    "oxycodone",
-    "oxymorphone",
-    "phenobarbital",
-    "pregabalin",
-    "tapentadol",
-    "testosterone",
-    "tramadol",
-    "zolpidem",
-)
+# R1-04: SYNTHETIC controlled-substance list, kept in data/rules/controlled_terms.yaml (illustrative, not a
+# legal schedule). Any hit routes the order to the controlled workflow (BLOCK).
+DEFAULT_CONTROLLED_TERMS = Path(__file__).resolve().parents[2] / "data" / "rules" / "controlled_terms.yaml"
+
+
+def load_controlled_terms(path: Path = DEFAULT_CONTROLLED_TERMS) -> tuple[str, ...]:
+    """Terms from the R1-04 data file. Missing file raises FileNotFoundError; empty or malformed raises ValueError."""
+    data = yaml.safe_load(path.read_text())
+    terms = data.get("terms") if isinstance(data, dict) else None
+    if not isinstance(terms, list) or not terms:
+        raise ValueError(f"{path}: no 'terms' list; R1-04 cannot run without its controlled-substance list.")
+    if not all(isinstance(t, str) and t.strip() for t in terms):
+        raise ValueError(f"{path}: every controlled term must be a non-blank string.")
+    return tuple(normalise_name(t) for t in terms)
+
+
+CONTROLLED_TERMS: tuple[str, ...] = load_controlled_terms()
 _SCHEDULE = re.compile(r"\bschedule\s+(?:ii|iii|iv|v|[2-5])\b|\bc-?(?:ii|iii|iv)\b")
 # Terms this long are also looked for with spaces/punctuation removed ("k e t a m i n e").
 _SQUASH_MIN_LEN = 7

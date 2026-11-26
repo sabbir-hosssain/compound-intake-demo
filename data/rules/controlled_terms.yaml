@@ -1,0 +1,46 @@
+# R1-04 controlled-substance terms. SYNTHETIC and illustrative, not a legal schedule.
+# Not complete and not legal or clinical advice. Any hit routes the order to the controlled
+# workflow (BLOCK); none of these are in the formula library. Loaded by src/intake/rules.py.
+# Terms are lower-case; matching is whole-word, plus a squashed-letters check for terms of 7+ letters.
+illustrative: true
+
+terms:
+  - alprazolam
+  - amphetamine
+  - anabolic steroid
+  - barbiturate
+  - benzodiazepine
+  - buprenorphine
+  - cannabis
+  - carisoprodol
+  - clonazepam
+  - cocaine
+  - codeine
+  - diazepam
+  - dronabinol
+  - fentanyl
+  - heroin
+  - hydrocodone
+  - hydromorphone
+  - ketamine
+  - lorazepam
+  - marijuana
+  - meperidine
+  - methadone
+  - methylphenidate
+  - midazolam
+  - modafinil
+  - morphine
+  - nandrolone
+  - opiate
+  - opioid
+  - opium
+  - oxandrolone
+  - oxycodone
+  - oxymorphone
+  - phenobarbital
+  - pregabalin
+  - tapentadol
+  - testosterone
+  - tramadol
+  - zolpidem

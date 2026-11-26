@@ -1,8 +1,10 @@
 """Rules (SPEC §5). S1.4: R1-01, R1-05, R2-01, RULES_VERSION, append-only flags. S2.3: every other rule + M-01."""
 
 import inspect
+import io
 import json
 import re
+import tokenize
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -358,6 +360,75 @@ def test_r1_04_does_not_fire_on_non_controlled_text(text: str) -> None:
 
 def test_controlled_terms_are_normalised() -> None:
     assert CONTROLLED_TERMS and all(t == t.casefold().strip() for t in CONTROLLED_TERMS)
+
+
+# --- S3.6: R1-04 term list lives in data/rules/controlled_terms.yaml ----------------------------
+
+CONTROLLED_FILE = ROOT / "data" / "rules" / "controlled_terms.yaml"
+
+# The list as it stood in rules.py before S3.6. Out of scope to add or remove terms.
+PRE_S36_TERMS = (
+    "alprazolam", "amphetamine", "anabolic steroid", "barbiturate", "benzodiazepine", "buprenorphine",
+    "cannabis", "carisoprodol", "clonazepam", "cocaine", "codeine", "diazepam", "dronabinol", "fentanyl",
+    "heroin", "hydrocodone", "hydromorphone", "ketamine", "lorazepam", "marijuana", "meperidine", "methadone",
+    "methylphenidate", "midazolam", "modafinil", "morphine", "nandrolone", "opiate", "opioid", "opium",
+    "oxandrolone", "oxycodone", "oxymorphone", "phenobarbital", "pregabalin", "tapentadol", "testosterone",
+    "tramadol", "zolpidem",
+)  # fmt: skip
+
+
+def test_controlled_terms_file_has_the_pre_s36_list_unchanged() -> None:
+    assert rules_module.load_controlled_terms(CONTROLLED_FILE) == PRE_S36_TERMS
+    assert CONTROLLED_TERMS == PRE_S36_TERMS
+
+
+def test_controlled_terms_file_header_says_illustrative() -> None:
+    header = CONTROLLED_FILE.read_text().split("\n\n", 1)[0].casefold()
+    assert "illustrative, not a legal schedule" in header
+
+
+def test_no_controlled_term_list_left_in_rules_source() -> None:
+    source = Path(inspect.getsourcefile(rules_module) or "").read_text()
+    literals = {
+        tok.string.strip("\"'").casefold()
+        for tok in tokenize.generate_tokens(io.StringIO(source).readline)
+        if tok.type == tokenize.STRING
+    }
+    assert not literals & set(PRE_S36_TERMS)
+
+
+def test_load_controlled_terms_reads_the_given_file(tmp_path: Path) -> None:
+    path = tmp_path / "terms.yaml"
+    path.write_text("# illustrative, not a legal schedule\nterms:\n  - alpha\n  - beta gamma\n")
+    assert rules_module.load_controlled_terms(path) == ("alpha", "beta gamma")
+
+
+def test_load_controlled_terms_fails_loudly_when_file_missing(tmp_path: Path) -> None:
+    with pytest.raises(FileNotFoundError):
+        rules_module.load_controlled_terms(tmp_path / "missing.yaml")
+
+
+@pytest.mark.parametrize(
+    "content",
+    ["", "# header only\n", "terms:\n", "terms: []\n", "other: [ketamine]\n", "terms:\n  - '  '\n", "- ketamine\n"],
+)
+def test_load_controlled_terms_fails_loudly_when_file_empty_or_malformed(tmp_path: Path, content: str) -> None:
+    path = tmp_path / "terms.yaml"
+    path.write_text(content)
+    with pytest.raises(ValueError):
+        rules_module.load_controlled_terms(path)
+
+
+def test_r1_04_fires_on_term_only_in_notes() -> None:
+    text = (
+        "Prescriber: Dr. A. Example\nPatient ref: PT-10001\n"
+        "Compound salicylic acid 3% and urea 10% in vanishing cream base.\n"
+        "Apply thin layer twice daily.\nQty: 60 g\n"
+        "Notes: patient also takes tramadol at night."
+    )
+    flags = _only(run_pass1(text), "R1-04")
+    assert len(flags) == 1
+    assert flags[0].severity is Severity.BLOCK and "'tramadol'" in flags[0].message
 
 
 # --- R2-02 strength above illustrative max -----------------------------------------------------
