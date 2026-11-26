@@ -325,6 +325,17 @@ def formula_diff(extraction: Extraction | None, formula: Formula, aliases: Mappi
     return rows
 
 
+NO_REASONS = "(no explanation was recorded for this proposal)"
+
+
+def reasons_text(proposal: Proposal) -> str:
+    """The explanation `intake run` stored with the proposal (`intake.explain.add_reasons`), or a placeholder.
+
+    Display only: nothing here or in `confirm_blockers` reads `reasons`, so it can't change CONFIRM.
+    """
+    return proposal.reasons.strip() or NO_REASONS
+
+
 def find_raw_text(prescription_id: str, input_hash: str, directories: Iterable[Path]) -> str | None:
     """The raw text `<dir>/<prescription_id>.txt`, only if its sha256 equals the record's input_hash."""
     if Path(prescription_id).name != prescription_id:

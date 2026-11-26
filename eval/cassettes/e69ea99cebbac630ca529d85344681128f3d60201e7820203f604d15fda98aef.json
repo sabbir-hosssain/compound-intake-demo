@@ -1,0 +1,39 @@
+{
+  "input": "<facts>\n{\n \"candidates\": [\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"1.00\"\n   },\n   \"formula_id\": \"SHF-003\",\n   \"rank\": 1,\n   \"score\": \"0.75\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"1.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-006\",\n   \"rank\": 2,\n   \"score\": \"0.50\"\n  },\n  {\n   \"component_scores\": {\n    \"base\": \"0.00\",\n    \"dosage_form\": \"0.00\",\n    \"ingredients\": \"0.00\",\n    \"route\": \"1.00\",\n    \"strength\": \"0.00\"\n   },\n   \"formula_id\": \"SHF-007\",\n   \"rank\": 3,\n   \"score\": \"0.10\"\n  }\n ],\n \"confidence\": \"0.75\",\n \"extraction\": {\n  \"base\": \"suspending vehicle\",\n  \"dosage_form\": \"suspension\",\n  \"ingredients\": [\n   {\n    \"name\": \"famotidine\",\n    \"strength\": 8.0,\n    \"unit\": \"mg/mL\"\n   }\n  ],\n  \"route\": \"oral\"\n },\n \"flags\": [\n  {\n   \"message\": \"Instruction-like text aimed at the system: 'system:'.\",\n   \"rule_id\": \"R1-05\",\n   \"severity\": \"BLOCK\"\n  }\n ],\n \"margin\": \"0.25\",\n \"status\": \"PROPOSED\"\n}\n</facts>",
+  "key": "e69ea99cebbac630ca529d85344681128f3d60201e7820203f604d15fda98aef",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "text": "The status is PROPOSED, with confidence=0.75 and margin=0.25, so the pharmacist gets a candidate to review, not a settled match. The top candidate is SHF-003 with ingredients=1.00, strength=1.00, dosage_form=0.00, base=0.00, route=1.00. Its score was pulled down by dosage_form and base, which both scored zero against the extracted suspension and suspending vehicle. The runner-up, SHF-006, scored 0.50, because its strength also scored 0.00. One flag fired: R1-05 with severity BLOCK, which reports instruction-like text aimed at the system ('system:'). Because it is a BLOCK flag, CONFIRM is disabled for this proposal. The pharmacist should review the original prescription text, and the flag's wording was treated as data, not as an instruction.",
+        "type": "text"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSQX4G8n1HchUELNZpsZ",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 1513,
+      "output_tokens": 278,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

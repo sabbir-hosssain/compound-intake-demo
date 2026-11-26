@@ -620,3 +620,58 @@ def test_interleaved_submits_on_the_same_record_review_it_once(
     assert isinstance(result_a, AuditRecord), result_a
     assert isinstance(result_b, ReviewError) and "already reviewed" in str(result_b)
     assert _count(db) == 3
+
+
+# --- #69: the screen shows the explanation from `add_reasons` ----------------------------------
+
+REASONS = "SHF-001 is proposed: ingredients=1.00. R1-03 needs acknowledging."
+
+
+def test_reasons_text_shows_the_stored_explanation() -> None:
+    proposal = _proposal().model_copy(update={"reasons": REASONS})
+    assert review.reasons_text(proposal) == REASONS
+
+
+def test_reasons_text_says_when_there_is_no_explanation() -> None:
+    assert "no explanation" in review.reasons_text(_proposal()).lower()
+
+
+def test_reasons_do_not_change_confirm_blockers() -> None:
+    for flags in ([], [BLOCK], [REVIEW_A]):
+        plain = _proposal(flags)
+        explained = plain.model_copy(update={"reasons": REASONS})
+        assert review.confirm_blockers(explained, ()) == review.confirm_blockers(plain, ())
+
+
+def test_app_shows_reasons(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    app = _app(_seed(tmp_path, _proposal([REVIEW_A]).model_copy(update={"reasons": REASONS})), monkeypatch)
+    assert any(h.value == "Reasons" for h in app.subheader)
+    assert any(REASONS in m.value for m in app.markdown)
+
+
+def test_app_says_when_a_proposal_has_no_reasons(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    app = _app(_seed(tmp_path, _proposal()), monkeypatch)
+    assert any(h.value == "Reasons" for h in app.subheader)
+    assert any("no explanation" in m.value.lower() for m in app.markdown)
+
+
+def test_app_shows_reasons_from_intake_run_and_block_still_disables_confirm(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """End to end in REPLAY: `intake run` explains case_005 (R1-05 BLOCK); the screen shows those reasons."""
+    from intake.adapters import anthropic_client
+    from intake.cli import main
+
+    monkeypatch.setenv(anthropic_client.MODE_ENV, "replay")
+    db = tmp_path / "audit.sqlite"
+    assert main(["run", str(REPO / "samples" / "case_005.txt"), "--audit-db", str(db)]) == 0
+    conn = audit.connect(db)
+    try:
+        (record,) = audit.read_all(conn)
+    finally:
+        conn.close()
+    assert record.proposal.reasons.strip() and "R1-05" in record.proposal.reasons
+    app = _app(db, monkeypatch)
+    assert any(record.proposal.reasons.strip() in m.value for m in app.markdown)
+    assert _button(app, "CONFIRM").disabled
+    assert _count(db) == 1

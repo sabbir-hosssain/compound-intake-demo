@@ -14,7 +14,7 @@ from typing import Any
 
 import pytest
 
-from intake import audit, pipeline
+from intake import audit, cli, explain, pipeline
 from intake.adapters import anthropic_client
 from intake.adapters.anthropic_client import Mode, ModelClient, ModelConfig
 from intake.cli import main
@@ -289,3 +289,79 @@ def test_record_json_has_null_review_action(db: Path) -> None:
     (raw,) = conn.execute("SELECT record_json FROM audit_log").fetchone()
     conn.close()
     assert json.loads(raw)["review_action"] is None
+
+
+# --- #69: the explanation is shown wherever a proposal is shown ---------------------------------
+
+SAMPLES = sorted((REPO / "samples").glob("*.txt"))
+SCORED_FIELDS = ("extraction", "candidates", "confidence", "margin", "status", "flags", "prescription_id")
+
+
+def _sample_proposal(sample: Path) -> Any:
+    text = sample.read_bytes().decode("utf-8")
+    return pipeline.build_proposal(text, sample.stem, client=ModelClient(mode=Mode.REPLAY))
+
+
+@pytest.mark.parametrize("sample", SAMPLES, ids=lambda p: p.stem)
+def test_every_sample_has_an_explain_recording_that_cites_everything(sample: Path) -> None:
+    """samples/ covers `intake run`, the seed set (case_*) and the demo fixtures (demo_*)."""
+    result = explain.explain(_sample_proposal(sample), client=ModelClient(mode=Mode.REPLAY))
+    assert result.source is explain.ExplainSource.MODEL, result.missing
+    assert result.reasons.strip()
+
+
+def test_run_prints_reasons_from_add_reasons(db: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["run", str(CASE_001), "--audit-db", str(db)]) == 0
+    out = capsys.readouterr().out
+    expected = explain.add_reasons(_sample_proposal(CASE_001), client=ModelClient(mode=Mode.REPLAY)).reasons
+    assert expected.strip()
+    assert "Reasons:" in out
+    for line in expected.strip().splitlines():
+        assert line.strip() in out
+
+
+def test_run_logs_the_explained_proposal_as_pending(db: Path) -> None:
+    main(["run", str(CASE_001), "--audit-db", str(db)])
+    (record,) = _records(db)
+    assert record.review_action is None
+    assert record.proposal.reasons.strip()
+    assert any(k.startswith(explain.PROMPT_PREFIX) for k in record.proposal.prompt_versions)
+
+
+@pytest.mark.parametrize("sample", [CASE_001, REPO / "samples" / "case_004.txt", REPO / "samples" / "case_005.txt"])
+def test_run_reasons_do_not_change_candidates_flags_or_status(sample: Path, db: Path) -> None:
+    main(["run", str(sample), "--audit-db", str(db)])
+    stored = _records(db)[0].proposal
+    plain = _sample_proposal(sample)
+    for field in SCORED_FIELDS:
+        assert getattr(stored, field) == getattr(plain, field), field
+    assert plain.prompt_versions.items() <= stored.prompt_versions.items()  # explain only adds its own prompt
+
+
+def test_missing_explain_recording_fails_and_writes_nothing(
+    db: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Extraction replays, but the explain input has no recording: exit 2, no fallback, no audit write."""
+    monkeypatch.setattr(explain, "explain_input", lambda proposal: "<facts>never recorded</facts>")
+    assert main(["run", str(CASE_001), "--audit-db", str(db)]) == cli.EXIT_MISSING_RECORDING
+    assert "recording" in capsys.readouterr().err.lower()
+    assert _records(db) == []
+
+
+def test_demo_prints_reasons_for_every_case(capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["demo"]) == cli.EXIT_OK
+    out = capsys.readouterr().out
+    cases = cli.load_demo_cases()
+    assert out.count("Reasons:") == len(cases)
+    for case in cases:
+        proposal = cli.demo_proposal(case, client=ModelClient(mode=Mode.REPLAY))
+        assert proposal.reasons.strip()
+        assert proposal.reasons.strip().splitlines()[0].strip() in out
+
+
+def test_demo_missing_explain_recording_fails(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setattr(explain, "explain_input", lambda proposal: "<facts>never recorded</facts>")
+    assert main(["demo"]) == cli.EXIT_MISSING_RECORDING
+    assert "recording" in capsys.readouterr().err.lower()

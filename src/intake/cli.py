@@ -1,9 +1,14 @@
 """`intake` command line.
 
-`intake run <file>` builds a proposal, prints it and logs it as pending.
+`intake run <file>` builds a proposal, adds the explanation (`intake.explain.add_reasons`), prints it and
+logs it as pending.
 `intake audit verify` recomputes the audit hash chain and reports the first broken link.
 `intake demo` runs the demo fixtures (data/demo/demo_cases.jsonl) through the same pipeline and prints
-each review outcome. It writes nothing to the audit log: only a pharmacist action commits a record.
+each review outcome with its explanation. It writes nothing to the audit log: only a pharmacist action
+commits a record.
+
+The explanation is added after matching and can only set `reasons` (see `intake.explain.with_reasons`);
+candidates, flags and status are the code's. A missing explain recording fails like a missing extraction one.
 
 The mode comes from INTAKE_MODE (default REPLAY). A missing recording in REPLAY is a failure
 (non-zero exit, nothing written), never a fallback to a live model (invariant 4).
@@ -19,9 +24,10 @@ from typing import Any
 from intake import audit
 from intake.adapters.anthropic_client import REPO_ROOT, ModelClient
 from intake.adapters.cassette import MissingRecordingError
+from intake.explain import add_reasons
 from intake.extract import CompletionClient
 from intake.models import Proposal, Severity
-from intake.pipeline import build_proposal, format_proposal, load_library, run_file
+from intake.pipeline import build_proposal, format_proposal, load_library, log_pending
 from intake.review import confirm_blockers
 
 EXIT_OK = 0
@@ -50,16 +56,31 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
+def format_reasons(proposal: Proposal) -> str:
+    """The explanation as printed under the proposal; the scores and flags above it are the code's."""
+    lines = proposal.reasons.strip().splitlines() or ["(no explanation)"]
+    return "\n".join(["Reasons:      " + lines[0], *("              " + line for line in lines[1:])])
+
+
+def explained_proposal(text: str, prescription_id: str, *, client: CompletionClient) -> Proposal:
+    """extract -> pass-1/2 rules -> match, then the explanation. Raises MissingRecordingError in REPLAY."""
+    proposal = build_proposal(text, prescription_id, client=client, library=load_library())
+    return add_reasons(proposal, client=client)
+
+
 def _run(file: Path, audit_db: Path | None) -> int:
     try:
-        proposal, record = run_file(file, client=ModelClient(), audit_db=audit_db)
+        text = file.read_bytes().decode("utf-8")
+        proposal = explained_proposal(text, file.stem, client=ModelClient())
     except MissingRecordingError as error:
         print(f"error: {error}", file=sys.stderr)
         return EXIT_MISSING_RECORDING
     except (OSError, UnicodeDecodeError) as error:
         print(f"error: cannot read {file}: {error}", file=sys.stderr)
         return EXIT_ERROR
+    record = log_pending(proposal, text, audit_db)  # only after every model call has succeeded
     print(format_proposal(proposal))
+    print(format_reasons(proposal))
     print(f"Audit:        seq {record.seq} logged as pending pharmacist review (review_action = null)")
     return EXIT_OK
 
@@ -96,8 +117,8 @@ def demo_case_text(case: dict[str, Any]) -> str:
 
 
 def demo_proposal(case: dict[str, Any], *, client: CompletionClient) -> Proposal:
-    """extract -> pass-1/2 rules -> match, exactly as `intake run`, but never logged."""
-    return build_proposal(demo_case_text(case), case["case_id"], client=client, library=load_library())
+    """extract -> pass-1/2 rules -> match -> explanation, exactly as `intake run`, but never logged."""
+    return explained_proposal(demo_case_text(case), case["case_id"], client=client)
 
 
 def _outcome(proposal: Proposal) -> Outcome:
@@ -131,6 +152,7 @@ def _demo_case(case: dict[str, Any], client: CompletionClient) -> bool:
     proposal = demo_proposal(case, client=client)
     print(f"=== {case['case_id']} ({case['category']}) · {case['sample_file']} ===")
     print(format_proposal(proposal))
+    print(format_reasons(proposal))
     print(_confirm_line(proposal))
     print("Audit:        nothing written to the audit log (demo; only a pharmacist action commits a record)")
     got, want = _outcome(proposal), _expected(case)
