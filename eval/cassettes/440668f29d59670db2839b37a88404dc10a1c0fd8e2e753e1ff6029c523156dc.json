@@ -1,0 +1,63 @@
+{
+  "input": "<prescription>\nRx from TeleHealthSH (fax)\nPrescriber: Dr. D. Showcase\nPatient ref: PT-30002\nMinoxidil 12% topical solution in propylene glycol and ethanol vehicle, 60 mL. Apply 1 mL BID to scalp.\n\n</prescription>",
+  "key": "440668f29d59670db2839b37a88404dc10a1c0fd8e2e753e1ff6029c523156dc",
+  "model_id": "claude-sonnet-5-5",
+  "prompt_hash": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a",
+  "response": {
+    "container": null,
+    "content": [
+      {
+        "caller": {
+          "type": "direct"
+        },
+        "id": "toolu_01QAdvQjHTR2udcvtxsm2W3R",
+        "input": {
+          "base": "propylene glycol and ethanol vehicle",
+          "directions": "Apply 1 mL BID to scalp.",
+          "dosage_form": "solution",
+          "extraction_notes": "Received via fax from TeleHealthSH. BID interpreted as written (twice daily). Minoxidil 12% is a high strength for topical use; pharmacist should verify.",
+          "ingredients": [
+            {
+              "name": "minoxidil",
+              "strength": 12,
+              "unit": "%"
+            }
+          ],
+          "office_stock": null,
+          "patient_ref": "PT-30002",
+          "prescriber_name": "Dr. D. Showcase",
+          "quantity": 60,
+          "quantity_unit": "mL",
+          "route": "topical",
+          "species": null
+        },
+        "name": "record_extraction",
+        "type": "tool_use"
+      }
+    ],
+    "diagnostics": null,
+    "id": "msg_011ChSK2nbSZWdSb3Nbzv7Nt",
+    "model": "claude-sonnet-5-5",
+    "role": "assistant",
+    "stop_details": null,
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "type": "message",
+    "usage": {
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "inference_geo": "global",
+      "input_tokens": 2001,
+      "output_tokens": 437,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "service_tier": "standard",
+      "speed": "standard"
+    }
+  }
+}

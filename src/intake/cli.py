@@ -2,25 +2,37 @@
 
 `intake run <file>` builds a proposal, prints it and logs it as pending.
 `intake audit verify` recomputes the audit hash chain and reports the first broken link.
+`intake demo` runs the demo fixtures (data/demo/demo_cases.jsonl) through the same pipeline and prints
+each review outcome. It writes nothing to the audit log: only a pharmacist action commits a record.
 
 The mode comes from INTAKE_MODE (default REPLAY). A missing recording in REPLAY is a failure
 (non-zero exit, nothing written), never a fallback to a live model (invariant 4).
 """
 
 import argparse
+import json
 import sys
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 
 from intake import audit
-from intake.adapters.anthropic_client import ModelClient
+from intake.adapters.anthropic_client import REPO_ROOT, ModelClient
 from intake.adapters.cassette import MissingRecordingError
-from intake.pipeline import format_proposal, run_file
+from intake.extract import CompletionClient
+from intake.models import Proposal, Severity
+from intake.pipeline import build_proposal, format_proposal, load_library, run_file
+from intake.review import confirm_blockers
 
 EXIT_OK = 0
 EXIT_ERROR = 1
 EXIT_MISSING_RECORDING = 2
 EXIT_CHAIN_BROKEN = 3
+EXIT_DEMO_MISMATCH = 4
+
+DEMO_CASES = REPO_ROOT / "data" / "demo" / "demo_cases.jsonl"
+
+Outcome = tuple[str | None, str, list[str], bool]  # top formula, status, sorted flag IDs, BLOCK present
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -33,6 +45,8 @@ def _parser() -> argparse.ArgumentParser:
     audit_commands = audit_cmd.add_subparsers(dest="audit_command", required=True)
     verify = audit_commands.add_parser("verify", help="Recompute the hash chain; report the first broken link.")
     verify.add_argument("--audit-db", type=Path, default=None, help="Audit SQLite file (default: config.toml).")
+    demo = commands.add_parser("demo", help="Run the demo fixtures; show flags and CONFIRM state (no audit write).")
+    demo.add_argument("--cases", type=Path, default=DEMO_CASES, help="Demo cases JSONL (default: data/demo).")
     return parser
 
 
@@ -68,12 +82,95 @@ def _verify(audit_db: Path | None) -> int:
     return EXIT_CHAIN_BROKEN
 
 
+# --- demo ----------------------------------------------------------------------------------------
+
+
+def load_demo_cases(path: Path = DEMO_CASES) -> list[dict[str, Any]]:
+    lines = Path(path).read_text(encoding="utf-8").splitlines()
+    return [json.loads(line) for line in lines if line.strip()]
+
+
+def demo_case_text(case: dict[str, Any]) -> str:
+    """The case's sample file, read exactly as `intake run` reads it, so one recording serves both."""
+    return (REPO_ROOT / case["sample_file"]).read_bytes().decode("utf-8")
+
+
+def demo_proposal(case: dict[str, Any], *, client: CompletionClient) -> Proposal:
+    """extract -> pass-1/2 rules -> match, exactly as `intake run`, but never logged."""
+    return build_proposal(demo_case_text(case), case["case_id"], client=client, library=load_library())
+
+
+def _outcome(proposal: Proposal) -> Outcome:
+    top = proposal.candidates[0].formula_id if proposal.candidates else None
+    has_block = any(f.severity is Severity.BLOCK for f in proposal.flags)
+    return top, proposal.status.value, sorted(f.rule_id for f in proposal.flags), has_block
+
+
+def _expected(case: dict[str, Any]) -> Outcome:
+    flags = sorted(case["expected_flags"])
+    return case["expected_formula_id"], case["expected_status"], flags, bool(case["expect_confirm_disabled"])
+
+
+def _describe(outcome: Outcome) -> str:
+    top, status, flags, has_block = outcome
+    confirm = "disabled" if has_block else "enabled"
+    return f"formula {top} · status {status} · flags [{', '.join(flags)}] · CONFIRM {confirm}"
+
+
+def _confirm_line(proposal: Proposal) -> str:
+    """CONFIRM state as the review screen opens (no REVIEW flag acknowledged yet)."""
+    blockers = confirm_blockers(proposal, acknowledged=())
+    if not blockers:
+        return "CONFIRM: enabled"
+    if any(f.severity is Severity.BLOCK for f in proposal.flags):
+        return "CONFIRM: disabled · " + " ".join(blockers)
+    return "CONFIRM: pending · " + " ".join(blockers)
+
+
+def _demo_case(case: dict[str, Any], client: CompletionClient) -> bool:
+    proposal = demo_proposal(case, client=client)
+    print(f"=== {case['case_id']} ({case['category']}) · {case['sample_file']} ===")
+    print(format_proposal(proposal))
+    print(_confirm_line(proposal))
+    print("Audit:        nothing written to the audit log (demo; only a pharmacist action commits a record)")
+    got, want = _outcome(proposal), _expected(case)
+    if got == want:
+        print(f"Result:       matches the fixture ({_describe(want)})")
+    else:
+        print(f"Result:       DIFFERS from the fixture: expected {_describe(want)}; got {_describe(got)}")
+    print()
+    return got == want
+
+
+def _demo(cases_path: Path) -> int:
+    try:
+        cases = load_demo_cases(cases_path)
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        print(f"error: cannot read {cases_path}: {error}", file=sys.stderr)
+        return EXIT_ERROR
+    client = ModelClient()
+    matched = 0
+    for case in cases:
+        try:
+            matched += _demo_case(case, client)
+        except MissingRecordingError as error:
+            print(f"error: {case['case_id']}: {error}", file=sys.stderr)
+            return EXIT_MISSING_RECORDING
+        except (OSError, UnicodeDecodeError) as error:
+            print(f"error: {case['case_id']}: cannot read {case['sample_file']}: {error}", file=sys.stderr)
+            return EXIT_ERROR
+    print(f"{matched}/{len(cases)} demo cases match their fixtures (mode {client.mode.value}).")
+    return EXIT_OK if matched == len(cases) else EXIT_DEMO_MISMATCH
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     if args.command == "run":
         return _run(args.file, args.audit_db)
     if args.command == "audit" and args.audit_command == "verify":
         return _verify(args.audit_db)
+    if args.command == "demo":
+        return _demo(args.cases)
     return EXIT_ERROR  # unreachable: argparse requires a known command
 
 
