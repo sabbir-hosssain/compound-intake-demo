@@ -2,22 +2,37 @@
 
 Score per formula = rapidfuzz token-set ratio (0-1) between the raw prescription text and the formula's
 name plus its ingredient string ("<name> <strength><unit>" per ingredient). Top 3 are returned; the
-result is NO_MATCH when the top score is below `NO_MATCH_CUTOFF`, which was tuned on the dev split only
-with `tune_cutoff` (see DECISIONS-LOG, issue #14). The baseline adds no flags and never calls a model.
+result is NO_MATCH when the top score is below `NO_MATCH_CUTOFF`, read from `baseline_no_match_cutoff` in
+eval/thresholds.yaml (protected). It was tuned on the dev split only with `tune_cutoff` (DECISIONS-LOG #14). The baseline adds no flags and never calls a model.
 """
 
 from collections.abc import Sequence
+from pathlib import Path
 
+import yaml
 from rapidfuzz import fuzz, utils
 
-from intake.match import TOP_K, MatchResult
+from intake.match import DEFAULT_THRESHOLDS, TOP_K, MatchResult
 from intake.models import Formula, MatchCandidate, ProposalStatus
 
 BASELINE_VERSION = "0.1.0"
-NO_MATCH_CUTOFF = 0.80  # tuned on dev: tests/test_baseline.py reproduces it with tune_cutoff
 NO_MATCH = "NO_MATCH"
 _PRECISION = 6
 _CUTOFF_GRID = [i / 100 for i in range(102)]  # 0.00 … 1.01 (1.01 rejects everything)
+
+
+def load_no_match_cutoff(path: Path = DEFAULT_THRESHOLDS) -> float:
+    """`baseline_no_match_cutoff` from eval/thresholds.yaml. Missing file: FileNotFoundError; malformed: ValueError."""
+    data = yaml.safe_load(path.read_text())
+    value = data.get("baseline_no_match_cutoff") if isinstance(data, dict) else None
+    valid = isinstance(value, int | float) and not isinstance(value, bool) and 0 <= value <= 1
+    if not valid:
+        raise ValueError(f"{path}: 'baseline_no_match_cutoff' must be a number from 0 to 1, got {value!r}.")
+    return float(value)  # type: ignore[arg-type]
+
+
+# Tuned on dev with tune_cutoff (S2.4); frozen at Gate 2. tests/test_baseline.py checks it is still dev-optimal.
+NO_MATCH_CUTOFF: float = load_no_match_cutoff()
 
 
 def formula_string(formula: Formula) -> str:

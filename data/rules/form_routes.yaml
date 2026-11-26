@@ -1,0 +1,25 @@
+# R2-04 dosage form -> routes it can plausibly be given by. SYNTHETIC and illustrative, not clinical
+# reference material; non-sterile forms only. A stated route outside a form's list raises R2-04 (REVIEW).
+# Keys must be exactly the forms R2-04 recognises (rules._FORM_WORDS); routes must be ones it
+# recognises (rules._ROUTE_WORDS). Loaded by src/intake/rules.py; a missing or malformed file stops startup.
+illustrative: true
+
+forms:
+  cream: [topical, transdermal, vaginal, rectal]
+  ointment: [topical, rectal, vaginal]
+  gel: [topical, transdermal, vaginal, rectal, oral, buccal]
+  lotion: [topical]
+  foam: [topical, rectal]
+  paste: [topical, buccal, oral]
+  solution: [topical, oral, nasal, otic]
+  suspension: [oral, rectal, topical]
+  syrup: [oral]
+  elixir: [oral]
+  capsule: [oral, vaginal]
+  tablet: [oral, sublingual, buccal, vaginal]
+  troche: [oral, buccal, sublingual]
+  lozenge: [oral, buccal, sublingual]
+  suppository: [rectal, vaginal]
+  spray: [topical, nasal, oral]
+  powder: [topical, oral]
+  shampoo: [topical]
