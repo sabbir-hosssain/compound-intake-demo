@@ -98,9 +98,9 @@ def _show_proposal(record: AuditRecord) -> None:
     st.code(raw if raw is not None else "(raw text not found for this input hash)", language=None)
     st.subheader("Extracted fields")
     st.json(proposal.extraction.model_dump(mode="json") if proposal.extraction else {"extraction": None})
-    if proposal.reasons:
-        st.subheader("Reasons")
-        st.write(proposal.reasons)
+    st.subheader("Reasons")
+    st.caption("Model-written explanation of the scores and flags; it cannot change them.")
+    st.markdown(review.reasons_text(proposal))
 
 
 def _action_inputs(record: AuditRecord, formula_ids: list[str], acknowledged: set[str]) -> ReviewActionType | None:
