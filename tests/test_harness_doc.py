@@ -59,16 +59,47 @@ def test_every_milestone_row_is_filled() -> None:
             assert value, f"{name}: empty cell '{column}'"
 
 
-def test_unrecorded_values_name_who_supplies_them() -> None:
+def _source_line(label: str) -> str | None:
+    match = re.search(rf"^- \*\*{re.escape(label)}\*\*.*$", _section("Sources"), re.MULTILINE)
+    return match.group(0) if match else None
+
+
+def test_architect_minutes_are_a_sourced_figure_or_a_named_pointer() -> None:
+    """Before a gate the cell points at the architect; once logged, a figure needs a gate-log source line."""
     for name, row in _table().items():
-        assert "architect" in row["Architect min"].lower(), name
-        without_gate = re.sub(r"Gate \d", "", row["Architect min"])
-        assert not re.search(r"\d", without_gate), f"{name}: architect minutes look invented"
-        assert "UNKNOWN" in row["Spend"], name
+        cell = row["Architect min"]
+        if re.search(r"\d", re.sub(r"Gate \d", "", cell)):
+            line = _source_line(f"{name} architect min")
+            assert line and "gate" in line.lower(), f"{name}: architect minutes {cell!r} have no gate-log source"
+        else:
+            assert "architect" in cell.lower(), f"{name}: no figure and no named supplier: {cell!r}"
 
 
-def test_open_milestone_is_marked_in_progress() -> None:
-    assert "in progress" in _table()["M4"]["Issues closed"]
+def test_agent_spend_is_a_sourced_figure_or_unknown_with_a_named_supplier() -> None:
+    supplier = _source_line("Spend, agent tokens") or ""
+    for name, row in _table().items():
+        if "UNKNOWN" in row["Spend"]:
+            assert "architect" in supplier.lower(), f"{name}: UNKNOWN spend but no named supplier in Sources"
+        else:
+            assert _source_line(f"{name} spend"), f"{name}: spend figure has no source line"
+
+
+def test_only_the_last_milestone_may_be_in_progress_and_names_its_gate() -> None:
+    rows = _table()
+    open_rows = [name for name, row in rows.items() if "in progress" in " ".join(row.values())]
+    assert open_rows in ([], [MILESTONES[-1]]), f"in-progress rows: {open_rows}"
+    for name in open_rows:
+        assert re.search(r"to Gate \d", rows[name]["Issues closed"]), f"{name}: in progress but no target gate"
+
+
+def test_protected_proposals_match_the_intro() -> None:
+    body = _section("What I'd change in the harness")
+    span = re.search(r"those items \((\d+)–(\d+)\)", body)
+    assert span, "intro must say which items touch protected paths"
+    expected = set(range(int(span.group(1)), int(span.group(2)) + 1))
+    items = re.findall(r"^(\d+)\. (.*)$", body, re.MULTILINE)
+    marked = {int(n) for n, text in items if "(Protected: " in text}
+    assert marked == expected, f"intro says {sorted(expected)}, marked {sorted(marked)}"
 
 
 def test_every_row_has_a_source() -> None:
