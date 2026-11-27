@@ -1,0 +1,85 @@
+"""S4.3 (#26): docs/HARNESS.md has a filled metrics row per milestone, each with a stated source, and a
+written "What I'd change in the harness" section.
+
+Values the orchestrator can't see (architect minutes, agent token spend) must say who supplies them rather
+than carry an invented number.
+"""
+
+import re
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[1]
+HARNESS = REPO / "docs" / "HARNESS.md"
+MILESTONES = ("M1", "M2", "M3", "M4")
+COLUMNS = (
+    "Milestone",
+    "Issues closed",
+    "Median fix rounds",
+    "Escalations",
+    "Reviewer catches",
+    "Hard-gate fails on main",
+    "Architect min",
+    "Wall-clock",
+    "Spend",
+)
+
+
+def _text() -> str:
+    return HARNESS.read_text(encoding="utf-8")
+
+
+def _cells(line: str) -> list[str]:
+    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+
+
+def _table() -> dict[str, dict[str, str]]:
+    lines = [line for line in _text().splitlines() if line.startswith("|")]
+    header = _cells(lines[0])
+    assert tuple(header) == COLUMNS
+    rows = {}
+    for line in lines[2:]:
+        cells = _cells(line)
+        if cells[0] in MILESTONES:
+            assert len(cells) == len(COLUMNS), line
+            rows[cells[0]] = dict(zip(COLUMNS, cells, strict=True))
+    return rows
+
+
+def _section(heading: str) -> str:
+    match = re.search(rf"^## {re.escape(heading)}\n(.*?)(?=^## |\Z)", _text(), re.DOTALL | re.MULTILINE)
+    assert match, f"missing section: {heading}"
+    return match.group(1).strip()
+
+
+def test_every_milestone_row_is_filled() -> None:
+    rows = _table()
+    assert set(rows) == set(MILESTONES)
+    for name, row in rows.items():
+        for column, value in row.items():
+            assert value, f"{name}: empty cell '{column}'"
+
+
+def test_unrecorded_values_name_who_supplies_them() -> None:
+    for name, row in _table().items():
+        assert "architect" in row["Architect min"].lower(), name
+        without_gate = re.sub(r"Gate \d", "", row["Architect min"])
+        assert not re.search(r"\d", without_gate), f"{name}: architect minutes look invented"
+        assert "UNKNOWN" in row["Spend"], name
+
+
+def test_open_milestone_is_marked_in_progress() -> None:
+    assert "in progress" in _table()["M4"]["Issues closed"]
+
+
+def test_every_row_has_a_source() -> None:
+    sources = _section("Sources")
+    for name in MILESTONES:
+        assert re.search(rf"^- \*\*{name}\b", sources, re.MULTILINE), f"no source line for {name}"
+    for column in COLUMNS[1:]:
+        assert column in sources, f"no source for column '{column}'"
+
+
+def test_what_id_change_section_is_written() -> None:
+    body = _section("What I'd change in the harness")
+    assert "filled in at M4" not in body
+    assert len(re.findall(r"^\d+\. ", body, re.MULTILINE)) >= 3
