@@ -146,8 +146,6 @@ From [docs/SPEC.md](docs/SPEC.md) §11, verbatim:
 Also known at the time of writing:
 - The audit chain has no external anchor, so deleting the newest records leaves a shorter chain that still
   verifies.
-- Which REVIEW flags a pharmacist acknowledged is enforced on the review screen but not yet stored in the audit
-  record.
 - One pinned model (`claude-sonnet-5-5`), one prompt version, one fictional library of 15 formulas. Nothing here
   says how another model or a real formulary would behave.
 - There's no authentication: the reviewer name is whatever the user types.
