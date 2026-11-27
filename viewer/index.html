@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>compound-intake-demo · replay viewer</title>
+<meta name="description" content="Watch a synthetic compound prescription go through intake: the model proposes, deterministic rules own the safety flags, the pharmacist confirms.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+<script src="app.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div class="mono muted" style="font-size:12px;letter-spacing:.04em"><a href="https://github.com/sabbir-hosssain/compound-intake-demo">compound-intake-demo</a> · replay viewer</div>
+      <h1>Watch one prescription go through intake</h1>
+      <p>The model proposes. Deterministic rules own the safety flags. Only the pharmacist confirms.</p>
+    </div>
+    <div class="chips">
+      <span class="chip">Recorded runs (REPLAY)</span>
+      <span class="chip">Synthetic data</span>
+      <span class="chip">Not clinical software</span>
+    </div>
+  </header>
+
+  <section class="card controls" aria-label="Controls">
+    <div class="row" role="group" aria-label="Scenario">
+      <span class="eyebrow" style="margin-right:4px">Scenario</span>
+      <span id="scenarios" class="row"></span>
+    </div>
+    <div class="row">
+      <button id="run" class="btn primary" type="button"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 2l9 5-9 5z" fill="currentColor"></path></svg><span id="run-label">Run</span></button>
+      <button id="pause" class="btn" type="button" disabled>Pause</button>
+      <button id="step" class="btn" type="button">Step</button>
+      <button id="speed" class="btn" type="button" aria-label="Playback speed">1×</button>
+    </div>
+  </section>
+
+  <div class="layout">
+    <aside class="side">
+      <section class="card" aria-label="Pipeline">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h2 class="eyebrow">Pipeline</h2>
+          <span id="progress" class="mono muted" style="font-size:12px">0 / 9</span>
+        </div>
+        <ol id="timeline" class="timeline"></ol>
+        <div class="legend">
+          <span><span class="kind LLM">LLM</span>proposes</span>
+          <span><span class="kind CODE">CODE</span>decides</span>
+          <span><span class="kind HUMAN">HUMAN</span>confirms</span>
+        </div>
+      </section>
+      <section class="card" aria-label="Flag tray" style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h2 class="eyebrow">Flag tray</h2>
+          <span id="flag-count" class="mono muted" style="font-size:12px">0 flags</span>
+        </div>
+        <p class="muted" style="font-size:12px">Flags only accumulate. No later stage can remove one.</p>
+        <div id="flags" style="display:flex;flex-direction:column;gap:10px" aria-live="polite"></div>
+      </section>
+    </aside>
+
+    <main class="main">
+      <section id="stage-panel" class="card panel" aria-live="polite"></section>
+      <section id="review-panel" class="card panel review" aria-label="Pharmacist review" hidden></section>
+      <section id="chain-panel" class="card panel chain" aria-label="Audit chain (simulated)" hidden></section>
+    </main>
+  </div>
+
+  <footer>
+    <span>Synthetic data. Illustrative formulas and dose limits, not for compounding. Not for clinical use. Traces are exported from recorded REPLAY runs by <code>intake trace</code>; review actions here are simulated and saved nowhere.</span>
+    <span>Prototyped by Sabbir Hossain with AI coding assistants (Claude) under an architect-defined harness.</span>
+  </footer>
+</div>
+<noscript><p style="padding:24px">The viewer needs JavaScript. The same flow runs in the terminal: <code>make demo</code>.</p></noscript>
+</body>
+</html>

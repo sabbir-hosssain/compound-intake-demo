@@ -1,0 +1,26 @@
+{
+  "mode": "REPLAY",
+  "scenarios": [
+    {
+      "file": "clean.json",
+      "id": "clean",
+      "label": "Clean"
+    },
+    {
+      "file": "ambiguous.json",
+      "id": "ambiguous",
+      "label": "Ambiguous"
+    },
+    {
+      "file": "unsafe.json",
+      "id": "unsafe",
+      "label": "Unsafe"
+    },
+    {
+      "file": "adversarial.json",
+      "id": "adversarial",
+      "label": "Adversarial"
+    }
+  ],
+  "trace_version": 1
+}

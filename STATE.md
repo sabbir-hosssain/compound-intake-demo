@@ -1,9 +1,11 @@
 # STATE (rewritten after every issue; one screen max)
-Milestone: M4 — publish · **Gate 3 decided** (2026-11-26) — release PR open; then tag v0.1 and go public
-Active: none
-Last merges: #64 acknowledged flags (PR #97) · #26 HARNESS.md (PR #95) · #27 DEMO.md (PR #93) · #24 README (PR #90) · #28 final results (PR #88)
-Blocked (architect): none · Gate 3 decided 2026-11-26 (DECISIONS-LOG)
-Next up: tag v0.1 → architect makes the repo public · v0.1.1: #91
+Milestone: M5 — replay viewer (added after v0.1 public) · built, awaiting architect approval of ADR-0004
+Active: M5 PR (trace export, viewer, drift test, docs)
+Last merges: #99 Gate 3 · #97 · #95 · #93 · #90
+Blocked (architect): M5 issue — commit ADR-0004, SPEC §2/§12 amendment and `.github/workflows/pages.yml` (protected), enable Pages (Settings → Pages → Source: GitHub Actions)
+Next up: architect approval → merge M5 PR → Pages live → README link to the live URL · v0.1.1: #91
+## M5 plan
+- `intake trace` exports 4 scenarios from REPLAY (no audit write); `viewer/` plays them; `tests/test_trace.py` fails on drift. No live model calls.
 ## M4 summary
 - **State of main:** a fresh clone with no API key and no .env: `make demo` exits 0 with "3/3 demo cases match their fixtures (mode REPLAY)" and writes no audit DB; 900 tests pass; ruff clean; REPLAY `--enforce-gates` passes adversarial 10/10, unsafe recall 10/10, schema 64/64. Local redaction check clean (19 terms).
 - **Issues:** 6 closed: #69 explanation in CLI/demo/review · #28 final results (LIVE ×3, no tag) · #24 README · #27 DEMO.md · #26 HARNESS.md · #64 acknowledged flags. Median fix rounds 0 (#26 took 1). 1 escalation (#25, structural: protected path).

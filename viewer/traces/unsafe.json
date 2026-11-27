@@ -1,0 +1,277 @@
+{
+  "generated_by": "intake trace",
+  "illustrative": true,
+  "mode": "REPLAY",
+  "proposal": {
+    "confidence": 0.75,
+    "flags": [
+      {
+        "message": "Strength 12 % for 'minoxidil' is above its illustrative max 10 %.",
+        "rule_id": "R2-02",
+        "rule_version": "0.2.0",
+        "severity": "BLOCK",
+        "source_pass": 2
+      }
+    ],
+    "library_version": "5f60ae9a7e8a",
+    "margin": 0.65,
+    "model_id": "claude-sonnet-5-5",
+    "prompt_versions": {
+      "explain_v1": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+      "extract_v1": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a"
+    },
+    "rules_version": "0.2.0",
+    "status": "PROPOSED"
+  },
+  "raw": {
+    "id": "demo_2_unsafe",
+    "input_hash": "d131f35c53d9099c40b9f9a5dd58368d995f6546fb5f3774a800d157dab3bd14",
+    "received_at": "2026-11-01T09:01:00Z",
+    "source": "eRx_free_text",
+    "text": "Rx from TeleHealthSH (fax)\nPrescriber: Dr. D. Showcase\nPatient ref: PT-30002\nMinoxidil 12% topical solution in propylene glycol and ethanol vehicle, 60 mL. Apply 1 mL BID to scalp."
+  },
+  "review": {
+    "blockers_after_ack": [
+      "BLOCK flag present (R2-02): use CORRECT or CLARIFY."
+    ],
+    "confirm_blockers": [
+      "BLOCK flag present (R2-02): use CORRECT or CLARIFY."
+    ],
+    "reason_codes": {
+      "CLARIFY": [
+        "AMBIGUOUS_ORDER",
+        "MISSING_INFORMATION",
+        "NOT_IN_LIBRARY",
+        "SAFETY_CONCERN"
+      ],
+      "CONFIRM": [
+        "MATCH_VERIFIED",
+        "VERIFIED_WITH_PRESCRIBER"
+      ],
+      "CORRECT": [
+        "EXTRACTION_ERROR",
+        "PRESCRIBER_CONFIRMED_CHANGE",
+        "WRONG_CANDIDATE"
+      ]
+    },
+    "review_flag_ids": []
+  },
+  "scenario": {
+    "blurb": "A strength above the illustrative maximum. Expect a BLOCK flag and CONFIRM disabled.",
+    "category": "unsafe",
+    "id": "unsafe",
+    "label": "Unsafe",
+    "source_case": "demo_2_unsafe"
+  },
+  "stages": {
+    "explain": {
+      "prompt_versions": {
+        "explain_v1": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e"
+      },
+      "reasons": "The status is PROPOSED, with confidence 0.75 and margin 0.65, so the system has put forward a top match for you to review, and the decision stays with you. The top candidate is SHF-014, with component scores ingredients=1.00, strength=0.00, dosage_form=1.00, base=1.00, route=1.00. The strength component pulled the score down: it is 0.00, while the other four components are all 1.00. The runner-up, SHF-001, scored only 0.10, which is why the margin is wide.\n\nOne flag fired: R2-02, severity BLOCK. It says the extracted strength of 12 % for minoxidil is above the illustrative maximum of 10 %. Because it is a BLOCK flag, CONFIRM is disabled for this proposal."
+    },
+    "extract": {
+      "extraction": {
+        "base": "propylene glycol and ethanol vehicle",
+        "directions": "Apply 1 mL BID to scalp.",
+        "dosage_form": "solution",
+        "extraction_notes": "Received via fax from TeleHealthSH. BID interpreted as written (twice daily). Minoxidil 12% is a high strength for topical use; pharmacist should verify.",
+        "ingredients": [
+          {
+            "name": "minoxidil",
+            "strength": 12.0,
+            "unit": "%"
+          }
+        ],
+        "office_stock": null,
+        "patient_ref": "PT-30002",
+        "prescriber_name": "Dr. D. Showcase",
+        "quantity": 60.0,
+        "quantity_unit": "mL",
+        "route": "topical",
+        "species": null
+      },
+      "model_id": "claude-sonnet-5-5",
+      "prompt_versions": {
+        "extract_v1": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a"
+      },
+      "status": "OK"
+    },
+    "match": {
+      "T_margin": 0.07,
+      "T_match": 0.58,
+      "candidates": [
+        {
+          "component_scores": {
+            "base": 1.0,
+            "dosage_form": 1.0,
+            "ingredients": 1.0,
+            "route": 1.0,
+            "strength": 0.0
+          },
+          "diff": [
+            {
+              "field": "dosage_form",
+              "formula": "solution",
+              "prescribed": "solution",
+              "same": true
+            },
+            {
+              "field": "base",
+              "formula": "propylene glycol and ethanol vehicle",
+              "prescribed": "propylene glycol and ethanol vehicle",
+              "same": true
+            },
+            {
+              "field": "route",
+              "formula": "topical",
+              "prescribed": "topical",
+              "same": true
+            },
+            {
+              "field": "ingredient: minoxidil",
+              "formula": "5 %",
+              "prescribed": "12 %",
+              "same": false
+            }
+          ],
+          "formula_id": "SHF-014",
+          "formula_version": "1.0",
+          "name": "Minoxidil Topical Solution",
+          "score": 0.75
+        },
+        {
+          "component_scores": {
+            "base": 0.0,
+            "dosage_form": 0.0,
+            "ingredients": 0.0,
+            "route": 1.0,
+            "strength": 0.0
+          },
+          "diff": [
+            {
+              "field": "dosage_form",
+              "formula": "cream",
+              "prescribed": "solution",
+              "same": false
+            },
+            {
+              "field": "base",
+              "formula": "vanishing cream base",
+              "prescribed": "propylene glycol and ethanol vehicle",
+              "same": false
+            },
+            {
+              "field": "route",
+              "formula": "topical",
+              "prescribed": "topical",
+              "same": true
+            },
+            {
+              "field": "ingredient: salicylic acid",
+              "formula": "3 %",
+              "prescribed": "—",
+              "same": false
+            },
+            {
+              "field": "ingredient: urea",
+              "formula": "10 %",
+              "prescribed": "—",
+              "same": false
+            },
+            {
+              "field": "ingredient: minoxidil",
+              "formula": "—",
+              "prescribed": "12 %",
+              "same": false
+            }
+          ],
+          "formula_id": "SHF-001",
+          "formula_version": "1.0",
+          "name": "Salicylic Acid / Urea Keratolytic Cream",
+          "score": 0.1
+        },
+        {
+          "component_scores": {
+            "base": 0.0,
+            "dosage_form": 0.0,
+            "ingredients": 0.0,
+            "route": 1.0,
+            "strength": 0.0
+          },
+          "diff": [
+            {
+              "field": "dosage_form",
+              "formula": "gel",
+              "prescribed": "solution",
+              "same": false
+            },
+            {
+              "field": "base",
+              "formula": "hydroalcoholic gel base",
+              "prescribed": "propylene glycol and ethanol vehicle",
+              "same": false
+            },
+            {
+              "field": "route",
+              "formula": "topical",
+              "prescribed": "topical",
+              "same": true
+            },
+            {
+              "field": "ingredient: lidocaine",
+              "formula": "4 %",
+              "prescribed": "—",
+              "same": false
+            },
+            {
+              "field": "ingredient: menthol",
+              "formula": "1 %",
+              "prescribed": "—",
+              "same": false
+            },
+            {
+              "field": "ingredient: minoxidil",
+              "formula": "—",
+              "prescribed": "12 %",
+              "same": false
+            }
+          ],
+          "formula_id": "SHF-002",
+          "formula_version": "1.0",
+          "name": "Lidocaine / Menthol Topical Gel",
+          "score": 0.1
+        }
+      ],
+      "confidence": 0.75,
+      "flags": [],
+      "margin": 0.65,
+      "skipped": false,
+      "status": "PROPOSED",
+      "weights": {
+        "base": 0.1,
+        "dosage_form": 0.15,
+        "ingredients": 0.4,
+        "route": 0.1,
+        "strength": 0.25
+      }
+    },
+    "pass1": {
+      "flags": [],
+      "rules_version": "0.2.0"
+    },
+    "pass2": {
+      "flags": [
+        {
+          "message": "Strength 12 % for 'minoxidil' is above its illustrative max 10 %.",
+          "rule_id": "R2-02",
+          "rule_version": "0.2.0",
+          "severity": "BLOCK",
+          "source_pass": 2
+        }
+      ],
+      "skipped": false
+    }
+  },
+  "trace_version": 1
+}
