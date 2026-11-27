@@ -1,6 +1,6 @@
 [project]
 name = "compound-intake-demo"
-version = "0.0.1"
+version = "0.1.0"
 description = "Where AI belongs in compound-prescription intake: the gate goes where the irreversibility is. Synthetic data; not for clinical use."
 readme = "README.md"
 license = { text = "MIT" }

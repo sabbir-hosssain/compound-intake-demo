@@ -1,9 +1,9 @@
 # STATE (rewritten after every issue; one screen max)
-Milestone: M4 — publish · **STOPPED AT GATE 3** (2026-11-27 00:28Z, main 3ec1d7a) — waiting for the architect
+Milestone: M4 — publish · **Gate 3 decided** (2026-11-26) — release PR open; then tag v0.1 and go public
 Active: none
 Last merges: #64 acknowledged flags (PR #97) · #26 HARNESS.md (PR #95) · #27 DEMO.md (PR #93) · #24 README (PR #90) · #28 final results (PR #88)
-Blocked (architect): #25 ADRs (protected; diffs drafted on the issue, options A/B/C, A recommended) · #91 `make eval` overwrites committed results (scope-question)
-Next up: Gate 3 — architect reads README.md and docs/DEMO.md, decides #25 and #91, tags `v0.1`, makes the repo public
+Blocked (architect): none · Gate 3 decided 2026-11-26 (DECISIONS-LOG)
+Next up: tag v0.1 → architect makes the repo public · v0.1.1: #91
 ## M4 summary
 - **State of main:** a fresh clone with no API key and no .env: `make demo` exits 0 with "3/3 demo cases match their fixtures (mode REPLAY)" and writes no audit DB; 900 tests pass; ruff clean; REPLAY `--enforce-gates` passes adversarial 10/10, unsafe recall 10/10, schema 64/64. Local redaction check clean (19 terms).
 - **Issues:** 6 closed: #69 explanation in CLI/demo/review · #28 final results (LIVE ×3, no tag) · #24 README · #27 DEMO.md · #26 HARNESS.md · #64 acknowledged flags. Median fix rounds 0 (#26 took 1). 1 escalation (#25, structural: protected path).
