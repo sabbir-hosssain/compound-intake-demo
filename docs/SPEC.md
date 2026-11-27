@@ -8,9 +8,9 @@ A compound prescription often arrives as free text, because the sending e-prescr
 **User:** the intake pharmacist at "SH Compounding Network", working a queue of inbound prescriptions, including orders from the telehealth partner "TeleHealthSH" and from outside prescribers.
 
 ## 2. Scope
-**In:** free-text intake · two rule passes · LLM extraction to a schema · code-based matching and scoring · LLM-written explanation · minimal review screen (confirm / correct / clarify) · hash-chained audit log · golden-set evaluation with a non-AI baseline · CI with recorded model responses.
+**In:** free-text intake · two rule passes · LLM extraction to a schema · code-based matching and scoring · LLM-written explanation · minimal review screen (confirm / correct / clarify) · hash-chained audit log · golden-set evaluation with a non-AI baseline · CI with recorded model responses · a static replay viewer on GitHub Pages (§12, ADR-0004).
 
-**Out:** beyond-use-date calculation, compounding records, dispensing, claims, structured SCRIPT parsing, sterile preparations, veterinary branch (schema placeholders only), clarification-call drafting, authentication, cloud hosting, AWS.
+**Out:** beyond-use-date calculation, compounding records, dispensing, claims, structured SCRIPT parsing, sterile preparations, veterinary branch (schema placeholders only), clarification-call drafting, authentication, cloud hosting of the pipeline or review app (the static viewer in §12 is the only hosted page), AWS.
 
 ## 3. Flow
 ```
@@ -86,3 +86,9 @@ Append-only SQLite table. `record_hash = sha256(prev_hash + canonical_json(recor
 
 ## 11. Limitations (they go in the README verbatim)
 Synthetic data; fictional, illustrative formulas and dose limits; labels written by a non-pharmacist with AI help and spot-checked by the author; small n with wide intervals; simulated override rate; no BUD, compounding record, sterile or veterinary logic; not clinical software.
+
+## 12. Replay viewer (`viewer/`, `src/intake/trace.py`)
+`intake trace` exports per-stage JSON for four scenarios from REPLAY recordings; it never writes the audit log.
+`viewer/` plays them back stage by stage and ends at a review panel whose actions are simulated in the browser
+(same rules as §5 "Effect on review" and `intake.review`) and saved nowhere. `tests/test_trace.py` fails if the
+committed traces differ from a fresh export. `.github/workflows/pages.yml` deploys `viewer/` only.
