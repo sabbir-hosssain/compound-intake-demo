@@ -1,9 +1,9 @@
 # STATE (rewritten after every issue; one screen max)
-Milestone: M5 — replay viewer (added after v0.1 public) · built, awaiting architect approval of ADR-0004
+Milestone: M5 — replay viewer (added after v0.1 public) · architect approved #100 (2026-11-26); merging #102 then #101
 Active: M5 PR (trace export, viewer, drift test, docs)
 Last merges: #99 Gate 3 · #97 · #95 · #93 · #90
-Blocked (architect): M5 issue — commit ADR-0004, SPEC §2/§12 amendment and `.github/workflows/pages.yml` (protected), enable Pages (Settings → Pages → Source: GitHub Actions)
-Next up: architect approval → merge M5 PR → Pages live → README link to the live URL · v0.1.1: #91
+Blocked (architect): enable Pages (Settings → Pages → Source: GitHub Actions)
+Next up: Pages enabled → README link to the live URL · v0.1.1: #91
 ## M5 plan
 - `intake trace` exports 4 scenarios from REPLAY (no audit write); `viewer/` plays them; `tests/test_trace.py` fails on drift. No live model calls.
 ## M4 summary

@@ -136,7 +136,7 @@ async function record() {
 
 function kv(rows) {
   return `<div class="kv">${rows.map(([k, v, opts = {}]) => {
-    const bar = opts.bar != null ? `<span class="bar" aria-hidden="true"><i data-w="${opts.bar}"></i></span>` : "";
+    const bar = opts.bar != null ? `<span class="bar" aria-hidden="true"><i data-w="${esc(opts.bar)}"></i></span>` : "";
     return `<div><span class="k">${esc(k)}</span><span class="v">${bar}<span class="${opts.mono === false ? "" : "mono"}" style="font-size:13px">${esc(v)}</span></span></div>`;
   }).join("")}</div>`;
 }
@@ -290,7 +290,7 @@ function renderFlags() {
   const flags = visibleFlags();
   $("flag-count").textContent = plural(flags.length, "flag");
   $("flags").innerHTML = flags.length
-    ? flags.map((f) => `<div class="flag ${f.severity}${isNew(`flag:${state.sc}:${f.rule_id}:${f.at}:${f.message}`) ? " rise" : ""}"><div class="head"><span class="mono" style="font-size:12px;font-weight:500">${esc(f.rule_id)}</span><span class="sev ${f.severity}">${f.severity}</span></div>
+    ? flags.map((f) => `<div class="flag ${esc(f.severity)}${isNew(`flag:${state.sc}:${f.rule_id}:${f.at}:${f.message}`) ? " rise" : ""}"><div class="head"><span class="mono" style="font-size:12px;font-weight:500">${esc(f.rule_id)}</span><span class="sev ${esc(f.severity)}">${esc(f.severity)}</span></div>
         <div style="font-size:13px">${esc(f.message)}</div><div style="font-size:11px;opacity:.85">Added by ${esc(STAGES[f.at].name.toLowerCase())}</div></div>`).join("")
     : `<div class="empty">No flags yet</div>`;
 }
@@ -370,7 +370,7 @@ function renderReview() {
       <label class="field">Reason code
         <select id="reason" ${!state.action || state.done ? "disabled" : ""}>
           <option value="">Select a reason…</option>
-          ${codes.map((c) => `<option value="${c}" ${state.reason === c ? "selected" : ""}>${c}</option>`).join("")}
+          ${codes.map((c) => `<option value="${esc(c)}" ${state.reason === c ? "selected" : ""}>${esc(c)}</option>`).join("")}
         </select></label>
       <button type="button" class="btn go" id="record" ${valid ? "" : "disabled"}>Record (simulated)</button>
     </div>

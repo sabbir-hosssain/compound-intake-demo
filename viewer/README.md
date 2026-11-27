@@ -28,4 +28,4 @@ Opening `index.html` straight from disk won't load the traces (browsers block lo
 ## Change it
 
 Change the pipeline, then `make traces` and commit the JSON. Never hand-edit a trace.
-Plain HTML, CSS and JavaScript: no build step, no framework, no dependencies besides web fonts.
+Plain HTML, CSS and JavaScript: no build step, no framework, no third-party requests (system fonts only).

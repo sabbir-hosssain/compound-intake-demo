@@ -127,7 +127,9 @@ def test_viewer_carries_the_honesty_lines() -> None:
         assert line in html, line
 
 
-def test_viewer_makes_no_network_calls_except_fonts_and_traces() -> None:
+def test_viewer_makes_no_network_calls_except_traces() -> None:
+    html = (VIEWER / "index.html").read_text(encoding="utf-8")
+    assert "https://fonts." not in html and "<script src=\"http" not in html
     js = (VIEWER / "app.js").read_text(encoding="utf-8")
     fetches = [part.split(")")[0] for part in js.split("fetch(")[1:]]
     assert fetches == ['"traces/index.json"', "`traces/${s.file}`"]
