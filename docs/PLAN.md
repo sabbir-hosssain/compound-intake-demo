@@ -75,6 +75,15 @@ Milestone → epic → story. Each **story becomes one GitHub issue**, with its 
 
 **M4 exit / Gate 3:** the architect reads the README and DEMO.md, then makes the repo public.
 
+## M5 — Replay viewer (added after v0.1)  ·  architect approval (ADR-0004)
+- **S5.1 Trace export** (code, S). `intake trace` writes per-stage JSON for 4 scenarios from REPLAY; no audit write. *AC:* deterministic; stage flags add up to the proposal's flags.
+- **S5.2 Static viewer** (code, M). `viewer/`: scenario picker, Run/Pause/Step/speed, 9-stage timeline, flag tray, stage detail, review panel with simulated actions and an in-browser hash chain. *AC:* same review rules as `intake.review`; honesty lines present; works at phone width.
+- **S5.3 Drift check** (code, S). `tests/test_trace.py` regenerates the traces and compares them with the committed copies.
+- **S5.4 Pages deploy** (architect, S). `.github/workflows/pages.yml` deploys `viewer/` only. *Protected path: architect-approved.*
+- **S5.5 Docs** (code, S). README "See it run", `viewer/README.md`, STATE and DECISIONS-LOG.
+
+**M5 exit:** the viewer is live on GitHub Pages and linked from the README.
+
 ---
 
 ## Issue template (used for every story)

@@ -150,6 +150,11 @@ Also known at the time of writing:
   says how another model or a real formulary would behave.
 - There's no authentication: the reviewer name is whatever the user types.
 
+## See it run
+A static replay viewer plays four synthetic cases (clean, ambiguous, unsafe, prompt injection) stage by stage and
+ends at the pharmacist's review, where you can try Confirm, Correct or Clarify. It replays recorded runs; nothing
+is saved. Run it locally with `make viewer`; see [viewer/README.md](viewer/README.md).
+
 ## Run it (no API key needed)
 Needs Python 3.12 and [uv](https://docs.astral.sh/uv/). Everything below runs in REPLAY mode from recorded
 model responses in `eval/cassettes/`, so it needs no API key and makes no network calls to a model.
@@ -162,6 +167,7 @@ uv run python -m eval.run_eval --mode replay --enforce-gates --results-dir "$(mk
 uv run intake run samples/case_001.txt      # one prescription end to end; logs a pending audit record
 uv run intake audit verify                  # recompute the hash chain
 make review                                 # the Streamlit review screen
+make viewer                                 # the replay viewer on http://localhost:8000
 ```
 
 `make demo` should end with "3/3 demo cases match their fixtures (mode REPLAY)". `intake run` writes to

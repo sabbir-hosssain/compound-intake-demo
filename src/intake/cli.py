@@ -53,6 +53,8 @@ def _parser() -> argparse.ArgumentParser:
     verify.add_argument("--audit-db", type=Path, default=None, help="Audit SQLite file (default: config.toml).")
     demo = commands.add_parser("demo", help="Run the demo fixtures; show flags and CONFIRM state (no audit write).")
     demo.add_argument("--cases", type=Path, default=DEMO_CASES, help="Demo cases JSONL (default: data/demo).")
+    trace = commands.add_parser("trace", help="Export replay traces for the static viewer (no audit write).")
+    trace.add_argument("--out", type=Path, default=None, help="Output directory (default: viewer/traces).")
     return parser
 
 
@@ -185,6 +187,24 @@ def _demo(cases_path: Path) -> int:
     return EXIT_OK if matched == len(cases) else EXIT_DEMO_MISMATCH
 
 
+# --- trace ---------------------------------------------------------------------------------------
+
+
+def _trace(out: Path | None) -> int:
+    from intake import trace  # imported here: trace imports this module's demo helpers
+
+    client = ModelClient()
+    try:
+        written = trace.write_all(out or trace.VIEWER_TRACES, client=client)
+    except MissingRecordingError as exc:
+        print(f"ERROR: missing recording: {exc}", file=sys.stderr)
+        return EXIT_MISSING_RECORDING
+    for path in written:
+        print(f"wrote {path}")
+    print(f"{len(written) - 1} traces exported (mode {client.mode.value}).")
+    return EXIT_OK
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     if args.command == "run":
@@ -193,6 +213,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _verify(args.audit_db)
     if args.command == "demo":
         return _demo(args.cases)
+    if args.command == "trace":
+        return _trace(args.out)
     return EXIT_ERROR  # unreachable: argparse requires a known command
 
 

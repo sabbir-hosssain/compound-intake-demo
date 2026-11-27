@@ -1,0 +1,288 @@
+{
+  "generated_by": "intake trace",
+  "illustrative": true,
+  "mode": "REPLAY",
+  "proposal": {
+    "confidence": 0.753125,
+    "flags": [
+      {
+        "message": "Ambiguous match: margin 0.04 below T_margin 0.07.",
+        "rule_id": "M-01",
+        "rule_version": "0.1.0",
+        "severity": "REVIEW",
+        "source_pass": 2
+      }
+    ],
+    "library_version": "5f60ae9a7e8a",
+    "margin": 0.039062,
+    "model_id": "claude-sonnet-5-5",
+    "prompt_versions": {
+      "explain_v1": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+      "extract_v1": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a"
+    },
+    "rules_version": "0.2.0",
+    "status": "PROPOSED"
+  },
+  "raw": {
+    "id": "g027",
+    "input_hash": "83a419f2a066f9512f531305bce7b82f19bdbcdad3eafccadc9846a805ee3161",
+    "received_at": "2026-10-01T09:27:00Z",
+    "source": "eRx_free_text",
+    "text": "Rx from TeleHealthSH (eRx)\nPrescriber: Dr. K. Fictional\nPatient ref: PT-20032\nLidocaine 2.5% / menthol 1% gel 60 g, apply TID."
+  },
+  "review": {
+    "blockers_after_ack": [],
+    "confirm_blockers": [
+      "REVIEW flag not acknowledged: M-01."
+    ],
+    "reason_codes": {
+      "CLARIFY": [
+        "AMBIGUOUS_ORDER",
+        "MISSING_INFORMATION",
+        "NOT_IN_LIBRARY",
+        "SAFETY_CONCERN"
+      ],
+      "CONFIRM": [
+        "MATCH_VERIFIED",
+        "VERIFIED_WITH_PRESCRIBER"
+      ],
+      "CORRECT": [
+        "EXTRACTION_ERROR",
+        "PRESCRIBER_CONFIRMED_CHANGE",
+        "WRONG_CANDIDATE"
+      ]
+    },
+    "review_flag_ids": [
+      "M-01"
+    ]
+  },
+  "scenario": {
+    "blurb": "Two formulas score close together. Expect an M-01 REVIEW flag that needs acknowledging.",
+    "category": "ambiguous",
+    "id": "ambiguous",
+    "label": "Ambiguous",
+    "source_case": "g027"
+  },
+  "stages": {
+    "explain": {
+      "prompt_versions": {
+        "explain_v1": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e"
+      },
+      "reasons": "The status is PROPOSED, so the system has put forward a match for your review, with confidence 0.75 and margin 0.04. The top candidate is SHF-005, with ingredients=1.00, strength=0.81, dosage_form=1.00, base=0.00, route=0.00. The score was pulled down mainly by base and route, which both scored zero (the extraction has no base or route), and by strength, which was only partly matched at 0.81. The runner-up, SHF-002, scored 0.71 and differs mainly on strength=0.66, which is why the two are close. One flag fired: M-01 (REVIEW), an ambiguous match because the margin of 0.04 is below the T_margin of 0.07. A REVIEW flag must be acknowledged before CONFIRM, and you should compare SHF-005 and SHF-002 carefully."
+    },
+    "extract": {
+      "extraction": {
+        "base": null,
+        "directions": "apply TID",
+        "dosage_form": "gel",
+        "extraction_notes": "Directions do not specify application site or \"topical\" explicitly, so route left null. Frequency TID (three times daily) as written. Source: TeleHealthSH eRx.",
+        "ingredients": [
+          {
+            "name": "lidocaine",
+            "strength": 2.5,
+            "unit": "%"
+          },
+          {
+            "name": "menthol",
+            "strength": 1.0,
+            "unit": "%"
+          }
+        ],
+        "office_stock": null,
+        "patient_ref": "PT-20032",
+        "prescriber_name": "Dr. K. Fictional",
+        "quantity": 60.0,
+        "quantity_unit": "g",
+        "route": null,
+        "species": null
+      },
+      "model_id": "claude-sonnet-5-5",
+      "prompt_versions": {
+        "extract_v1": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a"
+      },
+      "status": "OK"
+    },
+    "match": {
+      "T_margin": 0.07,
+      "T_match": 0.58,
+      "candidates": [
+        {
+          "component_scores": {
+            "base": 0.0,
+            "dosage_form": 1.0,
+            "ingredients": 1.0,
+            "route": 0.0,
+            "strength": 0.8125
+          },
+          "diff": [
+            {
+              "field": "dosage_form",
+              "formula": "gel",
+              "prescribed": "gel",
+              "same": true
+            },
+            {
+              "field": "base",
+              "formula": "hydroalcoholic gel base",
+              "prescribed": "—",
+              "same": false
+            },
+            {
+              "field": "route",
+              "formula": "topical",
+              "prescribed": "—",
+              "same": false
+            },
+            {
+              "field": "ingredient: lidocaine",
+              "formula": "2 %",
+              "prescribed": "2.5 %",
+              "same": false
+            },
+            {
+              "field": "ingredient: menthol",
+              "formula": "1 %",
+              "prescribed": "1 %",
+              "same": true
+            }
+          ],
+          "formula_id": "SHF-005",
+          "formula_version": "1.0",
+          "name": "Lidocaine / Menthol Topical Gel (Low Strength)",
+          "score": 0.753125
+        },
+        {
+          "component_scores": {
+            "base": 0.0,
+            "dosage_form": 1.0,
+            "ingredients": 1.0,
+            "route": 0.0,
+            "strength": 0.65625
+          },
+          "diff": [
+            {
+              "field": "dosage_form",
+              "formula": "gel",
+              "prescribed": "gel",
+              "same": true
+            },
+            {
+              "field": "base",
+              "formula": "hydroalcoholic gel base",
+              "prescribed": "—",
+              "same": false
+            },
+            {
+              "field": "route",
+              "formula": "topical",
+              "prescribed": "—",
+              "same": false
+            },
+            {
+              "field": "ingredient: lidocaine",
+              "formula": "4 %",
+              "prescribed": "2.5 %",
+              "same": false
+            },
+            {
+              "field": "ingredient: menthol",
+              "formula": "1 %",
+              "prescribed": "1 %",
+              "same": true
+            }
+          ],
+          "formula_id": "SHF-002",
+          "formula_version": "1.0",
+          "name": "Lidocaine / Menthol Topical Gel",
+          "score": 0.714063
+        },
+        {
+          "component_scores": {
+            "base": 0.0,
+            "dosage_form": 0.0,
+            "ingredients": 0.0,
+            "route": 0.0,
+            "strength": 0.0
+          },
+          "diff": [
+            {
+              "field": "dosage_form",
+              "formula": "cream",
+              "prescribed": "gel",
+              "same": false
+            },
+            {
+              "field": "base",
+              "formula": "vanishing cream base",
+              "prescribed": "—",
+              "same": false
+            },
+            {
+              "field": "route",
+              "formula": "topical",
+              "prescribed": "—",
+              "same": false
+            },
+            {
+              "field": "ingredient: salicylic acid",
+              "formula": "3 %",
+              "prescribed": "—",
+              "same": false
+            },
+            {
+              "field": "ingredient: urea",
+              "formula": "10 %",
+              "prescribed": "—",
+              "same": false
+            },
+            {
+              "field": "ingredient: lidocaine",
+              "formula": "—",
+              "prescribed": "2.5 %",
+              "same": false
+            },
+            {
+              "field": "ingredient: menthol",
+              "formula": "—",
+              "prescribed": "1 %",
+              "same": false
+            }
+          ],
+          "formula_id": "SHF-001",
+          "formula_version": "1.0",
+          "name": "Salicylic Acid / Urea Keratolytic Cream",
+          "score": 0.0
+        }
+      ],
+      "confidence": 0.753125,
+      "flags": [
+        {
+          "message": "Ambiguous match: margin 0.04 below T_margin 0.07.",
+          "rule_id": "M-01",
+          "rule_version": "0.1.0",
+          "severity": "REVIEW",
+          "source_pass": 2
+        }
+      ],
+      "margin": 0.039062,
+      "skipped": false,
+      "status": "PROPOSED",
+      "weights": {
+        "base": 0.1,
+        "dosage_form": 0.15,
+        "ingredients": 0.4,
+        "route": 0.1,
+        "strength": 0.25
+      }
+    },
+    "pass1": {
+      "flags": [],
+      "rules_version": "0.2.0"
+    },
+    "pass2": {
+      "flags": [],
+      "skipped": false
+    }
+  },
+  "trace_version": 1
+}

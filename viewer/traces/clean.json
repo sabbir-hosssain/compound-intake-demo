@@ -1,0 +1,268 @@
+{
+  "generated_by": "intake trace",
+  "illustrative": true,
+  "mode": "REPLAY",
+  "proposal": {
+    "confidence": 0.9,
+    "flags": [],
+    "library_version": "5f60ae9a7e8a",
+    "margin": 0.125,
+    "model_id": "claude-sonnet-5-5",
+    "prompt_versions": {
+      "explain_v1": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e",
+      "extract_v1": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a"
+    },
+    "rules_version": "0.2.0",
+    "status": "PROPOSED"
+  },
+  "raw": {
+    "id": "demo_1_clean",
+    "input_hash": "e1e566c2a25ec9100366c29f0c301fef9fd88bc09b53dbdf2bcad834bf3b253c",
+    "received_at": "2026-11-01T09:00:00Z",
+    "source": "eRx_free_text",
+    "text": "Rx via SH Compounding Network portal\nPrescriber: Dr. D. Showcase\nPatient ref: PT-30001\nHydrocortisone 1% / clotrimazole 1% cream in vanishing cream base, 30 g. Apply thin layer to affected area BID."
+  },
+  "review": {
+    "blockers_after_ack": [],
+    "confirm_blockers": [],
+    "reason_codes": {
+      "CLARIFY": [
+        "AMBIGUOUS_ORDER",
+        "MISSING_INFORMATION",
+        "NOT_IN_LIBRARY",
+        "SAFETY_CONCERN"
+      ],
+      "CONFIRM": [
+        "MATCH_VERIFIED",
+        "VERIFIED_WITH_PRESCRIBER"
+      ],
+      "CORRECT": [
+        "EXTRACTION_ERROR",
+        "PRESCRIBER_CONFIRMED_CHANGE",
+        "WRONG_CANDIDATE"
+      ]
+    },
+    "review_flag_ids": []
+  },
+  "scenario": {
+    "blurb": "A well-formed order. Expect no flags and a clear top match.",
+    "category": "clean",
+    "id": "clean",
+    "label": "Clean",
+    "source_case": "demo_1_clean"
+  },
+  "stages": {
+    "explain": {
+      "prompt_versions": {
+        "explain_v1": "afa041e1e98c60e1d77bd8af7ff1fdd8c55f8eb65b433d1aab6322a8cb41d89e"
+      },
+      "reasons": "The status is PROPOSED with confidence=0.90 and margin=0.12, so the system has a top formula for you to review, and the decision remains yours. The top candidate is SHF-009 with ingredients=1.00, strength=1.00, dosage_form=1.00, base=0.00, route=1.00. Only the base component pulled the score down: the extraction reads \"vanishing cream\" and base=0.00 shows no base match for this formula. The runner-up is SHF-010 at 0.78, which matches on ingredients but scores strength=0.50, so it sits 0.12 behind. No flags fired, so there are no BLOCK or REVIEW items on this proposal."
+    },
+    "extract": {
+      "extraction": {
+        "base": "vanishing cream",
+        "directions": "Apply thin layer to affected area BID (twice daily).",
+        "dosage_form": "cream",
+        "extraction_notes": null,
+        "ingredients": [
+          {
+            "name": "hydrocortisone",
+            "strength": 1.0,
+            "unit": "%"
+          },
+          {
+            "name": "clotrimazole",
+            "strength": 1.0,
+            "unit": "%"
+          }
+        ],
+        "office_stock": null,
+        "patient_ref": "PT-30001",
+        "prescriber_name": "Dr. D. Showcase",
+        "quantity": 30.0,
+        "quantity_unit": "g",
+        "route": "topical",
+        "species": null
+      },
+      "model_id": "claude-sonnet-5-5",
+      "prompt_versions": {
+        "extract_v1": "d4c2c075a918aa15dba026e35f9f84d1145c379b715b32c145a688bfb2f3ae6a"
+      },
+      "status": "OK"
+    },
+    "match": {
+      "T_margin": 0.07,
+      "T_match": 0.58,
+      "candidates": [
+        {
+          "component_scores": {
+            "base": 0.0,
+            "dosage_form": 1.0,
+            "ingredients": 1.0,
+            "route": 1.0,
+            "strength": 1.0
+          },
+          "diff": [
+            {
+              "field": "dosage_form",
+              "formula": "cream",
+              "prescribed": "cream",
+              "same": true
+            },
+            {
+              "field": "base",
+              "formula": "vanishing cream base",
+              "prescribed": "vanishing cream",
+              "same": false
+            },
+            {
+              "field": "route",
+              "formula": "topical",
+              "prescribed": "topical",
+              "same": true
+            },
+            {
+              "field": "ingredient: hydrocortisone",
+              "formula": "1 %",
+              "prescribed": "1 %",
+              "same": true
+            },
+            {
+              "field": "ingredient: clotrimazole",
+              "formula": "1 %",
+              "prescribed": "1 %",
+              "same": true
+            }
+          ],
+          "formula_id": "SHF-009",
+          "formula_version": "1.0",
+          "name": "Hydrocortisone / Clotrimazole Cream (1%/1%)",
+          "score": 0.9
+        },
+        {
+          "component_scores": {
+            "base": 0.0,
+            "dosage_form": 1.0,
+            "ingredients": 1.0,
+            "route": 1.0,
+            "strength": 0.5
+          },
+          "diff": [
+            {
+              "field": "dosage_form",
+              "formula": "cream",
+              "prescribed": "cream",
+              "same": true
+            },
+            {
+              "field": "base",
+              "formula": "vanishing cream base",
+              "prescribed": "vanishing cream",
+              "same": false
+            },
+            {
+              "field": "route",
+              "formula": "topical",
+              "prescribed": "topical",
+              "same": true
+            },
+            {
+              "field": "ingredient: hydrocortisone",
+              "formula": "2.5 %",
+              "prescribed": "1 %",
+              "same": false
+            },
+            {
+              "field": "ingredient: clotrimazole",
+              "formula": "1 %",
+              "prescribed": "1 %",
+              "same": true
+            }
+          ],
+          "formula_id": "SHF-010",
+          "formula_version": "1.0",
+          "name": "Hydrocortisone / Clotrimazole Cream (2.5%/1%)",
+          "score": 0.775
+        },
+        {
+          "component_scores": {
+            "base": 0.0,
+            "dosage_form": 1.0,
+            "ingredients": 0.0,
+            "route": 1.0,
+            "strength": 0.0
+          },
+          "diff": [
+            {
+              "field": "dosage_form",
+              "formula": "cream",
+              "prescribed": "cream",
+              "same": true
+            },
+            {
+              "field": "base",
+              "formula": "vanishing cream base",
+              "prescribed": "vanishing cream",
+              "same": false
+            },
+            {
+              "field": "route",
+              "formula": "topical",
+              "prescribed": "topical",
+              "same": true
+            },
+            {
+              "field": "ingredient: salicylic acid",
+              "formula": "3 %",
+              "prescribed": "—",
+              "same": false
+            },
+            {
+              "field": "ingredient: urea",
+              "formula": "10 %",
+              "prescribed": "—",
+              "same": false
+            },
+            {
+              "field": "ingredient: hydrocortisone",
+              "formula": "—",
+              "prescribed": "1 %",
+              "same": false
+            },
+            {
+              "field": "ingredient: clotrimazole",
+              "formula": "—",
+              "prescribed": "1 %",
+              "same": false
+            }
+          ],
+          "formula_id": "SHF-001",
+          "formula_version": "1.0",
+          "name": "Salicylic Acid / Urea Keratolytic Cream",
+          "score": 0.25
+        }
+      ],
+      "confidence": 0.9,
+      "flags": [],
+      "margin": 0.125,
+      "skipped": false,
+      "status": "PROPOSED",
+      "weights": {
+        "base": 0.1,
+        "dosage_form": 0.15,
+        "ingredients": 0.4,
+        "route": 0.1,
+        "strength": 0.25
+      }
+    },
+    "pass1": {
+      "flags": [],
+      "rules_version": "0.2.0"
+    },
+    "pass2": {
+      "flags": [],
+      "skipped": false
+    }
+  },
+  "trace_version": 1
+}
