@@ -675,3 +675,120 @@ def test_app_shows_reasons_from_intake_run_and_block_still_disables_confirm(
     assert any(record.proposal.reasons.strip() in m.value for m in app.markdown)
     assert _button(app, "CONFIRM").disabled
     assert _count(db) == 1
+
+
+# --- #64: the acknowledged REVIEW flags are stored on the ReviewAction ---------------------------
+
+
+def _submit(conn: sqlite3.Connection, pending: AuditRecord, **overrides: object) -> AuditRecord:
+    kwargs: dict[str, object] = {
+        "action": ReviewActionType.CONFIRM,
+        "reason_code": ReasonCode.MATCH_VERIFIED,
+        "reviewer": "pharmacist-1",
+        "acknowledged": frozenset(),
+        "known_formula_ids": KNOWN,
+        "at": AT,
+    }
+    kwargs.update(overrides)
+    return review.submit(conn, pending, **kwargs)
+
+
+BOTH = frozenset({REVIEW_A.rule_id, REVIEW_B.rule_id})
+
+
+def test_confirm_stores_the_acknowledged_review_flags_in_proposal_order() -> None:
+    action = _act(_proposal([REVIEW_A, REVIEW_B]), acknowledged=BOTH)
+    assert action.acknowledged_flags == [REVIEW_A.rule_id, REVIEW_B.rule_id]
+
+
+def test_confirm_without_review_flags_stores_an_empty_list() -> None:
+    assert _act(_proposal()).acknowledged_flags == []
+
+
+def test_stored_set_is_the_proposals_review_flags_never_more() -> None:
+    """Ticks that are not REVIEW flags on this proposal (an absent ID, a BLOCK ID) are not recorded."""
+    proposal = _proposal([REVIEW_A])
+    action = _act(proposal, acknowledged=frozenset({REVIEW_A.rule_id, "R9-99", BLOCK.rule_id}))
+    assert action.acknowledged_flags == review.review_flag_ids(proposal) == [REVIEW_A.rule_id]
+
+
+def test_correct_and_clarify_store_no_acknowledgments() -> None:
+    proposal = _proposal([REVIEW_A])
+    ticked = frozenset({REVIEW_A.rule_id})
+    correct = _act(
+        proposal,
+        action=ReviewActionType.CORRECT,
+        reason_code=ReasonCode.WRONG_CANDIDATE,
+        chosen_formula_id="SHF-007",
+        acknowledged=ticked,
+    )
+    clarify = _act(
+        proposal, action=ReviewActionType.CLARIFY, reason_code=ReasonCode.AMBIGUOUS_ORDER, acknowledged=ticked
+    )
+    assert correct.acknowledged_flags == [] and clarify.acknowledged_flags == []
+
+
+def test_acknowledged_flags_round_trip_through_the_audit_log(conn: sqlite3.Connection) -> None:
+    pending = _log_pending(conn, _proposal([REVIEW_A, REVIEW_B]))
+    record = _submit(conn, pending, acknowledged=BOTH)
+    stored = audit.read_all(conn)[-1]
+    assert stored == record
+    assert stored.review_action is not None
+    assert stored.review_action.acknowledged_flags == [REVIEW_A.rule_id, REVIEW_B.rule_id]
+    assert '"acknowledged_flags":["R1-03","M-01"]' in audit.canonical_json(stored)
+    assert stored.record_hash == chain_hash(stored.prev_hash, stored)
+    result = audit.verify(conn)
+    assert result.ok and result.records == 2
+
+
+def test_tampering_with_acknowledged_flags_breaks_the_chain(conn: sqlite3.Connection) -> None:
+    pending = _log_pending(conn, _proposal([REVIEW_A, REVIEW_B]))
+    record = _submit(conn, pending, acknowledged=BOTH)
+    assert record.review_action is not None
+    forged_action = record.review_action.model_copy(update={"acknowledged_flags": [REVIEW_A.rule_id]})
+    forged = record.model_copy(update={"review_action": forged_action})
+    conn.execute("DROP TRIGGER IF EXISTS audit_log_no_update")
+    with conn:
+        conn.execute("UPDATE audit_log SET record_json = ? WHERE seq = ?", (forged.model_dump_json(), record.seq))
+    result = audit.verify(conn)
+    assert not result.ok and result.broken_seq == record.seq
+
+
+@pytest.mark.parametrize("ticked", [frozenset(), frozenset({REVIEW_A.rule_id}), frozenset({"R9-99"})])
+def test_submit_refuses_confirm_without_the_full_review_set(conn: sqlite3.Connection, ticked: frozenset[str]) -> None:
+    pending = _log_pending(conn, _proposal([REVIEW_A, REVIEW_B]))
+    with pytest.raises(ReviewError, match="not acknowledged"):
+        _submit(conn, pending, acknowledged=ticked)
+    assert audit.read_all(conn) == [pending]
+
+
+def test_nothing_acknowledged_serialises_as_before_64(conn: sqlite3.Connection) -> None:
+    """An empty list is left out of the JSON, so review records written before #64 hash the same and still verify."""
+    pending = _log_pending(conn, _proposal())
+    record = _submit(conn, pending, action=ReviewActionType.CLARIFY, reason_code=ReasonCode.AMBIGUOUS_ORDER)
+    assert "acknowledged_flags" not in audit.canonical_json(record)
+    assert record.review_action is not None
+    reparsed = AuditRecord.model_validate_json(record.model_dump_json())
+    assert reparsed == record and reparsed.review_action is not None
+    assert reparsed.review_action.acknowledged_flags == []
+    assert audit.verify(conn).ok
+
+
+def test_app_confirm_records_the_ticked_flags(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    db = _seed(tmp_path, _proposal([REVIEW_A]))
+    app = _app(db, monkeypatch)
+    app.text_input(key="reviewer").input("pharmacist-1")
+    app.checkbox(key="ack-0-R1-03").check()
+    app.run()
+    app.selectbox(key="reason-0-CONFIRM").select(ReasonCode.MATCH_VERIFIED.value)
+    _button(app, "CONFIRM").click()
+    app.run()
+    assert not app.exception, app.exception
+    conn = audit.connect(db)
+    try:
+        stored = audit.read_all(conn)[-1]
+        assert audit.verify(conn).ok
+    finally:
+        conn.close()
+    assert stored.review_action is not None
+    assert stored.review_action.acknowledged_flags == [REVIEW_A.rule_id]

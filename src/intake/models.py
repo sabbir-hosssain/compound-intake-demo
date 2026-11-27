@@ -6,7 +6,7 @@ Models are structural only: rules, matching and persistence live elsewhere.
 from enum import StrEnum
 from typing import Annotated, Any, Literal
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, SerializerFunctionWrapHandler, model_serializer
 
 
 class _Model(BaseModel):
@@ -143,6 +143,16 @@ class ReviewAction(_Model):
     reason_code: str | None = None
     reviewer: str
     at: AwareDatetime
+    # REVIEW rule IDs the pharmacist ticked, in proposal order; filled on CONFIRM by intake.review (#64).
+    acknowledged_flags: list[str] = Field(default_factory=list)
+
+    @model_serializer(mode="wrap")
+    def _omit_empty_acknowledgments(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        """Leave an empty `acknowledged_flags` out, so records written before #64 hash the same and still verify."""
+        data = handler(self)
+        if not data.get("acknowledged_flags"):
+            data.pop("acknowledged_flags", None)
+        return data
 
 
 class AuditRecord(_FrozenModel):

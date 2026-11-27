@@ -4,7 +4,8 @@ The Streamlit screen (app/review.py) is a thin shell over this module so every r
 testable without Streamlit:
 
 - BLOCK disables CONFIRM, and no acknowledgment can lift it (invariant 3).
-- Every REVIEW flag must be acknowledged, by rule ID, before CONFIRM.
+- Every REVIEW flag must be acknowledged, by rule ID, before CONFIRM; a CONFIRM records those IDs in
+  `ReviewAction.acknowledged_flags` (#64). Ticks that are not REVIEW flags on the proposal are not recorded.
 - CONFIRM, CORRECT and CLARIFY each need a reason code from their own set, and a named reviewer.
 - One proposal per call; `action`, `reason_code`, `reviewer` and `acknowledged` have no defaults,
   so there is no bulk action and no auto-confirm.
@@ -156,10 +157,12 @@ def build_action(
     if not reviewer or not reviewer.strip():
         raise ReviewError("A named reviewer is required.")
     fields = dict(corrected_fields or {})
+    acknowledged_flags: list[str] = []
     if action is ReviewActionType.CONFIRM:
         if fields:
             raise ReviewError("CONFIRM takes no corrected fields; use CORRECT.")
         chosen_formula_id = _check_confirm(proposal, acknowledged, chosen_formula_id)
+        acknowledged_flags = review_flag_ids(proposal)  # _check_confirm passed, so every one was ticked
     elif action is ReviewActionType.CORRECT:
         _check_correct(chosen_formula_id, fields, known_formula_ids)
     elif chosen_formula_id is not None or fields:
@@ -171,6 +174,7 @@ def build_action(
         reason_code=reason.value,
         reviewer=reviewer.strip(),
         at=at or datetime.now(UTC),
+        acknowledged_flags=acknowledged_flags,
     )
 
 
